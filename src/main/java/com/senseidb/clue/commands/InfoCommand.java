@@ -1,13 +1,16 @@
 package com.senseidb.clue.commands;
 
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Terms;
 
 import com.senseidb.clue.ClueContext;
 
@@ -36,6 +39,19 @@ public class InfoCommand extends ClueCommand {
       out.println("maxdoc: " + r.maxDoc());
       out.println("num deleted docs: " + r.numDeletedDocs());
       out.println("segment count: "+leaves.size());
+      Set<String> fields = new HashSet<String>();
+      for (AtomicReaderContext leaf : leaves){
+        AtomicReader ar = leaf.reader();
+        Fields flds = ar.fields();
+        for (String f : flds){
+          fields.add(f);
+        }
+      }
+      out.println("number of fields: " + fields.size());
+      Iterator<String> fieldNames = fields.iterator();
+      while(fieldNames.hasNext()){
+        out.println(fieldNames.next());
+      }
     }
     else{
       int segid;
@@ -67,8 +83,9 @@ public class InfoCommand extends ClueCommand {
       while(fieldNames.hasNext()){
         out.println(fieldNames.next());
       }
-      out.flush();
     }
+
+    out.flush();
   }
 
 }
