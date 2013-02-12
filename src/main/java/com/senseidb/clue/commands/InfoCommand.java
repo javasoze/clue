@@ -1,16 +1,15 @@
 package com.senseidb.clue.commands;
 
 import java.io.PrintStream;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
-import org.apache.lucene.index.Fields;
+import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Terms;
 
 import com.senseidb.clue.ClueContext;
 
@@ -29,6 +28,18 @@ public class InfoCommand extends ClueCommand {
   public String help() {
     return "displays information about the index, <segment number> to get information on the segment";
   }
+  
+  private static String toString(FieldInfo finfo){
+	  TreeMap<String,String> valMap = new TreeMap<String,String>();
+	  valMap.put("name", finfo.name);
+	  valMap.put("docval", String.valueOf(finfo.hasDocValues()));
+	  if (finfo.hasDocValues()){
+		  valMap.put("docval_type", String.valueOf(finfo.getDocValuesType()));
+	  }
+	  
+	  valMap.put("attributes", finfo.attributes().toString());
+	  return valMap.toString();
+  }
 
   @Override
   public void execute(String[] args, PrintStream out) throws Exception{
@@ -39,18 +50,18 @@ public class InfoCommand extends ClueCommand {
       out.println("maxdoc: " + r.maxDoc());
       out.println("num deleted docs: " + r.numDeletedDocs());
       out.println("segment count: "+leaves.size());
-      Set<String> fields = new HashSet<String>();
+      HashMap<String,FieldInfo> fields = new HashMap<String,FieldInfo>();
       for (AtomicReaderContext leaf : leaves){
         AtomicReader ar = leaf.reader();
-        Fields flds = ar.fields();
-        for (String f : flds){
-          fields.add(f);
+        FieldInfos flds = ar.getFieldInfos();
+        for (int i=0;i<flds.size();++i){
+        	FieldInfo finfo = flds.fieldInfo(i);
+        	fields.put(finfo.name, finfo);
         }
       }
       out.println("number of fields: " + fields.size());
-      Iterator<String> fieldNames = fields.iterator();
-      while(fieldNames.hasNext()){
-        out.println(fieldNames.next());
+      for (FieldInfo finfo : fields.values()){
+        out.println(toString(finfo));
       }
     }
     else{
@@ -69,19 +80,20 @@ public class InfoCommand extends ClueCommand {
       AtomicReaderContext leaf = leaves.get(segid);
       AtomicReader atomicReader = leaf.reader();
       
+      
       out.println("segment "+segid+": ");
       out.println("doc base: "+leaf.docBase);
       out.println("numdocs: " + atomicReader.numDocs());
       out.println("maxdoc: " + atomicReader.maxDoc());
       out.println("num deleted docs: " + atomicReader.numDeletedDocs());
      
-      Fields fields = atomicReader.fields();
-      Iterator<String> fieldNames = fields.iterator();
+      FieldInfos fields = atomicReader.getFieldInfos();
       
       out.println("number of fields: " + fields.size());
       
-      while(fieldNames.hasNext()){
-        out.println(fieldNames.next());
+      for (int i=0;i<fields.size();++i){
+    	  FieldInfo finfo = fields.fieldInfo(i);
+    	  out.println(toString(finfo));
       }
     }
 

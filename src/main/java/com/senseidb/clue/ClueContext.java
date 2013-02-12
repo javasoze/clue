@@ -1,5 +1,6 @@
 package com.senseidb.clue;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -7,6 +8,7 @@ import java.util.TreeMap;
 import org.apache.lucene.index.IndexReader;
 
 import com.senseidb.clue.commands.ClueCommand;
+import com.senseidb.clue.commands.DocValCommand;
 import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.HelpCommand;
 import com.senseidb.clue.commands.InfoCommand;
@@ -25,6 +27,7 @@ public class ClueContext {
     new HelpCommand(this);
     new ExitCommand(this);
     new InfoCommand(this);
+    new DocValCommand(this);
     new SearchCommand(this);
   }
   
@@ -46,5 +49,13 @@ public class ClueContext {
   
   public IndexReader getIndexReader(){
     return idxReader;
+  }
+  
+  public void shutdown(){
+    try {
+      idxReader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }

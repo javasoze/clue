@@ -23,6 +23,7 @@ public class ExitCommand extends ClueCommand {
   @Override
   public void execute(String[] args, PrintStream out) {
     out.flush();
+    ctx.shutdown();
     System.exit(0);
   }
 
