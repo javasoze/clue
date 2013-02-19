@@ -34,13 +34,21 @@ public class TermsCommand extends ClueCommand {
 
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
-    
     String field = null;
+    String termVal = null;
     try{
       field = args[0];
     }
     catch(Exception e){
       field = null;
+    }
+    
+    if (field != null){
+      String[] parts = field.split(":");
+      if (parts.length > 1){
+        field = parts[0];
+        termVal = parts[1];
+      }
     }
     
     IndexReader reader = ctx.getIndexReader();
@@ -53,17 +61,24 @@ public class TermsCommand extends ClueCommand {
       Terms terms = atomicReader.fields().terms(field);
       
       if (terms == null) {
-        out.println("no terms for field: "+field);
-        out.flush();
-        return;
+        continue;
       }
       
       if (termMap == null){
         termMap = new TreeMap<BytesRef,TermsEnum>(terms.getComparator());
       }
       
+      
       TermsEnum te = terms.iterator(null);
-      BytesRef termBytes = te.next();
+      BytesRef termBytes;
+      if (termVal != null){
+        te.seekCeil(new BytesRef(termVal));
+        termBytes = te.term();
+      }
+      else{
+        termBytes = te.next();
+      }
+      
       while(true){
         if (termBytes == null) break;
         AtomicInteger count = termCountMap.get(termBytes);
@@ -97,7 +112,6 @@ public class TermsCommand extends ClueCommand {
         nextKey = te.next();
       }
     }
-    
     out.flush();
   }
 

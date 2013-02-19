@@ -18,14 +18,14 @@ public class ClueApplication {
   private final ClueContext ctx;
   private final ClueCommand helpCommand;
   
-  public ClueApplication(String idxLocation) throws IOException{
+  public ClueApplication(String idxLocation, boolean interactiveMode) throws IOException{
     FSDirectory dir = FSDirectory.open(new File(idxLocation));
     if (!DirectoryReader.indexExists(dir)){
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
     }
     IndexReader r = DirectoryReader.open(dir);
-    ctx = new ClueContext(r);
+    ctx = new ClueContext(r, interactiveMode);
     helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
   
@@ -43,7 +43,6 @@ public class ClueApplication {
     }
   }
   
-  
   public static void main(String[] args) throws Exception {
     if (args.length < 1){
       System.out.println("usage: <index location> <command> <command args>");
@@ -52,9 +51,10 @@ public class ClueApplication {
     
     String idxLocation = args[0];
     
-    ClueApplication app = new ClueApplication(idxLocation);
+    ClueApplication app = null;
     
     if (args.length > 1){
+      app = new ClueApplication(idxLocation, false);
       String cmd = args[1];
       String[] cmdArgs;
       cmdArgs = new String[args.length - 2];
@@ -62,6 +62,7 @@ public class ClueApplication {
       app.handleCommand(cmd, cmdArgs, System.out);
     }
     else{
+      app = new ClueApplication(idxLocation, true);
       BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
       while(true){
         System.out.print("> ");

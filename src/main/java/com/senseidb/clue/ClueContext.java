@@ -12,6 +12,7 @@ import com.senseidb.clue.commands.DocValCommand;
 import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.HelpCommand;
 import com.senseidb.clue.commands.InfoCommand;
+import com.senseidb.clue.commands.PostingsCommand;
 import com.senseidb.clue.commands.SearchCommand;
 import com.senseidb.clue.commands.TermsCommand;
 
@@ -19,9 +20,11 @@ public class ClueContext {
 
   private final IndexReader idxReader;
   private final SortedMap<String, ClueCommand> cmdMap;
+  private final boolean interactiveMode;
   
-  public ClueContext(IndexReader idxReader){
+  public ClueContext(IndexReader idxReader, boolean interactiveMode){
     this.idxReader = idxReader;
+    this.interactiveMode = interactiveMode;
     this.cmdMap = new TreeMap<String, ClueCommand>();
     
     // registers all the commands we currently support
@@ -31,6 +34,7 @@ public class ClueContext {
     new DocValCommand(this);
     new SearchCommand(this);
     new TermsCommand(this);
+    new PostingsCommand(this);
   }
   
   public void registerCommand(ClueCommand cmd){
@@ -39,6 +43,10 @@ public class ClueContext {
       throw new IllegalArgumentException(cmdName+" exists!");
     }
     cmdMap.put(cmdName, cmd);
+  }
+  
+  public boolean isInteractiveMode(){
+    return interactiveMode;
   }
   
   public ClueCommand getCommand(String cmd){
