@@ -41,11 +41,14 @@ public class InfoCommand extends ClueCommand {
 	  if (finfo.hasDocValues()){
 		  valMap.put("docval_type", String.valueOf(finfo.getDocValuesType()));
 	  }
-	  valMap.put("num_terms", String.valueOf(terms.size()));
-	  valMap.put("attributes", finfo.attributes().toString());
-	  valMap.put("doc_count", String.valueOf(terms.getDocCount()));
-	  valMap.put("sum_doc_freq", String.valueOf(terms.getSumDocFreq()));
-    valMap.put("sum_total_term_freq", String.valueOf(terms.getSumTotalTermFreq()));
+
+    valMap.put("attributes", finfo.attributes().toString());
+    if (terms != null){
+	    valMap.put("num_terms", String.valueOf(terms.size()));
+	    valMap.put("doc_count", String.valueOf(terms.getDocCount()));
+	    valMap.put("sum_doc_freq", String.valueOf(terms.getSumDocFreq()));
+      valMap.put("sum_total_term_freq", String.valueOf(terms.getSumTotalTermFreq()));
+    }
 	  
 	  return valMap.toString();
   }

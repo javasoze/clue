@@ -44,7 +44,7 @@ public class DocValCommand extends ClueCommand {
     List<AtomicReaderContext> leaves = reader.leaves();
     for (int i=leaves.size()-1; i>=0; --i){
       AtomicReaderContext ctx = leaves.get(i);
-      if (ctx.docBase < docid){
+      if (ctx.docBase <= docid){
         int subid = docid - ctx.docBase;
         AtomicReader atomicReader = ctx.reader();
         DocValues docVals = atomicReader.docValues(field);

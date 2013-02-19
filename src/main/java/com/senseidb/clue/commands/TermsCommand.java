@@ -58,6 +58,10 @@ public class TermsCommand extends ClueCommand {
     for (AtomicReaderContext leaf : leaves){
       AtomicReader atomicReader = leaf.reader();
       
+      if (field == null){
+        continue;
+      }
+      
       Terms terms = atomicReader.fields().terms(field);
       
       if (terms == null) {
@@ -92,7 +96,7 @@ public class TermsCommand extends ClueCommand {
       }
     }
     
-    while(!termMap.isEmpty()){
+    while(termMap != null && !termMap.isEmpty()){
       Entry<BytesRef,TermsEnum> entry = termMap.pollFirstEntry();
       if (entry == null) break;
       BytesRef key = entry.getKey();
