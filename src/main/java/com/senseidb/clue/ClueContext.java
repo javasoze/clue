@@ -13,6 +13,7 @@ import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.HelpCommand;
 import com.senseidb.clue.commands.InfoCommand;
 import com.senseidb.clue.commands.SearchCommand;
+import com.senseidb.clue.commands.TermsCommand;
 
 public class ClueContext {
 
@@ -29,6 +30,7 @@ public class ClueContext {
     new InfoCommand(this);
     new DocValCommand(this);
     new SearchCommand(this);
+    new TermsCommand(this);
   }
   
   public void registerCommand(ClueCommand cmd){
