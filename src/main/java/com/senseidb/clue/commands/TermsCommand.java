@@ -29,7 +29,7 @@ public class TermsCommand extends ClueCommand {
 
   @Override
   public String help() {
-    return "gets terms from the index";
+    return "gets terms from the index, <field:term>, term can be a prefix";
   }
 
   @Override
