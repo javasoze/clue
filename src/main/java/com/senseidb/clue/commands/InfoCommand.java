@@ -53,6 +53,7 @@ public class InfoCommand extends ClueCommand {
   @Override
   public void execute(String[] args, PrintStream out) throws Exception{
     IndexReader r = ctx.getIndexReader();
+    
     List<AtomicReaderContext> leaves = r.leaves();
     if (args.length == 0){
       out.println("numdocs: " + r.numDocs());
@@ -81,7 +82,7 @@ public class InfoCommand extends ClueCommand {
       try{
         segid = Integer.parseInt(args[0]);
         if (segid <0 || segid >= leaves.size()){
-          throw new IllegalArgumentException("in valid segment");
+          throw new IllegalArgumentException("invalid segment");
         }
       }
       catch(Exception e){
@@ -91,7 +92,6 @@ public class InfoCommand extends ClueCommand {
       
       AtomicReaderContext leaf = leaves.get(segid);
       AtomicReader atomicReader = leaf.reader();
-      
       
       out.println("segment "+segid+": ");
       out.println("doc base: "+leaf.docBase);
