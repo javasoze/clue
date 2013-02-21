@@ -19,6 +19,16 @@ Command list:
 
     ./bin/clue.sh my-idx help
 
+
+    docval - gets doc value for a given doc, <field> <docid>, if <docid> not specified, all docs are shown
+	exit - exits program
+	help - displays help
+	info - displays information about the index, <segment number> to get information on the segment
+	postings - iterating postings given a term, e.g. <fieldname:fieldvalue>
+	search - executes a query against the index, <query string> <num doc count to return, default 10>
+	terms - gets terms from the index, <field:term>, term can be a prefix
+	
+
 ### Examples:
 
 1. Getting all the terms in the field 'color':
