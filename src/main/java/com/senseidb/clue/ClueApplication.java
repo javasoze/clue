@@ -6,9 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 
 import com.senseidb.clue.commands.ClueCommand;
 import com.senseidb.clue.commands.HelpCommand;
@@ -24,8 +27,8 @@ public class ClueApplication {
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
     }
-    IndexReader r = DirectoryReader.open(dir);
-    ctx = new ClueContext(r, interactiveMode);
+    IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_41, new StandardAnalyzer(Version.LUCENE_41));
+    ctx = new ClueContext(new IndexReaderFactory(dir), new IndexWriter(dir, writerConfig), interactiveMode);
     helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
   
