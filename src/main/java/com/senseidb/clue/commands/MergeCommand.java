@@ -19,7 +19,7 @@ public class MergeCommand extends ClueCommand {
 
   @Override
   public String help() {
-    return "force merges segments into given N segments";
+    return "force merges segments into given N segments, input: number of max segments";
   }
 
   @Override

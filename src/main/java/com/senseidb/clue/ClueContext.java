@@ -9,6 +9,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 
 import com.senseidb.clue.commands.ClueCommand;
+import com.senseidb.clue.commands.DeleteCommand;
 import com.senseidb.clue.commands.DocValCommand;
 import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.HelpCommand;
@@ -40,6 +41,7 @@ public class ClueContext {
     new TermsCommand(this);
     new PostingsCommand(this);
     new MergeCommand(this);
+    new DeleteCommand(this);
   }
   
   public void registerCommand(ClueCommand cmd){
