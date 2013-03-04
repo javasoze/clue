@@ -1,7 +1,6 @@
 package com.senseidb.clue.commands;
 
 import java.io.PrintStream;
-import java.util.Arrays;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
@@ -30,7 +29,7 @@ public class SearchCommand extends ClueCommand {
 
   @Override
   public String help() {
-    return "executes a query against the index, <query string> <num doc count to return, default 10>";
+    return "executes a query against the index, input: <query string>";
   }
 
   @Override
@@ -42,8 +41,12 @@ public class SearchCommand extends ClueCommand {
       q = new MatchAllDocsQuery();
     }
     else{
-      System.out.println(Arrays.toString(args));
-      q = qparser.parse(args[0]);
+      StringBuilder buf = new StringBuilder();
+      for (String s : args){
+        buf.append(s).append(" ");
+      }
+      String qstring = buf.toString();
+      q = qparser.parse(qstring);
     }
     
     long start = System.currentTimeMillis();
