@@ -1,6 +1,14 @@
 CLue - Command Line tool for Apache Lucene
 ==========================================
 
+### Overview:
+
+When working with Lucene, it is often useful to inspect an index.
+
+[Luke](http://www.getopt.org/luke/) is awesome, but often times it is not feasible to inspect an index on a remote machine using a GUI.
+
+Another important feature for Clue is the ability to interact with other Unix commands via piping, e.g. grep, more etc.
+
 ### Build:
 
 mvn package
