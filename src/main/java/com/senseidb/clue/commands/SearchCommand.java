@@ -36,7 +36,7 @@ public class SearchCommand extends ClueCommand {
   public void execute(String[] args, PrintStream out) throws Exception {
     IndexReader r = ctx.getIndexReader();
     IndexSearcher searcher = new IndexSearcher(r);
-    Query q;
+    Query q = null;
     if (args.length == 0){
       q = new MatchAllDocsQuery();
     }
@@ -46,7 +46,13 @@ public class SearchCommand extends ClueCommand {
         buf.append(s).append(" ");
       }
       String qstring = buf.toString();
-      q = qparser.parse(qstring);
+      try{
+        q = qparser.parse(qstring);
+      }
+      catch(Exception e){
+        out.println("cannot parse query: "+e.getMessage());
+        return;
+      }
     }
     
     long start = System.currentTimeMillis();
