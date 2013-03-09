@@ -50,12 +50,21 @@ public class PostingsCommand extends ClueCommand {
       }
     }
     
+    if (field == null || termVal == null){
+      out.println("usage: field:term");
+      out.flush();
+      return;
+    }
+    
     IndexReader reader = ctx.getIndexReader();
     List<AtomicReaderContext> leaves = reader.leaves();
     int docBase = 0;
     for (AtomicReaderContext leaf : leaves){
       AtomicReader atomicReader = leaf.reader();
       Terms terms = atomicReader.terms(field);
+      if (terms == null){
+        continue;
+      }
       boolean hasPositions = terms.hasPositions();
       if (terms != null && termVal != null){
         TermsEnum te = terms.iterator(null);
@@ -68,6 +77,11 @@ public class PostingsCommand extends ClueCommand {
               out.print("docid: "+(docid+docBase)+", freq: "+iter.freq()+", ");
               for (int i=0;i<iter.freq();++i){
                 out.print("pos "+i+": "+iter.nextPosition());
+                BytesRef payload = iter.getPayload();
+                if (payload != null){
+                  out.print(",payload: "+payload);
+                }
+                out.print(";");
               }
               out.println();
             }
