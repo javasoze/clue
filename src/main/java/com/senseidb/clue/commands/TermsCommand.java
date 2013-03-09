@@ -55,6 +55,10 @@ public class TermsCommand extends ClueCommand {
     List<AtomicReaderContext> leaves = reader.leaves();
     TreeMap<BytesRef,TermsEnum> termMap = null;
     HashMap<BytesRef,AtomicInteger> termCountMap = new HashMap<BytesRef,AtomicInteger>();
+
+    int numCount = 0;
+    int numPerPage = 20;
+    
     for (AtomicReaderContext leaf : leaves){
       AtomicReader atomicReader = leaf.reader();
       
@@ -84,7 +88,7 @@ public class TermsCommand extends ClueCommand {
       }
       
       while(true){
-        if (termBytes == null) break;
+        if (termBytes == null) break;        
         AtomicInteger count = termCountMap.get(termBytes);
         if (count == null){
           termCountMap.put(termBytes, new AtomicInteger(te.docFreq()));
@@ -97,11 +101,21 @@ public class TermsCommand extends ClueCommand {
     }
     
     while(termMap != null && !termMap.isEmpty()){
+      numCount++;
       Entry<BytesRef,TermsEnum> entry = termMap.pollFirstEntry();
       if (entry == null) break;
       BytesRef key = entry.getKey();
       AtomicInteger count = termCountMap.remove(key);
       out.println(key.utf8ToString()+" ("+count+") ");
+      if (ctx.isInteractiveMode()){
+        if (numCount % numPerPage == 0){
+          int ch = System.in.read();
+          if (ch == -1) {
+            out.flush();
+            return;
+          }
+        }
+      }
       TermsEnum te = entry.getValue();
       BytesRef nextKey = te.next();
       while(true){

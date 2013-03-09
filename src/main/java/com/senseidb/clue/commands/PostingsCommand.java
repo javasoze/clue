@@ -59,6 +59,7 @@ public class PostingsCommand extends ClueCommand {
     IndexReader reader = ctx.getIndexReader();
     List<AtomicReaderContext> leaves = reader.leaves();
     int docBase = 0;
+    int numPerPage = 20;
     for (AtomicReaderContext leaf : leaves){
       AtomicReader atomicReader = leaf.reader();
       Terms terms = atomicReader.terms(field);
@@ -68,12 +69,14 @@ public class PostingsCommand extends ClueCommand {
       boolean hasPositions = terms.hasPositions();
       if (terms != null && termVal != null){
         TermsEnum te = terms.iterator(null);
+        int count = 0;
         if (te.seekExact(new BytesRef(termVal) , true)){
           
           if (hasPositions){
             DocsAndPositionsEnum iter = te.docsAndPositions(atomicReader.getLiveDocs(), null);
             int docid;
             while((docid = iter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
+              count++;
               out.print("docid: "+(docid+docBase)+", freq: "+iter.freq()+", ");
               for (int i=0;i<iter.freq();++i){
                 out.print("pos "+i+": "+iter.nextPosition());
@@ -84,6 +87,15 @@ public class PostingsCommand extends ClueCommand {
                 out.print(";");
               }
               out.println();
+              if (ctx.isInteractiveMode()){
+                if (count % numPerPage == 0){
+                  int ch = System.in.read();
+                  if (ch == -1) {
+                    out.flush();
+                    return;
+                  }
+                }
+              }
             }
           }
           else{
@@ -91,7 +103,17 @@ public class PostingsCommand extends ClueCommand {
           
             int docid;
             while((docid = iter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
+              count++;
               out.println("docid: "+(docid+docBase));
+              if (ctx.isInteractiveMode()){
+                if (count % numPerPage == 0){
+                  int ch = System.in.read();
+                  if (ch == -1) {
+                    out.flush();
+                    return;
+                  }
+                }
+              }
             }
           }
         }
