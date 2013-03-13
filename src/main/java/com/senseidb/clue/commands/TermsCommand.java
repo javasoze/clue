@@ -50,7 +50,22 @@ public class TermsCommand extends ClueCommand {
         termVal = parts[1];
       }
     }
+    else{
+      out.println("Usage: field:value");
+      return;
+    }
     
+    boolean isExact = false;
+    
+    if (termVal != null){
+      if (termVal.endsWith("*")){
+         termVal = termVal.substring(0, termVal.length()-1);
+      }
+      else{
+        isExact = true; 
+      }
+    }
+        
     IndexReader reader = ctx.getIndexReader();
     List<AtomicReaderContext> leaves = reader.leaves();
     TreeMap<BytesRef,TermsEnum> termMap = null;
@@ -61,10 +76,6 @@ public class TermsCommand extends ClueCommand {
     
     for (AtomicReaderContext leaf : leaves){
       AtomicReader atomicReader = leaf.reader();
-      
-      if (field == null){
-        continue;
-      }
       
       Terms terms = atomicReader.fields().terms(field);
       
@@ -80,7 +91,14 @@ public class TermsCommand extends ClueCommand {
       TermsEnum te = terms.iterator(null);
       BytesRef termBytes;
       if (termVal != null){
-        te.seekCeil(new BytesRef(termVal));
+        if (isExact){
+          if (!te.seekExact(new BytesRef(termVal), false)){
+            continue;
+          }
+        }
+        else{
+          te.seekCeil(new BytesRef(termVal));
+        }
         termBytes = te.term();
       }
       else{
@@ -96,7 +114,12 @@ public class TermsCommand extends ClueCommand {
           break;
         }
         count.getAndAdd(te.docFreq());
-        termBytes = te.next();
+        if (isExact){
+          termBytes = null; 
+        }
+        else{
+          termBytes = te.next();
+        }
       }
     }
     
@@ -118,7 +141,10 @@ public class TermsCommand extends ClueCommand {
         }
       }
       TermsEnum te = entry.getValue();
-      BytesRef nextKey = te.next();
+      BytesRef nextKey = null;
+      if (!isExact){
+        nextKey = te.next();
+      }
       while(true){
         if (nextKey == null) break;
         count = termCountMap.get(nextKey);
