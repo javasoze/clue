@@ -89,6 +89,7 @@ public class PostingsCommand extends ClueCommand {
               out.println();
               if (ctx.isInteractiveMode()){
                 if (count % numPerPage == 0){
+                  out.println("Ctrl-D to break");
                   int ch = System.in.read();
                   if (ch == -1) {
                     out.flush();
@@ -107,6 +108,7 @@ public class PostingsCommand extends ClueCommand {
               out.println("docid: "+(docid+docBase));
               if (ctx.isInteractiveMode()){
                 if (count % numPerPage == 0){
+                  out.println("Ctrl-D to break");
                   int ch = System.in.read();
                   if (ch == -1) {
                     out.flush();

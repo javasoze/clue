@@ -109,6 +109,7 @@ public class TermsCommand extends ClueCommand {
       out.println(key.utf8ToString()+" ("+count+") ");
       if (ctx.isInteractiveMode()){
         if (numCount % numPerPage == 0){
+          out.println("Ctrl-D to break");
           int ch = System.in.read();
           if (ch == -1) {
             out.flush();
