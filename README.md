@@ -28,12 +28,14 @@ Command list:
     ./bin/clue.sh my-idx help
 
 
-    docval - gets doc value for a given doc, <field> <docid>, if <docid> not specified, all docs are shown
+    delete - deletes a list of documents from searching via a query, input: query
+	docval - gets doc value for a given doc, <field> <docid>, if <docid> not specified, all docs are shown
 	exit - exits program
 	help - displays help
 	info - displays information about the index, <segment number> to get information on the segment
+	merge - force merges segments into given N segments, input: number of max segments
 	postings - iterating postings given a term, e.g. <fieldname:fieldvalue>
-	search - executes a query against the index, <query string> <num doc count to return, default 10>
+	search - executes a query against the index, input: <query string>
 	terms - gets terms from the index, <field:term>, term can be a prefix
 	
 
