@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
@@ -97,10 +98,12 @@ public class InfoCommand extends ClueCommand {
       for (AtomicReaderContext leaf : leaves) {
         AtomicReader ar = leaf.reader();
         FieldInfos fldInfos = ar.getFieldInfos();
+        Iterator<FieldInfo> finfoIter = fldInfos.iterator();
+        
         Fields flds = ar.fields();
-
-        for (int i = 0; i < flds.size(); ++i) {
-          FieldInfo finfo = fldInfos.fieldInfo(i);
+        
+        while (finfoIter.hasNext()) {
+          FieldInfo finfo = finfoIter.next();
           Object[] data = fields.get(finfo.name);
           Terms t = flds.terms(finfo.name);
           if (data == null) {
