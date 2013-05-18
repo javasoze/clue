@@ -9,6 +9,22 @@ When working with Lucene, it is often useful to inspect an index.
 
 Another important feature for Clue is the ability to interact with other Unix commands via piping, e.g. grep, more etc.
 
+### Downloads:
+
+latest version: 0.0.1
+
+source:
+
+    [release-0.0.1.zip](https://github.com/javasoze/clue/archive/release-0.0.1.zip)
+
+clue-all executable jar with all dependencies:
+
+    [clue-all-0.0.1.jar](https://dl.dropboxusercontent.com/u/6490038/sensei-downloads/clue-all-0.0.1.jar)
+
+clue jar with only clue class files, used as a library:
+
+     [clue-0.0.1.jar](https://dl.dropboxusercontent.com/u/6490038/sensei-downloads/clue-0.0.1.jar)
+
 ### Build:
 
 mvn package
