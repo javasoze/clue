@@ -42,7 +42,7 @@
 				<version>2.4</version>
 				<configuration>
 				    <appendAssemblyId>false</appendAssemblyId>
-				    <finalName>clue-all</finalName>
+				    <finalName>clue-all-${version}</finalName>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
