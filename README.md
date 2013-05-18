@@ -13,6 +13,16 @@ Another important feature for Clue is the ability to interact with other Unix co
 
 mvn package
 
+This will create 2 artifacts in the target directory:
+
+1. clue-xxx.jar
+
+   jar file containing all clue classes.
+
+2. clue-all-xxx.jar
+
+   executable jar file containing all clue classes as well as all runtime dependencies, e.g. java -jar clue-all-xxx.jar works
+
 ### Run:
 
 Interactive Mode:
