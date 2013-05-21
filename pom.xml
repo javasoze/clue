@@ -9,6 +9,30 @@
 	<version>0.0.1</version>
 	<description>command line client for Apache Lucene</description>
 
+	<url>http://github.com/javasoze/clue</url>
+
+	  <licenses>
+	    <license>
+	      <name>Apache License, Version 2.0</name>
+	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+	      <distribution>repo</distribution>
+	    </license>
+	  </licenses>
+
+	  <scm>
+	    <connection>scm:git://github.com/javasoze/clue.git</connection>
+	    <developerConnection>scm:git@github.com:javasoze/clue.git</developerConnection>
+	    <url>http://github.com/javasoze/clue</url>
+	  </scm>
+	
+	<developers>
+	  <developer>
+	    <id>javasoze</id>
+	    <name>John Wang</name>
+	    <email>john.wang@gmail.com</email>
+	  </developer>
+	</developers>
+	
 	<!-- Set the compiler to java6 -->
 	<build>
 		<plugins>
@@ -120,5 +144,36 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
+	
+	<profiles>
+        <profile>
+           <id>release-sign-artifacts</id>
+             <activation>
+               <property>
+                  <name>performRelease</name>
+                  <value>true</value>
+               </property>
+            </activation>
+            <build>
+               <plugins>
+                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.1</version>
+                        <executions>
+                           <execution>
+                                            <id>sign-artifacts</id>
+                                            <phase>verify</phase>
+                                            <goals>
+                                                <goal>sign</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </profile>
+                </profiles>
+
 </project>
 
