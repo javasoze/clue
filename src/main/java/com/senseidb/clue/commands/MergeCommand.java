@@ -34,9 +34,14 @@ public class MergeCommand extends ClueCommand {
     }
     
     IndexWriter writer = ctx.getIndexWriter();
-    writer.forceMerge(count, true);
-    writer.commit();
-    ctx.refreshReader();
+    if (writer != null) {
+      writer.forceMerge(count, true);
+      writer.commit();
+      ctx.refreshReader();
+    }
+    else {
+      out.println("unable to open index writer, index is in readonly mode");
+    }
   }
 
 }

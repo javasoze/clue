@@ -51,9 +51,14 @@ public class DeleteCommand extends ClueCommand {
     
     if (q != null){
       IndexWriter writer = ctx.getIndexWriter();
-      writer.deleteDocuments(q);
-      writer.commit();
-      ctx.refreshReader();
+      if (writer != null) {
+        writer.deleteDocuments(q);
+        writer.commit();
+        ctx.refreshReader();
+      }
+      else {
+        out.println("unable to open writer, index is in readonly mode");
+      }
     }
   }
 

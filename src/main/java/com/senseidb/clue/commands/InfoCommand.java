@@ -87,6 +87,7 @@ public class InfoCommand extends ClueCommand {
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
     IndexReader r = ctx.getIndexReader();
+    out.println("readonly mode: " + getContext().isReadOnlyMode());
 
     List<AtomicReaderContext> leaves = r.leaves();
     if (args.length == 0) {

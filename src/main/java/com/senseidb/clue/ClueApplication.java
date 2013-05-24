@@ -8,7 +8,6 @@ import java.io.PrintStream;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -28,7 +27,7 @@ public class ClueApplication {
       System.exit(1);
     }
     IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_41, new StandardAnalyzer(Version.LUCENE_41));
-    ctx = new ClueContext(new IndexReaderFactory(dir), new IndexWriter(dir, writerConfig), interactiveMode);
+    ctx = new ClueContext(dir, new IndexReaderFactory(dir), writerConfig, interactiveMode);
     helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
   
@@ -57,28 +56,41 @@ public class ClueApplication {
     ClueApplication app = null;
     
     if (args.length > 1){
-      app = new ClueApplication(idxLocation, false);
       String cmd = args[1];
-      String[] cmdArgs;
-      cmdArgs = new String[args.length - 2];
-      System.arraycopy(args, 2, cmdArgs, 0, cmdArgs.length);
-      app.handleCommand(cmd, cmdArgs, System.out);
-    }
-    else{
-      app = new ClueApplication(idxLocation, true);
-      BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
-      while(true){
-        System.out.print("> ");
-        String line = inReader.readLine().trim();
-        if (line.isEmpty()) continue;
-        String[] parts = line.split("\\s");
-        if (parts.length > 0){
-          String cmd = parts[0];
-          String[] cmdArgs = new String[parts.length - 1];
-          System.arraycopy(parts, 1, cmdArgs, 0, cmdArgs.length);
+      if ("readonly".equalsIgnoreCase(cmd)) {
+        if (args.length > 2) {
+          cmd = args[2];
+          app = new ClueApplication(idxLocation, false);
+          String[] cmdArgs;
+          cmdArgs = new String[args.length - 3];
+          System.arraycopy(args, 3, cmdArgs, 0, cmdArgs.length);
+          app.ctx.setReadOnlyMode(true);
           app.handleCommand(cmd, cmdArgs, System.out);
         }
       }
-    }    
+      else {
+        app = new ClueApplication(idxLocation, false);
+        String[] cmdArgs;
+        cmdArgs = new String[args.length - 2];
+        System.arraycopy(args, 2, cmdArgs, 0, cmdArgs.length);
+        app.handleCommand(cmd, cmdArgs, System.out);
+      }
+      return;
+    }
+    app = new ClueApplication(idxLocation, true);
+    BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
+    while(true){
+      System.out.print("> ");
+      String line = inReader.readLine().trim();
+      if (line.isEmpty()) continue;
+      String[] parts = line.split("\\s");
+      if (parts.length > 0){
+        String cmd = parts[0];
+        String[] cmdArgs = new String[parts.length - 1];
+        System.arraycopy(parts, 1, cmdArgs, 0, cmdArgs.length);
+        app.handleCommand(cmd, cmdArgs, System.out);
+      }
+    }
+        
   }
 }
