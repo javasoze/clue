@@ -9,6 +9,10 @@ When working with Lucene, it is often useful to inspect an index.
 
 Another important feature for Clue is the ability to interact with other Unix commands via piping, e.g. grep, more etc.
 
+#### License:
+
+Clue is under the [Apache Public License v2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+
 ### Downloads:
 
 latest version: 0.0.1
