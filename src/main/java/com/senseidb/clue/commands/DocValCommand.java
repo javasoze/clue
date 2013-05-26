@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
-import org.apache.lucene.index.DocValues;
-import org.apache.lucene.index.DocValues.Source;
-import org.apache.lucene.index.DocValues.Type;
+import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.FieldInfo.DocValuesType;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.NumericDocValues;
 
 import com.senseidb.clue.ClueContext;
 
@@ -28,81 +28,101 @@ public class DocValCommand extends ClueCommand {
     return "gets doc value for a given doc, <field> <docid>, if <docid> not specified, all docs are shown";
   }
 
-  private void showDocId(int docid, int docBase, String field, AtomicReader atomicReader, PrintStream out, int segmentid) throws Exception{
-    int subid = docid-docBase;
-    DocValues docVals = atomicReader.docValues(field);
-    Source src = null;
-    if (docVals != null && (src = docVals.getSource()) != null){
+  private void showDocId(int docid, int docBase, NumericDocValues docVals, DocValuesType docValType, 
+      PrintStream out, int segmentid) throws Exception {
+    int subid = docid - docBase;
+    if (docVals != null) {
+
       String val;
-      Type docValType = src.getType();
-      switch(docValType){
-      case VAR_INTS:
-      case FIXED_INTS_16:
-      case FIXED_INTS_32:
-      case FIXED_INTS_64:
-      case FIXED_INTS_8:
-        val = String.valueOf(src.getInt(subid));
+
+      switch (docValType) {
+      case NUMERIC:
+        val = String.valueOf(docVals.get(subid));
         break;
-      case FLOAT_32:
-      case FLOAT_64:
-        val = String.valueOf(src.getFloat(subid));
-        break;
-      case BYTES_FIXED_DEREF:
-      case BYTES_FIXED_SORTED:
-      case BYTES_FIXED_STRAIGHT:
-      case BYTES_VAR_DEREF:
-      case BYTES_VAR_SORTED:
-      case BYTES_VAR_STRAIGHT:
-        val = String.valueOf(src.getBytes(subid, null));
-        break;
-        default:
-          val = null;
+      default:
+        val = null;
       }
-      
-      if (val == null){
-        out.println("cannot read doc value type: "+docValType);
+
+      if (val == null) {
+        out.println("cannot read doc value type: " + docValType);
+      } else {
+        out.println("type: " + docValType + ", val: " + val + ", segment: "
+            + segmentid + ", docid: " + docid + ", subid: " + subid);
       }
-      else{
-        out.println("type: "+docValType+", val: "+val+", segment: "+segmentid+", docid: "+docid+", subid: "+subid); 
-      }
-    }
-    else{
+    } else {
       out.println("doc value unavailable");
     }
   }
-  
+
+  private void showDocId(int docid, int docBase, String field,
+      AtomicReader atomicReader, PrintStream out, int segmentid)
+      throws Exception {
+    FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
+
+    if (finfo == null || !finfo.hasDocValues()) {
+      out.println("docvalue does not exist for field: " + field);
+      return;
+    }
+
+    NumericDocValues docVals = atomicReader.getNumericDocValues(field);
+
+    showDocId(docid, docBase, docVals, finfo.getDocValuesType(), out, segmentid);
+  }
+
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
     String field = args[0];
     int docid;
+
+    int numPerPage = 20;
     
-    try{
+    try {
       docid = Integer.parseInt(args[1]);
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       out.println("invalid docid, all docs are shown");
       docid = -1;
     }
-    
+
     IndexReader reader = ctx.getIndexReader();
     List<AtomicReaderContext> leaves = reader.leaves();
-    if (docid >= 0){
-      for (int i=leaves.size()-1; i>=0; --i){
+    if (docid >= 0) {
+      for (int i = leaves.size() - 1; i >= 0; --i) {
         AtomicReaderContext ctx = leaves.get(i);
-        if (ctx.docBase <= docid){
-          AtomicReader atomicReader = ctx.reader();          
+        if (ctx.docBase <= docid) {
+          AtomicReader atomicReader = ctx.reader();
           showDocId(docid, ctx.docBase, field, atomicReader, out, i);
           out.flush();
           return;
         }
       }
-    }
-    else{
-      for (int i=0; i<leaves.size(); ++i){
+    } else {
+      for (int i = 0; i < leaves.size(); ++i) {
         AtomicReaderContext ctx = leaves.get(i);
         AtomicReader atomicReader = ctx.reader();
-        for (int k=0;k<atomicReader.maxDoc();++k){
-          showDocId(k+ctx.docBase, ctx.docBase, field, atomicReader, out, i);
+        FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
+
+        if (finfo == null || !finfo.hasDocValues()) {
+          out.println("docvalue does not exist for field: " + field);
+          break;
+        }
+
+        NumericDocValues docVals = atomicReader.getNumericDocValues(field);
+        
+        int maxDoc = atomicReader.maxDoc();
+        
+        for (int k = 0; k < maxDoc; ++k) {
+          
+          showDocId(k + ctx.docBase, ctx.docBase, docVals, finfo.getDocValuesType(), out, i);
+          if (getContext().isInteractiveMode()){
+            if ((k+1) % numPerPage == 0){
+              out.println("Ctrl-D to break");
+              int ch = System.in.read();
+              if (ch == -1) {
+                out.flush();
+                return;
+              }
+            }
+          }
         }
         out.flush();
       }

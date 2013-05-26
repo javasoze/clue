@@ -26,7 +26,7 @@ public class ClueApplication {
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
     }
-    IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_41, new StandardAnalyzer(Version.LUCENE_41));
+    IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_43));
     ctx = new ClueContext(dir, new IndexReaderFactory(dir), writerConfig, interactiveMode);
     helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
