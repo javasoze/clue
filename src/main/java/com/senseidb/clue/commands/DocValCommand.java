@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfo.DocValuesType;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.util.BytesRef;
 
 import com.senseidb.clue.ClueContext;
 
@@ -28,7 +30,11 @@ public class DocValCommand extends ClueCommand {
     return "gets doc value for a given doc, <field> <docid>, if <docid> not specified, all docs are shown";
   }
 
-  private void showDocId(int docid, int docBase, NumericDocValues docVals, DocValuesType docValType, 
+  private void showDocId(int docid, int docBase, 
+      NumericDocValues docVals,
+      BinaryDocValues binDoccVals,
+      DocValuesType docValType,
+      BytesRef bytesRef,
       PrintStream out, int segmentid) throws Exception {
     int subid = docid - docBase;
     if (docVals != null) {
@@ -39,6 +45,9 @@ public class DocValCommand extends ClueCommand {
       case NUMERIC:
         val = String.valueOf(docVals.get(subid));
         break;
+      case BINARY:
+        binDoccVals.get(subid, bytesRef);
+        val = bytesRef.toString();
       default:
         val = null;
       }
@@ -64,9 +73,23 @@ public class DocValCommand extends ClueCommand {
       return;
     }
 
-    NumericDocValues docVals = atomicReader.getNumericDocValues(field);
+    NumericDocValues docVals = null;
+    
+    BinaryDocValues binDocVals = null;
+    
+    DocValuesType docValType = finfo.getDocValuesType();
+    
+    BytesRef bref = null;
+    
+    if (docValType == DocValuesType.NUMERIC) {
+      docVals = atomicReader.getNumericDocValues(field);
+    }
+    else if (docValType == DocValuesType.BINARY) {
+      bref = new BytesRef();
+      binDocVals = atomicReader.getBinaryDocValues(field);
+    }
 
-    showDocId(docid, docBase, docVals, finfo.getDocValuesType(), out, segmentid);
+    showDocId(docid, docBase, docVals, binDocVals, docValType, bref, out, segmentid);
   }
 
   @Override
@@ -106,13 +129,27 @@ public class DocValCommand extends ClueCommand {
           break;
         }
 
-        NumericDocValues docVals = atomicReader.getNumericDocValues(field);
+        NumericDocValues docVals = null;
+        
+        BinaryDocValues binDocVals = null;
+        
+        DocValuesType docValType = finfo.getDocValuesType();
+        
+        BytesRef bref = null;
+        
+        if (docValType == DocValuesType.NUMERIC) {
+          docVals = atomicReader.getNumericDocValues(field);
+        }
+        else if (docValType == DocValuesType.BINARY) {
+          bref = new BytesRef();
+          binDocVals = atomicReader.getBinaryDocValues(field);
+        }
         
         int maxDoc = atomicReader.maxDoc();
         
         for (int k = 0; k < maxDoc; ++k) {
           
-          showDocId(k + ctx.docBase, ctx.docBase, docVals, finfo.getDocValuesType(), out, i);
+          showDocId(k + ctx.docBase, ctx.docBase, docVals, binDocVals, docValType, bref, out, i);
           if (getContext().isInteractiveMode()){
             if ((k+1) % numPerPage == 0){
               out.println("Ctrl-D to break");
