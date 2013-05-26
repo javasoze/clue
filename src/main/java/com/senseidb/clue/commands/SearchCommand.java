@@ -19,7 +19,7 @@ public class SearchCommand extends ClueCommand {
   private final QueryParser qparser;
   public SearchCommand(ClueContext ctx) {
     super(ctx);
-    qparser = new QueryParser(Version.LUCENE_41, "contents", new StandardAnalyzer(Version.LUCENE_41));
+    qparser = new QueryParser(Version.LUCENE_43, "contents", new StandardAnalyzer(Version.LUCENE_43));
   }
 
   @Override
