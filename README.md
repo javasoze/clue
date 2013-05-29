@@ -66,18 +66,24 @@ Command list:
 	search - executes a query against the index, input: <query string>
 	terms - gets terms from the index, <field:term>, term can be a prefix
 	
+### Build a sample index to play with:
+
+Clue bundles with some test data (15000 car data) for you to build a sample index to play with, do:
+
+    ./bin/build_sample_index.sh my-idx
+	
 
 ### Examples:
 
-1. Getting all the terms in the field 'color':
+1. Getting all the terms in the field 'color_indexed':
 
-    **./bin/clue.sh /tmp/my-idx terms color**
+    **./bin/clue.sh /tmp/my-idx terms color_indexed**
 
-2. Getting all the terms in the field 'color' starting with the term staring with 'r':
+2. Getting all the terms in the field 'color_indexed' starting with the term staring with 'r':
 
-    **./bin/clue.sh /tmp/my-idx terms color:r**
+    **./bin/clue.sh /tmp/my-idx terms color_indexed:r**
 
-    **./bin/clue.sh /tmp/my-idx terms color | grep r**
+    **./bin/clue.sh /tmp/my-idx terms color_indexed | grep r**
 
 3. Do a search:
 
@@ -89,8 +95,24 @@ Command list:
 
 5. Iterate a posting for the term color:red
 
-    **./bin/clue.sh /tmp/my-idx postings color:red**
+    **./bin/clue.sh /tmp/my-idx postings color_indexed:red**
 
-6. List docvalues for a column-stride-field:
+6. List docvalues for the column-stride-field color:
 
-    **./bin/clue.sh /tmp/my-idx docval price**
+    **./bin/clue.sh /tmp/my-idx docval color**
+
+7. Get docvalue for the column-stride-field category for document 4:
+
+    **./bin/clue.sh /tmp/my-idx docval category 5**
+
+8. Get docvalue for the column-stride-field year of type numeric for document 3:
+
+	**./bin/clue.sh /tmp/my-idx docval year 3**
+	
+9. Get docvalue for the column-stride-field json of type binary for document 3:
+
+	**./bin/clue.sh /tmp/my-idx docval json 3**
+	
+9. Get docvalue for the column-stride-field tags of type sorted-set for document 3:
+
+	**./bin/clue.sh /tmp/my-idx docval tags 3**
