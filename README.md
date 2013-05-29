@@ -88,42 +88,42 @@ Clue bundles with some test data (15000 car data) for you to build a sample inde
 
 1. Getting all the terms in the field 'color_indexed':
 
-    **./bin/clue.sh /tmp/my-idx terms color_indexed**
+    **./bin/clue.sh my-idx terms color_indexed**
 
 2. Getting all the terms in the field 'color_indexed' starting with the term staring with 'r':
 
-    **./bin/clue.sh /tmp/my-idx terms color_indexed:r**
+    **./bin/clue.sh my-idx terms color_indexed:r**
 
-    **./bin/clue.sh /tmp/my-idx terms color_indexed | grep r**
+    **./bin/clue.sh my-idx terms color_indexed | grep r**
 
 3. Do a search:
 
-    **./bin/clue.sh /tmp/my-idx search myquery**
+    **./bin/clue.sh my-idx search myquery**
 
 4. Get the index info:
 
-    **./bin/clue.sh /tmp/my-idx info**
+    **./bin/clue.sh my-idx info**
 
-5. Iterate a posting for the term color:red
+5. Iterate a posting for the term color_indexed:red
 
-    **./bin/clue.sh /tmp/my-idx postings color_indexed:red**
+    **./bin/clue.sh my-idx postings color_indexed:red**
 
 6. List docvalues for the column-stride-field color:
 
-    **./bin/clue.sh /tmp/my-idx docval color**
+    **./bin/clue.sh my-idx docval *color***
 
-7. Get docvalue for the column-stride-field category for document 4:
+7. Get docvalue for the column-stride-field *category* for document 4:
 
-    **./bin/clue.sh /tmp/my-idx docval category 5**
+    **./bin/clue.sh my-idx docval *category* 5**
 
-8. Get docvalue for the column-stride-field year of type numeric for document 3:
+8. Get docvalue for the column-stride-field *year* of type numeric for document 3:
 
-	**./bin/clue.sh /tmp/my-idx docval year 3**
+	**./bin/clue.sh my-idx docval year 3**
 	
-9. Get docvalue for the column-stride-field json of type binary for document 3:
+9. Get docvalue for the column-stride-field *json* of type binary for document 3:
 
-	**./bin/clue.sh /tmp/my-idx docval json 3**
+	**./bin/clue.sh my-idx docval json 3**
 	
-9. Get docvalue for the column-stride-field tags of type sorted-set for document 3:
+9. Get docvalue for the column-stride-field *tags* of type sorted-set for document 3:
 
-	**./bin/clue.sh /tmp/my-idx docval tags 3**
+	**./bin/clue.sh my-idx docval tags 3**
