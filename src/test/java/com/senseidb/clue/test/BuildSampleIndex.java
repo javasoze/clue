@@ -64,12 +64,18 @@ public class BuildSampleIndex {
    * @param args
    */
   public static void main(String[] args) throws Exception{
+    if (args.length != 2) {
+      System.out.println("usage: source_file index_dir");
+    }
     File f = new File(args[0]);
     BufferedReader reader = new BufferedReader(new FileReader(f));
     
+    File idxDir = new File(args[1]);
+    
     IndexWriterConfig idxWriterConfig = new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_43));
-    Directory idxDir = FSDirectory.open(new File("/tmp/clue-idx"));
-    IndexWriter writer = new IndexWriter(idxDir, idxWriterConfig);
+    Directory dir = FSDirectory.open(idxDir);
+    IndexWriter writer = new IndexWriter(dir, idxWriterConfig);
+    int count = 0;
     while (true) {
       String line = reader.readLine();
       if (line == null) break;
@@ -77,7 +83,13 @@ public class BuildSampleIndex {
       JSONObject json = new JSONObject(line);
       Document doc = buildDoc(json);
       writer.addDocument(doc);
+      count++;
+      if (count % 100 == 0) {
+        System.out.print(".");
+      }
     }
+    
+    System.out.println(count+" docs indexed");
     
     reader.close();
     writer.commit();
