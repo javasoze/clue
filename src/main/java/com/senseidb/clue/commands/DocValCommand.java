@@ -1,5 +1,6 @@
 package com.senseidb.clue.commands;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfo.DocValuesType;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.SortedDocValues;
+import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.util.BytesRef;
 
 import com.senseidb.clue.ClueContext;
@@ -31,8 +34,7 @@ public class DocValCommand extends ClueCommand {
   }
 
   private void showDocId(int docid, int docBase, 
-      NumericDocValues docVals,
-      BinaryDocValues binDoccVals,
+      Object docVals,
       DocValuesType docValType,
       BytesRef bytesRef,
       PrintStream out, int segmentid) throws Exception {
@@ -43,11 +45,46 @@ public class DocValCommand extends ClueCommand {
 
       switch (docValType) {
       case NUMERIC:
-        val = String.valueOf(docVals.get(subid));
+        NumericDocValues dv = (NumericDocValues)docVals;
+        val = String.valueOf(dv.get(subid));
         break;
       case BINARY:
-        binDoccVals.get(subid, bytesRef);
-        val = bytesRef.toString();
+        BinaryDocValues bv = (BinaryDocValues)docVals;
+        bv.get(subid, bytesRef);
+        val = bytesRef.utf8ToString();
+        break;
+      case SORTED: {
+        SortedDocValues sv = (SortedDocValues)docVals;
+        sv.get(subid, bytesRef);
+        StringBuffer sb = new StringBuffer();
+        sb.append("numTerms in field: ").append(sv.getValueCount()).append(", ");
+        sb.append("value: [");
+        sb.append(bytesRef.utf8ToString());
+        sb.append("]");
+        val = sb.toString();
+        break;
+      }
+      case SORTED_SET: {
+        SortedSetDocValues sv = (SortedSetDocValues)docVals;
+        sv.setDocument(subid);
+        long nextOrd;
+        long count = sv.getValueCount();
+        StringBuffer sb = new StringBuffer();
+        sb.append("numTerms in field: ").append(count).append(", ");
+        sb.append("values: [");
+        boolean firstPass = true;
+        while ((nextOrd = sv.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS) {
+          sv.lookupOrd(nextOrd, bytesRef);
+          if (!firstPass) {
+            sb.append(", ");
+          }
+          sb.append(bytesRef.utf8ToString());
+          firstPass = false;
+        }
+        sb.append("]");
+        val = sb.toString();
+        break;
+      }
       default:
         val = null;
       }
@@ -62,6 +99,23 @@ public class DocValCommand extends ClueCommand {
       out.println("doc value unavailable");
     }
   }
+  
+  private Object readDocValues(String field, DocValuesType docValType, AtomicReader atomicReader) throws IOException{
+    Object docVals = null;
+    if (docValType == DocValuesType.NUMERIC) {
+      docVals = atomicReader.getNumericDocValues(field);
+    }
+    else if (docValType == DocValuesType.BINARY) {
+      docVals = atomicReader.getBinaryDocValues(field);
+    }
+    else if (docValType == DocValuesType.SORTED) {
+      docVals = atomicReader.getSortedDocValues(field);
+    }
+    else if (docValType == DocValuesType.SORTED_SET) {
+      docVals = atomicReader.getSortedSetDocValues(field);
+    }
+    return docVals;
+  }
 
   private void showDocId(int docid, int docBase, String field,
       AtomicReader atomicReader, PrintStream out, int segmentid)
@@ -73,25 +127,13 @@ public class DocValCommand extends ClueCommand {
       return;
     }
 
-    NumericDocValues docVals = null;
-    
-    BinaryDocValues binDocVals = null;
     
     DocValuesType docValType = finfo.getDocValuesType();
+    BytesRef bref = new BytesRef();
     
-    BytesRef bref = null;
-    
-    if (docValType == DocValuesType.NUMERIC) {
-      docVals = atomicReader.getNumericDocValues(field);
-    }
-    else if (docValType == DocValuesType.BINARY) {
-      bref = new BytesRef();
-      binDocVals = atomicReader.getBinaryDocValues(field);
-    }
-
-    showDocId(docid, docBase, docVals, binDocVals, docValType, bref, out, segmentid);
+    showDocId(docid, docBase, readDocValues(field, docValType, atomicReader), docValType, bref, out, segmentid);
   }
-
+  
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
     String field = args[0];
@@ -128,28 +170,16 @@ public class DocValCommand extends ClueCommand {
           out.println("docvalue does not exist for field: " + field);
           break;
         }
-
-        NumericDocValues docVals = null;
-        
-        BinaryDocValues binDocVals = null;
         
         DocValuesType docValType = finfo.getDocValuesType();
+        BytesRef bref = new BytesRef();
         
-        BytesRef bref = null;
-        
-        if (docValType == DocValuesType.NUMERIC) {
-          docVals = atomicReader.getNumericDocValues(field);
-        }
-        else if (docValType == DocValuesType.BINARY) {
-          bref = new BytesRef();
-          binDocVals = atomicReader.getBinaryDocValues(field);
-        }
         
         int maxDoc = atomicReader.maxDoc();
         
         for (int k = 0; k < maxDoc; ++k) {
           
-          showDocId(k + ctx.docBase, ctx.docBase, docVals, binDocVals, docValType, bref, out, i);
+          showDocId(k + ctx.docBase, ctx.docBase, readDocValues(field, docValType, atomicReader), docValType, bref, out, i);
           if (getContext().isInteractiveMode()){
             if ((k+1) % numPerPage == 0){
               out.println("Ctrl-D to break");
