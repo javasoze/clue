@@ -13,9 +13,20 @@ Another important feature for Clue is the ability to interact with other Unix co
 
 Clue is under the [Apache Public License v2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
+#### Bugs:
+
+Please file bugs and feature requests [here](https://github.com/javasoze/clue/issues).
+
 ### Downloads:
 
 latest version: 0.0.2
+
+#### What's new in this release?
+
+* lucene 4.3 upgrade.
+* readonly support - you can toggle on/off readonly mode so you can view an index opened (for write) by another process.
+* better docvalue support - major speed on up viewing docvalues, and all types of docvalus are now supported: numeric, binary, sorted and sortedset.
+* bundle sample data and tool for producing a sample index exhibiting all features of the tool.
 
 source: [release-0.0.2.zip](https://github.com/javasoze/clue/archive/release-0.0.2.zip)
 
