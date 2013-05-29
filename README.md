@@ -111,7 +111,7 @@ Clue bundles with some test data (15000 car data) for you to build a sample inde
 
 6. List docvalues for the column-stride-field color:
 
-    **./bin/clue.sh my-idx docval *color* **
+    **./bin/clue.sh my-idx docval color**
 
 7. Get docvalue for the column-stride-field *category* for document 4:
 
