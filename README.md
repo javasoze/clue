@@ -15,15 +15,15 @@ Clue is under the [Apache Public License v2.0](http://www.apache.org/licenses/LI
 
 ### Downloads:
 
-latest version: 0.0.1
+latest version: 0.0.2
 
-source: [release-0.0.1.zip](https://github.com/javasoze/clue/archive/release-0.0.1.zip)
+source: [release-0.0.2.zip](https://github.com/javasoze/clue/archive/release-0.0.2.zip)
 
 clue-all executable jar with all dependencies:
-     [clue-all-0.0.1.jar](https://dl.dropboxusercontent.com/u/6490038/sensei-downloads/clue-all-0.0.1.jar)
+     [clue-all-0.0.2.jar](https://dl.dropboxusercontent.com/u/6490038/sensei-downloads/clue-all-0.0.2.jar)
 
 clue jar with only clue class files, used as a library:
-     [clue-0.0.1.jar](https://dl.dropboxusercontent.com/u/6490038/sensei-downloads/clue-0.0.1.jar)
+     [clue-0.0.2.jar](https://dl.dropboxusercontent.com/u/6490038/sensei-downloads/clue-0.0.2.jar)
 
 ### Build:
 
