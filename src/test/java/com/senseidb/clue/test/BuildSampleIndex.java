@@ -8,7 +8,9 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.BinaryDocValuesField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleDocValuesField;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.SortedSetDocValuesField;
@@ -16,6 +18,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
@@ -27,9 +30,11 @@ public class BuildSampleIndex {
   static void addMetaString(Document doc, String field, String value) {
     if (value != null) {
       doc.add(new SortedDocValuesField(field, new BytesRef(value)));
-      doc.add(new StringField(field+"_indexed", value, Store.NO));
+      doc.add(new StringField(field+"_indexed", value, Store.YES));
     }
   }
+  
+  static final String CONTENTS_FIELD = "contents";
   
   static Document buildDoc(JSONObject json) throws Exception{
     Document doc = new Document();
@@ -54,9 +59,24 @@ public class BuildSampleIndex {
           doc.add(new StringField("tags_indexed", part, Store.NO));
         }
       }
+      
+      // store everything
+      FieldType ft = new FieldType();
+      ft.setIndexed(true);
+      ft.setOmitNorms(false);
+      ft.setTokenized(true);
+      ft.setStoreTermVectors(true);
+      ft.setStoreTermVectorOffsets(true);
+      ft.setStoreTermVectorPayloads(true);
+      ft.setStoreTermVectorPositions(true);
+      ft.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+      
+      Field tagPayload = new Field("tags_payload", new PayloadTokenizer(tagsString), ft);
+      doc.add(tagPayload);
     }
     
     doc.add(new BinaryDocValuesField("json", new BytesRef(json.toString())));
+    
     return doc;
   }
   

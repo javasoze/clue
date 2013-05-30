@@ -67,6 +67,7 @@ public class PostingsCommand extends ClueCommand {
         continue;
       }
       boolean hasPositions = terms.hasPositions();
+      
       if (terms != null && termVal != null){
         TermsEnum te = terms.iterator(null);
         int count = 0;
@@ -74,15 +75,18 @@ public class PostingsCommand extends ClueCommand {
           
           if (hasPositions){
             DocsAndPositionsEnum iter = te.docsAndPositions(atomicReader.getLiveDocs(), null);
+            
             int docid;
             while((docid = iter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
               count++;
               out.print("docid: "+(docid+docBase)+", freq: "+iter.freq()+", ");
               for (int i=0;i<iter.freq();++i){
                 out.print("pos "+i+": "+iter.nextPosition());
+                out.print(", start offset: "+ iter.startOffset());
+                out.print(", end offset: "+ iter.endOffset());
                 BytesRef payload = iter.getPayload();
                 if (payload != null){
-                  out.print(",payload: "+payload);
+                  out.print(", payload: "+payload);
                 }
                 out.print(";");
               }
@@ -105,7 +109,7 @@ public class PostingsCommand extends ClueCommand {
             int docid;
             while((docid = iter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
               count++;
-              out.println("docid: "+(docid+docBase));
+              out.println("docid: "+(docid+docBase)+", freq: "+iter.freq());
               if (ctx.isInteractiveMode()){
                 if (count % numPerPage == 0){
                   out.println("Ctrl-D to break");
