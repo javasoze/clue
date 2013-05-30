@@ -23,6 +23,7 @@ import com.senseidb.clue.commands.NormsCommand;
 import com.senseidb.clue.commands.PostingsCommand;
 import com.senseidb.clue.commands.ReadonlyCommand;
 import com.senseidb.clue.commands.SearchCommand;
+import com.senseidb.clue.commands.StoredFieldCommand;
 import com.senseidb.clue.commands.TermVectorCommand;
 import com.senseidb.clue.commands.TermsCommand;
 
@@ -61,6 +62,7 @@ public class ClueContext {
     new ExplainCommand(this);
     new NormsCommand(this);
     new TermVectorCommand(this);
+    new StoredFieldCommand(this);
   }
   
   public void registerCommand(ClueCommand cmd){
