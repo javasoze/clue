@@ -41,8 +41,13 @@ public class InfoCommand extends ClueCommand {
     TreeMap<String, String> valMap = new TreeMap<String, String>();
     valMap.put("name", finfo.name);
     valMap.put("docval", String.valueOf(finfo.hasDocValues()));
-
+    valMap.put("norms", String.valueOf(finfo.hasNorms()));
+    valMap.put("payloads", String.valueOf(finfo.hasPayloads()));
+    valMap.put("vectors", String.valueOf(finfo.hasVectors()));
     valMap.put("attributes", finfo.attributes().toString());
+    if (finfo.hasNorms()) {
+      valMap.put("norm_type", String.valueOf(finfo.getNormType()));
+    }
     if (finfo.hasDocValues()) {
       valMap.put("docval_type", String.valueOf(finfo.getDocValuesType()));
     } else {
