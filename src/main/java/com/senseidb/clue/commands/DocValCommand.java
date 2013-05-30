@@ -2,6 +2,7 @@ package com.senseidb.clue.commands;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.index.AtomicReader;
@@ -136,30 +137,41 @@ public class DocValCommand extends ClueCommand {
   
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
+    if (args.length < 2) {
+      out.println("usage: field doc1,doc2...");
+      return;
+    }
+    
     String field = args[0];
-    int docid;
+    
+    List<Integer> docidList = new ArrayList<Integer>();
 
     int numPerPage = 20;
     
     try {
-      docid = Integer.parseInt(args[1]);
+      String[] docListStrings = args[1].split(",");
+      for (String s : docListStrings) {
+        docidList.add(Integer.parseInt(s));
+      }
     } catch (Exception e) {
       out.println("invalid docid, all docs are shown");
-      docid = -1;
+      docidList = null;
     }
 
     IndexReader reader = ctx.getIndexReader();
     List<AtomicReaderContext> leaves = reader.leaves();
-    if (docid >= 0) {
+    if (docidList != null && !docidList.isEmpty()) {
       for (int i = leaves.size() - 1; i >= 0; --i) {
         AtomicReaderContext ctx = leaves.get(i);
-        if (ctx.docBase <= docid) {
-          AtomicReader atomicReader = ctx.reader();
-          showDocId(docid, ctx.docBase, field, atomicReader, out, i);
-          out.flush();
-          return;
+        for (Integer docid : docidList) {
+          if (ctx.docBase <= docid) {
+            AtomicReader atomicReader = ctx.reader();
+            showDocId(docid, ctx.docBase, field, atomicReader, out, i);
+          }
         }
       }
+      out.flush();
+      return;
     } else {
       for (int i = 0; i < leaves.size(); ++i) {
         AtomicReaderContext ctx = leaves.get(i);

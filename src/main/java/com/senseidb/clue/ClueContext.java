@@ -19,6 +19,7 @@ import com.senseidb.clue.commands.ExplainCommand;
 import com.senseidb.clue.commands.HelpCommand;
 import com.senseidb.clue.commands.InfoCommand;
 import com.senseidb.clue.commands.MergeCommand;
+import com.senseidb.clue.commands.NormsCommand;
 import com.senseidb.clue.commands.PostingsCommand;
 import com.senseidb.clue.commands.ReadonlyCommand;
 import com.senseidb.clue.commands.SearchCommand;
@@ -57,6 +58,7 @@ public class ClueContext {
     new ReadonlyCommand(this);
     new DirectoryCommand(this);
     new ExplainCommand(this);
+    new NormsCommand(this);
   }
   
   public void registerCommand(ClueCommand cmd){
