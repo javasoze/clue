@@ -55,6 +55,8 @@ public class SearchCommand extends ClueCommand {
       }
     }
     
+    out.println("parsed query: "+q);
+    
     long start = System.currentTimeMillis();
     TopDocs td = searcher.search(q, 10);
     long end = System.currentTimeMillis();
@@ -63,7 +65,7 @@ public class SearchCommand extends ClueCommand {
     out.println("time: "+(end-start)+"ms");
     ScoreDoc[] docs = td.scoreDocs;
     for (ScoreDoc doc : docs){
-      System.out.println("doc: "+doc.doc+", score: "+doc.score);
+      out.println("doc: "+doc.doc+", score: "+doc.score);
     }
   }
 
