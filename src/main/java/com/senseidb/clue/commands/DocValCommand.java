@@ -137,7 +137,7 @@ public class DocValCommand extends ClueCommand {
   
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length < 2) {
+    if (args.length < 1) {
       out.println("usage: field doc1,doc2...");
       return;
     }
