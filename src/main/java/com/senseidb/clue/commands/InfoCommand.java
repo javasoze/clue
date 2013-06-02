@@ -35,6 +35,7 @@ public class InfoCommand extends ClueCommand {
     return "displays information about the index, <segment number> to get information on the segment";
   }
 
+  @SuppressWarnings("unchecked")
   private static String toString(Object[] info) throws IOException {
     FieldInfo finfo = (FieldInfo) info[0];
     List<Terms> termList = (List<Terms>) info[1];
@@ -90,6 +91,7 @@ public class InfoCommand extends ClueCommand {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void execute(String[] args, PrintStream out) throws Exception {
     IndexReader r = ctx.getIndexReader();
     out.println("readonly mode: " + getContext().isReadOnlyMode());
