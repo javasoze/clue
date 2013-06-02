@@ -43,19 +43,17 @@ public class ReconstructCommand extends ClueCommand {
     DocsAndPositionsEnum dpe = null;
     while ((text = te.next()) != null) {
       dpe = te.docsAndPositions(liveDocs, dpe);
-      int iterDoc;
-      while ((iterDoc = dpe.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-        if (iterDoc == docid) {
-          int freq = dpe.freq();
-          for (int i = 0; i < freq; ++i) {
-            int pos = dpe.nextPosition();
-            List<String> textList = docTextMap.get(pos);
-            if (textList == null) {
-              textList = new ArrayList<String>();
-              docTextMap.put(pos, textList);
-            }
-            textList.add(text.utf8ToString());
+      int iterDoc = dpe.advance(docid);
+      if (iterDoc == docid) {
+        int freq = dpe.freq();
+        for (int i = 0; i < freq; ++i) {
+          int pos = dpe.nextPosition();
+          List<String> textList = docTextMap.get(pos);
+          if (textList == null) {
+            textList = new ArrayList<String>();
+            docTextMap.put(pos, textList);
           }
+          textList.add(text.utf8ToString());
         }
       }
     }
@@ -76,11 +74,9 @@ public class ReconstructCommand extends ClueCommand {
     DocsEnum dpe = null;
     while ((text = te.next()) != null) {
       dpe = te.docs(liveDocs, dpe);
-      int iterDoc;
-      while ((iterDoc = dpe.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-        if (iterDoc == docid) {
-          textList.add(text.utf8ToString());
-        }
+      int iterDoc = dpe.advance(docid);
+      if (iterDoc == docid) {
+        textList.add(text.utf8ToString());
       }
     }
     StringBuffer buf = new StringBuffer();
