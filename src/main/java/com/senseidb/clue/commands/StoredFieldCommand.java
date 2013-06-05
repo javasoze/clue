@@ -33,7 +33,7 @@ public class StoredFieldCommand extends ClueCommand {
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
     if (args.length != 2) {
-      out.println("usage: field doc1,doc2...");
+      out.println("usage: field doc");
       return;
     }
     
