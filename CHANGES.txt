@@ -1,0 +1,18 @@
+Version 0.0.3
+
+* bug fix: info command missing norm, payload, vector info
+* add command to display stored fields
+* add command to display term vectors
+* add ability to reconstruct document from indexed fields
+* explain support
+
+Version 0.0.2
+
+* lucene 4.3 upgrade.
+* readonly support - you can toggle on/off readonly mode so you can view an index opened (for write) by another process.
+* better docvalue support - major speed on up viewing docvalues, and all types of docvalus are now supported: numeric, binary, sorted and sortedset.
+* bundle sample data and tool for producing a sample index exhibiting all features of the tool.
+
+Version 0.0.1
+
+* initial release
