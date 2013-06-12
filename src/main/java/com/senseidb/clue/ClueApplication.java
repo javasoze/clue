@@ -81,8 +81,9 @@ public class ClueApplication {
     BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
     while(true){
       System.out.print("> ");
-      String line = inReader.readLine().trim();
-      if (line.isEmpty()) continue;
+      String line = inReader.readLine();
+      if (line == null || line.isEmpty()) continue;
+      line = line.trim();
       String[] parts = line.split("\\s");
       if (parts.length > 0){
         String cmd = parts[0];
