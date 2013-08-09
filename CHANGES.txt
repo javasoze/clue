@@ -5,6 +5,7 @@ Version 0.0.3
 * add command to display term vectors
 * add ability to reconstruct document from indexed fields
 * explain support
+* lucene 4.4 upgrade
 
 Version 0.0.2
 
