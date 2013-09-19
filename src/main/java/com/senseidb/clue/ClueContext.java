@@ -13,6 +13,7 @@ import org.apache.lucene.store.Directory;
 import com.senseidb.clue.commands.ClueCommand;
 import com.senseidb.clue.commands.DeleteCommand;
 import com.senseidb.clue.commands.DirectoryCommand;
+import com.senseidb.clue.commands.DocStoredCommand;
 import com.senseidb.clue.commands.DocValCommand;
 import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.ExplainCommand;
@@ -65,6 +66,7 @@ public class ClueContext {
     new TermVectorCommand(this);
     new StoredFieldCommand(this);
     new ReconstructCommand(this);
+    new DocStoredCommand(this);
   }
   
   public void registerCommand(ClueCommand cmd){
