@@ -2,9 +2,12 @@ package com.senseidb.clue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -23,7 +26,8 @@ public class DirectoryFactory {
         return FSDirectory.open(new File(path));
       }
       else if ("hdfs".equals(protocol)){        
-        return new HdfsDirectory(path, FileSystem.get(new Configuration()));
+        Path hdfsPath = new Path(idxPath);
+        return new HdfsDirectory(path, hdfsPath.getFileSystem(new Configuration()));
       }
       else {
         throw new IOException("unsupported protocol: "+protocol);

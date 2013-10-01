@@ -10,6 +10,6 @@ HEAP_OPTS="-Xmx1g -Xms1g -XX:NewSize=256m"
 JAVA_OPTS="-server -d64"
 
 MAIN_CLASS="com.senseidb.clue.ClueApplication"
-CLASSPATH=$resources/:$lib/*:$dist/*:$1/ext/*
+CLASSPATH=$resources/:$lib/*:$dist/*:$1/ext/*:$CLASSPATH
 
 java $JAVA_OPTS $JMX_OPTS $HEAP_OPTS -classpath $CLASSPATH $MAIN_CLASS $@

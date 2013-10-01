@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -33,17 +34,17 @@ public class HdfsDirectory extends Directory {
 
   @Override
   public IndexOutput createOutput(String name, IOContext context) throws IOException {
-    throw new UnsupportedOperationException();
+    return new HDFSIndexOutput(new Path(dir, name));
   }
 
   @Override
   public void sync(Collection<String> strings) throws IOException {
-    throw new UnsupportedOperationException();
   }
 
   @Override
   public void deleteFile(String name) throws IOException {
-    throw new UnsupportedOperationException();
+    Path path = new Path(dir, name);
+    fs.delete(path, false);
   }
 
   @Override
@@ -69,11 +70,58 @@ public class HdfsDirectory extends Directory {
 
   @Override
   public IndexInput openInput(String name, IOContext context) throws IOException {
-    // I'm finding that I need to uncomment this from time to time for debugging:
-    // System.out.println("Trying to openInput: " + name);
     return new HDFSIndexInput(new Path(dir, name));
   }
 
+  private class HDFSIndexOutput extends IndexOutput {
+
+    private final FSDataOutputStream out;
+    private long currentPosition;
+    
+    HDFSIndexOutput(Path path) throws IOException {
+      out = fs.create(path);
+      currentPosition = 0;
+    }
+    
+    @Override
+    public void flush() throws IOException {
+      out.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+      out.close();
+    }
+    
+    @Override
+    public long getFilePointer() {
+      return currentPosition;
+    }
+
+    @Override
+    public void seek(long pos) throws IOException {
+      throw new UnsupportedOperationException("invalid call on seek");
+    }
+
+    @Override
+    public long length() throws IOException {
+      return currentPosition;
+    }
+
+    @Override
+    public void writeByte(byte b) throws IOException {
+      out.write(b & 0xFF);
+      currentPosition++;
+    }
+
+    @Override
+    public void writeBytes(byte[] b, int offset, int length) throws IOException {
+      out.write(b, offset, length);
+      currentPosition += length;
+    }
+    
+  }
+  
   private class HDFSIndexInput extends IndexInput {
     private final Path path;
     private final FSDataInputStream in;
@@ -86,8 +134,7 @@ public class HdfsDirectory extends Directory {
 
     @Override
     public void close() throws IOException {
-      // TODO(jimmy): For some reason, if we actually close the stream here, it doesn't work...
-      // something having to do how Lucene internally calls this method. Need ask Michael Busch.
+      fs.close();
     }
 
     @Override
@@ -115,10 +162,6 @@ public class HdfsDirectory extends Directory {
 
     @Override
     public void readBytes(byte[] b, int offset, int len) throws IOException {
-      // I'm finding that I need to uncomment this from time to time for debugging:
-      // System.out.println("attempt to read " + len + " from " + getFilePointer());
-
-      // Important: use readFully instead of read.
       in.readFully(b, offset, len);
     }
 
