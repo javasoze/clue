@@ -114,6 +114,28 @@
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-analyzers-common</artifactId>
 			<version>4.4.0</version>
+		</dependency>		    
+		<dependency>
+	        <groupId>org.apache.solr</groupId>
+	        <artifactId>solr-core</artifactId>
+	        <version>4.4.0</version>
+			<exclusions>
+              <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+              </exclusion>
+            </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-core</artifactId>
+			<version>1.1.2</version>
+			<exclusions>
+              <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+              </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
