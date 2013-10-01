@@ -3,7 +3,8 @@ package com.senseidb.clue;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.hadoop.hdfs.DistributedFileSystem;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -22,7 +23,7 @@ public class DirectoryFactory {
         return FSDirectory.open(new File(path));
       }
       else if ("hdfs".equals(protocol)){        
-        return new HdfsDirectory(path, new DistributedFileSystem());
+        return new HdfsDirectory(path, FileSystem.get(new Configuration()));
       }
       else {
         throw new IOException("unsupported protocol: "+protocol);
