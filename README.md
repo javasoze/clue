@@ -20,7 +20,7 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 0.0.2
+latest version: 0.0.3
 
 #### What's new in this release?
 
@@ -29,13 +29,13 @@ latest version: 0.0.2
 * better docvalue support - major speed on up viewing docvalues, and all types of docvalus are now supported: numeric, binary, sorted and sortedset.
 * bundle sample data and tool for producing a sample index exhibiting all features of the tool.
 
-source: [release-0.0.2.zip](https://github.com/javasoze/clue/archive/release-0.0.2.zip)
+source: [release-0.0.3.zip](https://github.com/javasoze/clue/archive/release-0.0.3.zip)
 
 clue-all executable jar with all dependencies:
-     [clue-all-0.0.2.jar](https://dl.dropboxusercontent.com/u/6490038/sensei-downloads/clue-all-0.0.2.jar)
+     [clue-all-0.0.3.jar](https://github.com/javasoze/clue/releases/download/release-0.0.3/clue-all-0.0.3.jar)
 
 clue jar with only clue class files, used as a library:
-     [clue-0.0.2.jar](https://dl.dropboxusercontent.com/u/6490038/sensei-downloads/clue-0.0.2.jar)
+     [clue-0.0.3.jar](https://github.com/javasoze/clue/releases/download/release-0.0.3/clue-0.0.3.jar)
 
 ### Build:
 
