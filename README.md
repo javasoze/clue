@@ -70,13 +70,19 @@ Command list:
 	directory - prints directory information
 	docval - gets doc value for a given doc, <field> <docid>, if <docid> not specified, all docs are shown
 	exit - exits program
+	explain - shows score explanation of a doc
+	export - export index to readable text files
 	help - displays help
 	info - displays information about the index, <segment number> to get information on the segment
 	merge - force merges segments into given N segments, input: number of max segments
+	norm - displays norm values for a field for a list of documents
 	postings - iterating postings given a term, e.g. <fieldname:fieldvalue>
 	readonly - puts clue in readonly mode
+	reconstruct - reconstructs an indexed field for a document
 	search - executes a query against the index, input: <query string>
+	stored - displays stored data for a given field
 	terms - gets terms from the index, <field:term>, term can be a prefix
+	tv - shows term vector of a field for a doc
 	
 ### Build a sample index to play with:
 
