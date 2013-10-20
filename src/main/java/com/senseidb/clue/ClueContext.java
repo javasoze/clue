@@ -16,6 +16,7 @@ import com.senseidb.clue.commands.DirectoryCommand;
 import com.senseidb.clue.commands.DocValCommand;
 import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.ExplainCommand;
+import com.senseidb.clue.commands.ExportCommand;
 import com.senseidb.clue.commands.HelpCommand;
 import com.senseidb.clue.commands.InfoCommand;
 import com.senseidb.clue.commands.MergeCommand;
@@ -65,6 +66,7 @@ public class ClueContext {
     new TermVectorCommand(this);
     new StoredFieldCommand(this);
     new ReconstructCommand(this);
+    new ExportCommand(this);
   }
   
   public void registerCommand(ClueCommand cmd){
