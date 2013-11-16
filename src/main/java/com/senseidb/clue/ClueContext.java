@@ -5,11 +5,14 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 
+import com.senseidb.clue.api.IndexReaderFactory;
+import com.senseidb.clue.api.QueryBuilder;
 import com.senseidb.clue.commands.ClueCommand;
 import com.senseidb.clue.commands.DeleteCommand;
 import com.senseidb.clue.commands.DirectoryCommand;
@@ -38,11 +41,17 @@ public class ClueContext {
   private final Directory directory;
   private boolean readOnlyMode;
   private final IndexWriterConfig writerConfig;
+  private final QueryBuilder queryBuilder;
+  private final Analyzer analyzerQuery;
   
-  public ClueContext(Directory directory, IndexReaderFactory readerFactory,
-       IndexWriterConfig writerConfig, boolean interactiveMode){
-    this.directory = directory;
-    this.readerFactory = readerFactory;
+  public ClueContext(Directory dir, ClueConfiguration config,
+       IndexWriterConfig writerConfig, boolean interactiveMode) throws Exception {
+    this.directory = dir;
+    this.analyzerQuery = config.getAnalyzerQuery();
+    this.readerFactory = config.getIndexReaderFactory();
+    this.readerFactory.initialize(directory);
+    this.queryBuilder = config.getQueryBuilder();
+    this.queryBuilder.initialize("contents", analyzerQuery);
     this.writerConfig = writerConfig;
     this.writer = null;
     this.interactiveMode = interactiveMode;
@@ -69,6 +78,16 @@ public class ClueContext {
     new ExportCommand(this);
   }
   
+  
+  public QueryBuilder getQueryBuilder() {
+    return queryBuilder;
+  }
+
+  public Analyzer getAnalyzerQuery() {
+    return analyzerQuery;
+  }
+
+
   public void registerCommand(ClueCommand cmd){
     String cmdName = cmd.getName();
     if (cmdMap.containsKey(cmdName)){
@@ -95,10 +114,6 @@ public class ClueContext {
   
   public IndexReader getIndexReader(){
     return readerFactory.getIndexReader();
-  }
-  
-  public void refreshReader() throws IOException{
-    readerFactory.refreshReader();
   }
   
   public IndexWriter getIndexWriter(){
@@ -129,7 +144,11 @@ public class ClueContext {
     }
   }
   
-  public void shutdown() throws IOException{
+  public void refreshReader() throws Exception {
+    readerFactory.refreshReader();
+  }
+  
+  public void shutdown() throws Exception{
     try {
       readerFactory.shutdown();
     } 

@@ -1,9 +1,9 @@
 package com.senseidb.clue;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.URI;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
@@ -19,16 +19,14 @@ public class ClueApplication {
   private final ClueContext ctx;
   private final ClueCommand helpCommand;
   
-  private final DirectoryFactory dirFactory = new DirectoryFactory();
-  
-  public ClueApplication(String idxLocation, boolean interactiveMode) throws IOException{
-    Directory dir = dirFactory.buildDirectory(idxLocation);
+  public ClueApplication(String idxLocation, ClueConfiguration config, boolean interactiveMode) throws Exception{
+    Directory dir = config.getDirBuilder().build(new URI(idxLocation));
     if (!DirectoryReader.indexExists(dir)){
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
     }
-    IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_44, new StandardAnalyzer(Version.LUCENE_44));
-    ctx = new ClueContext(dir, new IndexReaderFactory(dir), writerConfig, interactiveMode);
+    IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_45, new StandardAnalyzer(Version.LUCENE_45));    
+    ctx = new ClueContext(dir, config, writerConfig, interactiveMode);
     helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
   
@@ -52,6 +50,8 @@ public class ClueApplication {
       System.exit(1);
     }
     
+    ClueConfiguration config = ClueConfiguration.load();
+    
     String idxLocation = args[0];
     
     ClueApplication app = null;
@@ -61,7 +61,7 @@ public class ClueApplication {
       if ("readonly".equalsIgnoreCase(cmd)) {
         if (args.length > 2) {
           cmd = args[2];
-          app = new ClueApplication(idxLocation, false);
+          app = new ClueApplication(idxLocation, config, false);
           String[] cmdArgs;
           cmdArgs = new String[args.length - 3];
           System.arraycopy(args, 3, cmdArgs, 0, cmdArgs.length);
@@ -70,7 +70,7 @@ public class ClueApplication {
         }
       }
       else {
-        app = new ClueApplication(idxLocation, false);
+        app = new ClueApplication(idxLocation, config, false);
         String[] cmdArgs;
         cmdArgs = new String[args.length - 2];
         System.arraycopy(args, 2, cmdArgs, 0, cmdArgs.length);
@@ -78,7 +78,7 @@ public class ClueApplication {
       }
       return;
     }
-    app = new ClueApplication(idxLocation, true);
+    app = new ClueApplication(idxLocation, config, true);
     BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
     while(true){
       System.out.print("> ");

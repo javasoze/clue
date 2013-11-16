@@ -2,24 +2,19 @@ package com.senseidb.clue.commands;
 
 import java.io.PrintStream;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.util.Version;
 
 import com.senseidb.clue.ClueContext;
 
 public class SearchCommand extends ClueCommand {
 
-  private final QueryParser qparser;
   public SearchCommand(ClueContext ctx) {
     super(ctx);
-    qparser = new QueryParser(Version.LUCENE_43, "contents", new StandardAnalyzer(Version.LUCENE_43));
   }
 
   @Override
@@ -47,7 +42,7 @@ public class SearchCommand extends ClueCommand {
       }
       String qstring = buf.toString();
       try{
-        q = qparser.parse(qstring);
+        q = ctx.getQueryBuilder().build(qstring);
       }
       catch(Exception e){
         out.println("cannot parse query: "+e.getMessage());
