@@ -71,7 +71,7 @@ public class PostingsCommand extends ClueCommand {
       if (terms != null && termVal != null){
         TermsEnum te = terms.iterator(null);
         int count = 0;
-        if (te.seekExact(new BytesRef(termVal) , true)){
+        if (te.seekExact(new BytesRef(termVal))){
           
           if (hasPositions){
             DocsAndPositionsEnum iter = te.docsAndPositions(atomicReader.getLiveDocs(), null);

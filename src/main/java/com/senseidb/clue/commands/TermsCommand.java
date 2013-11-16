@@ -92,7 +92,7 @@ public class TermsCommand extends ClueCommand {
       BytesRef termBytes;
       if (termVal != null){
         if (isExact){
-          if (!te.seekExact(new BytesRef(termVal), false)){
+          if (!te.seekExact(new BytesRef(termVal))){
             continue;
           }
         }
