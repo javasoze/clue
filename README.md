@@ -20,22 +20,27 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 0.0.3
+latest version: 0.0.4
 
 #### What's new in this release?
 
-* lucene 4.3 upgrade.
-* readonly support - you can toggle on/off readonly mode so you can view an index opened (for write) by another process.
-* better docvalue support - major speed on up viewing docvalues, and all types of docvalus are now supported: numeric, binary, sorted and sortedset.
-* bundle sample data and tool for producing a sample index exhibiting all features of the tool.
+* Add ability to investigate indexes on HDFS
+* Add command to dump the index
+* Add command to import from a dumped index
+* Add configuration support, now you can configure Clue to run your own custom code
+* Add index trimming functionlity: sometimes you want a smaller index to work with
+* lucene 4.5.1 upgrade
 
-source: [release-0.0.3.zip](https://github.com/javasoze/clue/archive/release-0.0.3.zip)
+source: [release-0.0.4.zip](https://github.com/javasoze/clue/archive/release-0.0.4.zip)
 
 clue-all executable jar with all dependencies:
-     [clue-all-0.0.3.jar](https://github.com/javasoze/clue/releases/download/release-0.0.3/clue-all-0.0.3.jar)
+     [clue-all-0.0.4.jar](https://github.com/javasoze/clue/releases/download/release-0.0.4/clue-all-0.0.4.jar)
 
 clue jar with only clue class files, used as a library:
-     [clue-0.0.3.jar](https://github.com/javasoze/clue/releases/download/release-0.0.3/clue-0.0.3.jar)
+     [clue-0.0.4.jar](https://github.com/javasoze/clue/releases/download/release-0.0.4/clue-0.0.4.jar)
+
+distribution
+     [clue.tar.gz](https://github.com/javasoze/clue/releases/download/release-0.0.4/clue.tar.gz)
 
 ### Build:
 
