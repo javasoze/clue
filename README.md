@@ -65,8 +65,12 @@ Command list:
 
     ./bin/clue.sh my-idx help
 
-
-    delete - deletes a list of documents from searching via a query, input: query
+    using configuration file found at: /Users/johnwang/github/clue/config/clue.conf
+	Analyzer: 		class org.apache.lucene.analysis.standard.StandardAnalyzer
+	Query Builder: 		class com.senseidb.clue.api.DefaultQueryBuilder
+	Directory Builder: 	class com.senseidb.clue.api.DefaultDirectoryBuilder
+	IndexReader Factory: 	class com.senseidb.clue.api.DefaultIndexReaderFactory
+	delete - deletes a list of documents from searching via a query, input: query
 	directory - prints directory information
 	docval - gets doc value for a given doc, <field> <docid>, if <docid> not specified, all docs are shown
 	exit - exits program
@@ -82,6 +86,7 @@ Command list:
 	search - executes a query against the index, input: <query string>
 	stored - displays stored data for a given field
 	terms - gets terms from the index, <field:term>, term can be a prefix
+	trim - trims the index, <TRIM PERCENTAGE> <OPTIONS>, options are: head, tail, random
 	tv - shows term vector of a field for a doc
 	
 ### Build a sample index to play with:
