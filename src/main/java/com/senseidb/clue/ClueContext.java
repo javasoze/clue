@@ -21,6 +21,7 @@ import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.ExplainCommand;
 import com.senseidb.clue.commands.ExportCommand;
 import com.senseidb.clue.commands.HelpCommand;
+import com.senseidb.clue.commands.IndexTrimCommand;
 import com.senseidb.clue.commands.InfoCommand;
 import com.senseidb.clue.commands.MergeCommand;
 import com.senseidb.clue.commands.NormsCommand;
@@ -76,6 +77,7 @@ public class ClueContext {
     new StoredFieldCommand(this);
     new ReconstructCommand(this);
     new ExportCommand(this);
+    new IndexTrimCommand(this);
   }
   
   
