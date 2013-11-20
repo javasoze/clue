@@ -38,8 +38,13 @@ public class ClueConfiguration {
       T obj = (T) (Class.forName(className).newInstance());
       return obj;
     } catch (Exception e) {
-      System.out.println("unable to obtain instance of class: " + className);
-      return defaultInstance;
+      try { 
+        T obj2 = (T) (Class.forName(className).getConstructor(Version.class).newInstance(Version.LUCENE_45));
+        return obj2; 
+      } catch (Exception e2) {
+        System.out.println("unable to obtain instance of class: " + className);
+        return defaultInstance;
+      }
     }
   }
 
