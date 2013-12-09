@@ -54,7 +54,7 @@ public class StoredFieldCommand extends ClueCommand {
       stored = true;
       
       int docID = doc - ctx.docBase;
-      if (docID >= 0) {
+      if (docID >= 0 && docID < atomicReader.maxDoc()) {
       
         Document storedData = atomicReader.document(docID, new HashSet<String>(Arrays.asList(field)));
         
