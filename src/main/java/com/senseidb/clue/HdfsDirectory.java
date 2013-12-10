@@ -8,12 +8,12 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.BaseDirectory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 
-public class HdfsDirectory extends Directory {
+public class HdfsDirectory extends BaseDirectory {
   private final FileSystem fs;
   private final Path dir;
 
