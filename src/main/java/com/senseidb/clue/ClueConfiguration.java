@@ -45,7 +45,7 @@ public class ClueConfiguration {
 
   private ClueConfiguration(Properties config) {    
     analyzerQuery = getInstance(config.getProperty(ANALYZER_QUERY_PARAM), 
-        new StandardAnalyzer(Version.LUCENE_45));    
+        new StandardAnalyzer(Version.LUCENE_46));    
     dirBuilder = getInstance(config.getProperty(DIRECTORY_BUILDER_PARAM),
         new DefaultDirectoryBuilder());
     queryBuilder = getInstance(config.getProperty(QUERY_BUILDER_PARAM),
