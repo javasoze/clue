@@ -47,7 +47,7 @@ public class StoredFieldCommand extends ClueCommand {
     boolean found = false;
     boolean stored = false;
     
-    int docID = doc;
+    
     for (AtomicReaderContext ctx : leaves) {
       AtomicReader atomicReader = ctx.reader();
       FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
@@ -55,9 +55,10 @@ public class StoredFieldCommand extends ClueCommand {
       
       stored = true;
       
-      if (docID > ctx.docBase) {
-        docID -= ctx.docBase;
-        continue;
+      int docID = doc - ctx.docBase;
+      
+      if (docID >= atomicReader.maxDoc()) {
+          continue;
       }
       
       if (docID >= 0) {
