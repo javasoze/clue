@@ -39,7 +39,7 @@ public class ClueConfiguration {
       return obj;
     } catch (Exception e) {
       try { 
-        T obj2 = (T) (Class.forName(className).getConstructor(Version.class).newInstance(Version.LUCENE_45));
+        T obj2 = (T) (Class.forName(className).getConstructor(Version.class).newInstance(Version.LUCENE_46));
         return obj2; 
       } catch (Exception e2) {
         System.out.println("unable to obtain instance of class: " + className);
