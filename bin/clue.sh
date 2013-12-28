@@ -12,4 +12,5 @@ JAVA_OPTS="-server -d64"
 MAIN_CLASS="com.senseidb.clue.ClueApplication"
 CLASSPATH=$CLASSPATH:$resources/:$lib/*:$dist/*:$1/ext/*
 
-java $JAVA_OPTS $JMX_OPTS $HEAP_OPTS -classpath $CLASSPATH $MAIN_CLASS $@
+(cd $bin/..; java $JAVA_OPTS $JMX_OPTS $HEAP_OPTS -classpath $CLASSPATH $MAIN_CLASS $@)
+
