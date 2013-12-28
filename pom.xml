@@ -6,7 +6,7 @@
 	<artifactId>clue</artifactId>
 	<packaging>jar</packaging>
 	<name>clue</name>
-	<version>0.0.4</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<description>command line client for Apache Lucene</description>
 
 	<url>http://github.com/javasoze/clue</url>
