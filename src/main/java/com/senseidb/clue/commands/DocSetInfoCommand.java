@@ -126,7 +126,7 @@ public class DocSetInfoCommand extends ClueCommand {
           double density = (double) docFreq / (double) (maxDocId - minDocId) ; 
           out.println(String.format("min: %d, max: %d, count: %d, density: %.2f", minDocId, maxDocId, docFreq, density));
           out.println("percentiles: " + Arrays.toString(PERCENTILES) + " => " + Arrays.toString(percentDocs));
-          out.println("histograms: (bucketsize=" + bucketSize+")");
+          out.println("histogram: (bucketsize=" + bucketSize+")");
           out.println(Arrays.toString(buckets));
         }
       }
