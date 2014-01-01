@@ -16,6 +16,7 @@ import com.senseidb.clue.api.QueryBuilder;
 import com.senseidb.clue.commands.ClueCommand;
 import com.senseidb.clue.commands.DeleteCommand;
 import com.senseidb.clue.commands.DirectoryCommand;
+import com.senseidb.clue.commands.DocSetInfoCommand;
 import com.senseidb.clue.commands.DocValCommand;
 import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.ExplainCommand;
@@ -67,6 +68,7 @@ public class ClueContext {
     new SearchCommand(this);
     new TermsCommand(this);
     new PostingsCommand(this);
+    new DocSetInfoCommand(this);
     new MergeCommand(this);
     new DeleteCommand(this);
     new ReadonlyCommand(this);
