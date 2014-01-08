@@ -14,6 +14,7 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BytesRef;
 
 import com.senseidb.clue.ClueContext;
+import com.senseidb.clue.api.BytesRefPrinter;
 
 public class PostingsCommand extends ClueCommand {
 
@@ -56,6 +57,8 @@ public class PostingsCommand extends ClueCommand {
       return;
     }
     
+    BytesRefPrinter payloadPrinter = ctx.getPayloadBytesRefDisplay().getBytesRefPrinter(field);
+    
     IndexReader reader = ctx.getIndexReader();
     List<AtomicReaderContext> leaves = reader.leaves();
     int docBase = 0;
@@ -86,7 +89,7 @@ public class PostingsCommand extends ClueCommand {
                 out.print(", end offset: "+ iter.endOffset());
                 BytesRef payload = iter.getPayload();
                 if (payload != null){
-                  out.print(", payload: "+payload);
+                  out.print(", payload: " + payloadPrinter.print(payload));
                 }
                 out.print(";");
               }

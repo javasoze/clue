@@ -11,6 +11,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 
+import com.senseidb.clue.api.BytesRefDisplay;
 import com.senseidb.clue.api.IndexReaderFactory;
 import com.senseidb.clue.api.QueryBuilder;
 import com.senseidb.clue.commands.ClueCommand;
@@ -45,6 +46,8 @@ public class ClueContext {
   private final IndexWriterConfig writerConfig;
   private final QueryBuilder queryBuilder;
   private final Analyzer analyzerQuery;
+  private final BytesRefDisplay termBytesRefDisplay;
+  private final BytesRefDisplay payloadBytesRefDisplay;
   
   public ClueContext(Directory dir, ClueConfiguration config,
        IndexWriterConfig writerConfig, boolean interactiveMode) throws Exception {
@@ -55,6 +58,8 @@ public class ClueContext {
     this.queryBuilder = config.getQueryBuilder();
     this.queryBuilder.initialize("contents", analyzerQuery);
     this.writerConfig = writerConfig;
+    this.termBytesRefDisplay = config.getTermBytesRefDisplay();
+    this.payloadBytesRefDisplay = config.getPayloadBytesRefDisplay();
     this.writer = null;
     this.interactiveMode = interactiveMode;
     this.cmdMap = new TreeMap<String, ClueCommand>();
@@ -89,6 +94,14 @@ public class ClueContext {
 
   public Analyzer getAnalyzerQuery() {
     return analyzerQuery;
+  }
+  
+  public BytesRefDisplay getTermBytesRefDisplay() {
+    return termBytesRefDisplay;
+  }
+  
+  public BytesRefDisplay getPayloadBytesRefDisplay() {
+    return payloadBytesRefDisplay;
   }
 
 

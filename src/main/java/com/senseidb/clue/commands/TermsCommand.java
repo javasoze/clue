@@ -15,6 +15,7 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.BytesRef;
 
 import com.senseidb.clue.ClueContext;
+import com.senseidb.clue.api.BytesRefPrinter;
 
 public class TermsCommand extends ClueCommand {
 
@@ -54,6 +55,8 @@ public class TermsCommand extends ClueCommand {
       out.println("Usage: field:value");
       return;
     }
+    
+    BytesRefPrinter bytesRefPrinter = ctx.getTermBytesRefDisplay().getBytesRefPrinter(field);
     
     boolean isExact = false;
     
@@ -129,7 +132,7 @@ public class TermsCommand extends ClueCommand {
       if (entry == null) break;
       BytesRef key = entry.getKey();
       AtomicInteger count = termCountMap.remove(key);
-      out.println(key.utf8ToString()+" ("+count+") ");
+      out.println(bytesRefPrinter.print(key)+" ("+count+") ");
       if (ctx.isInteractiveMode()){
         if (numCount % numPerPage == 0){
           out.println("Ctrl-D to break");
