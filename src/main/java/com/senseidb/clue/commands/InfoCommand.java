@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
@@ -39,13 +40,17 @@ public class InfoCommand extends ClueCommand {
   private static String toString(Object[] info) throws IOException {
     FieldInfo finfo = (FieldInfo) info[0];
     List<Terms> termList = (List<Terms>) info[1];
-    TreeMap<String, String> valMap = new TreeMap<String, String>();
+    TreeMap<String, String> valMap = new TreeMap<String, String>();    
     valMap.put("name", finfo.name);
     valMap.put("docval", String.valueOf(finfo.hasDocValues()));
     valMap.put("norms", String.valueOf(finfo.hasNorms()));
     valMap.put("payloads", String.valueOf(finfo.hasPayloads()));
     valMap.put("vectors", String.valueOf(finfo.hasVectors()));
     valMap.put("attributes", finfo.attributes().toString());
+    IndexOptions indexOptions = finfo.getIndexOptions();
+    if (indexOptions != null) {
+      valMap.put("index-options", finfo.getIndexOptions().name());
+    }
     if (finfo.hasNorms()) {
       valMap.put("norm_type", String.valueOf(finfo.getNormType()));
     }
