@@ -38,14 +38,18 @@ public class ClueApplication {
     return config;
   }
   
+  public ClueContext newContext(Directory dir, ClueConfiguration config, boolean interactiveMode) throws Exception {
+    return new ClueContext(dir, config, interactiveMode);
+  }
+  
   public ClueApplication(String idxLocation, boolean interactiveMode) throws Exception{
     Directory dir = config.getDirBuilder().build(new URI(idxLocation));
     if (!DirectoryReader.indexExists(dir)){
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
     }
-    IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_47, new StandardAnalyzer(Version.LUCENE_47));    
-    ctx = new ClueContext(dir, config, writerConfig, interactiveMode);
+        
+    ctx = newContext(dir, config, interactiveMode);
     helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
   

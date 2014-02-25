@@ -6,10 +6,12 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.Version;
 
 import com.senseidb.clue.api.BytesRefDisplay;
 import com.senseidb.clue.api.IndexReaderFactory;
@@ -49,15 +51,15 @@ public class ClueContext {
   private final BytesRefDisplay termBytesRefDisplay;
   private final BytesRefDisplay payloadBytesRefDisplay;
   
-  public ClueContext(Directory dir, ClueConfiguration config,
-       IndexWriterConfig writerConfig, boolean interactiveMode) throws Exception {
+  public ClueContext(Directory dir, ClueConfiguration config, boolean interactiveMode) 
+      throws Exception {
     this.directory = dir;
     this.analyzerQuery = config.getAnalyzerQuery();
     this.readerFactory = config.getIndexReaderFactory();
     this.readerFactory.initialize(directory);
     this.queryBuilder = config.getQueryBuilder();
     this.queryBuilder.initialize("contents", analyzerQuery);
-    this.writerConfig = writerConfig;
+    this.writerConfig = new IndexWriterConfig(Version.LUCENE_47, new StandardAnalyzer(Version.LUCENE_47));
     this.termBytesRefDisplay = config.getTermBytesRefDisplay();
     this.payloadBytesRefDisplay = config.getPayloadBytesRefDisplay();
     this.writer = null;

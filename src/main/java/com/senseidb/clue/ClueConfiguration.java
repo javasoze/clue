@@ -36,6 +36,8 @@ public class ClueConfiguration {
   private final BytesRefDisplay termBytesRefDisplay;
   private final BytesRefDisplay payloadBytesRefDisplay;
   
+  private final Properties config;
+  
   private static <T> T getInstance(String className, T defaultInstance) {
     try {
       if (className == null) {
@@ -53,8 +55,13 @@ public class ClueConfiguration {
       }
     }
   }
+  
+  public Properties getProperties() {
+    return config;
+  }
 
-  private ClueConfiguration(Properties config) {    
+  private ClueConfiguration(Properties config) { 
+    this.config = config;
     analyzerQuery = getInstance(config.getProperty(ANALYZER_QUERY_PARAM), 
         new StandardAnalyzer(Version.LUCENE_47));    
     dirBuilder = getInstance(config.getProperty(DIRECTORY_BUILDER_PARAM),
