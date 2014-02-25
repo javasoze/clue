@@ -92,7 +92,7 @@ public class BuildSampleIndex {
     
     File idxDir = new File(args[1]);
     
-    IndexWriterConfig idxWriterConfig = new IndexWriterConfig(Version.LUCENE_45, new StandardAnalyzer(Version.LUCENE_45));
+    IndexWriterConfig idxWriterConfig = new IndexWriterConfig(Version.LUCENE_47, new StandardAnalyzer(Version.LUCENE_47));
     Directory dir = FSDirectory.open(idxDir);
     IndexWriter writer = new IndexWriter(dir, idxWriterConfig);
     int count = 0;

@@ -45,7 +45,7 @@ public class ClueConfiguration {
       return obj;
     } catch (Exception e) {
       try { 
-        T obj2 = (T) (Class.forName(className).getConstructor(Version.class).newInstance(Version.LUCENE_46));
+        T obj2 = (T) (Class.forName(className).getConstructor(Version.class).newInstance(Version.LUCENE_47));
         return obj2; 
       } catch (Exception e2) {
         System.out.println("unable to obtain instance of class: " + className);
@@ -56,7 +56,7 @@ public class ClueConfiguration {
 
   private ClueConfiguration(Properties config) {    
     analyzerQuery = getInstance(config.getProperty(ANALYZER_QUERY_PARAM), 
-        new StandardAnalyzer(Version.LUCENE_46));    
+        new StandardAnalyzer(Version.LUCENE_47));    
     dirBuilder = getInstance(config.getProperty(DIRECTORY_BUILDER_PARAM),
         new DefaultDirectoryBuilder());
     queryBuilder = getInstance(config.getProperty(QUERY_BUILDER_PARAM),
