@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
@@ -37,25 +36,26 @@ public class InfoCommand extends ClueCommand {
   }
 
   @SuppressWarnings("unchecked")
-  private static String toString(Object[] info) throws IOException {
+  private static void toString(Object[] info, PrintStream out) throws IOException {
     FieldInfo finfo = (FieldInfo) info[0];
     List<Terms> termList = (List<Terms>) info[1];
-    TreeMap<String, String> valMap = new TreeMap<String, String>();    
-    valMap.put("name", finfo.name);
-    valMap.put("docval", String.valueOf(finfo.hasDocValues()));
-    valMap.put("norms", String.valueOf(finfo.hasNorms()));
-    valMap.put("payloads", String.valueOf(finfo.hasPayloads()));
-    valMap.put("vectors", String.valueOf(finfo.hasVectors()));
-    valMap.put("attributes", finfo.attributes().toString());
+    out.println("name:\t" + finfo.name);
+    out.println("norms:\t" + String.valueOf(finfo.hasNorms()));
+    out.println("payloads:\t" + String.valueOf(finfo.hasPayloads()));
+    out.println("docval:\t" + String.valueOf(finfo.hasDocValues()));
     IndexOptions indexOptions = finfo.getIndexOptions();
     if (indexOptions != null) {
-      valMap.put("index-options", finfo.getIndexOptions().name());
+      out.println("index_options:\t" + finfo.getIndexOptions().name());
     }
+    
+    out.println("vectors:\t" + String.valueOf(finfo.hasVectors()));
+    out.println("attributes:\t" + finfo.attributes().toString());
+    
     if (finfo.hasNorms()) {
-      valMap.put("norm_type", String.valueOf(finfo.getNormType()));
+      out.println("norm_type:\t" + String.valueOf(finfo.getNormType()));
     }
     if (finfo.hasDocValues()) {
-      valMap.put("docval_type", String.valueOf(finfo.getDocValuesType()));
+      out.println("docval_type:\t" + String.valueOf(finfo.getDocValuesType()));
     } else {
 
       if (termList != null) {
@@ -85,14 +85,12 @@ public class InfoCommand extends ClueCommand {
         if (sumTotalTermFreq < 0) {
           sumTotalTermFreq = -1;
         }
-        valMap.put("num_terms", String.valueOf(numTerms));
-        valMap.put("doc_count", String.valueOf(docCount));
-        valMap.put("sum_doc_freq", String.valueOf(sumDocFreq));
-        valMap.put("sum_total_term_freq", String.valueOf(sumTotalTermFreq));
+        out.println("num_terms:\t" + String.valueOf(numTerms));
+        out.println("doc_count:\t" + String.valueOf(docCount));
+        out.println("sum_doc_freq:\t" + String.valueOf(sumDocFreq));
+        out.println("sum_total_term_freq:\t" + String.valueOf(sumTotalTermFreq));
       }
     }
-
-    return valMap.toString();
   }
 
   @Override
@@ -133,8 +131,11 @@ public class InfoCommand extends ClueCommand {
         }
       }
       out.println("number of fields: " + fields.size());
+      
       for (Object[] finfo : fields.values()) {
-        out.println(toString(finfo));
+        FieldInfo f = (FieldInfo) finfo[0];
+        out.println("=================================== Field "+f.name+" ===================================");
+        toString(finfo, out);
       }
     } else {
       int segid;
@@ -153,10 +154,10 @@ public class InfoCommand extends ClueCommand {
       AtomicReader atomicReader = leaf.reader();
 
       out.println("segment " + segid + ": ");
-      out.println("doc base: " + leaf.docBase);
-      out.println("numdocs: " + atomicReader.numDocs());
-      out.println("maxdoc: " + atomicReader.maxDoc());
-      out.println("num deleted docs: " + atomicReader.numDeletedDocs());
+      out.println("doc base:\t" + leaf.docBase);
+      out.println("numdocs:\t" + atomicReader.numDocs());
+      out.println("maxdoc:\t" + atomicReader.maxDoc());
+      out.println("num deleted docs:\t" + atomicReader.numDeletedDocs());
 
       FieldInfos fields = atomicReader.getFieldInfos();
       Fields flds = atomicReader.fields();
@@ -166,7 +167,8 @@ public class InfoCommand extends ClueCommand {
       for (int i = 0; i < fields.size(); ++i) {
         FieldInfo finfo = fields.fieldInfo(i);
         Terms te = flds.terms(finfo.name);
-        out.println(toString(new Object[] { finfo, Arrays.asList(te) }));
+        out.println("=================================== Field "+finfo.name+" ===================================");
+        toString(new Object[] { finfo, Arrays.asList(te) }, out);
       }
     }
 
