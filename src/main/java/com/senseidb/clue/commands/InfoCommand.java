@@ -3,10 +3,11 @@ package com.senseidb.clue.commands;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
@@ -39,57 +40,55 @@ public class InfoCommand extends ClueCommand {
   private static void toString(Object[] info, PrintStream out) throws IOException {
     FieldInfo finfo = (FieldInfo) info[0];
     List<Terms> termList = (List<Terms>) info[1];
-    out.println("name:\t" + finfo.name);
-    out.println("norms:\t" + String.valueOf(finfo.hasNorms()));
-    out.println("payloads:\t" + String.valueOf(finfo.hasPayloads()));
-    out.println("docval:\t" + String.valueOf(finfo.hasDocValues()));
-    IndexOptions indexOptions = finfo.getIndexOptions();
-    if (indexOptions != null) {
-      out.println("index_options:\t" + finfo.getIndexOptions().name());
+    out.println("name:\t\t" + finfo.name);    
+    out.println("docval:\t\t" + String.valueOf(finfo.hasDocValues()));
+    if (finfo.hasDocValues()) {
+      out.println("docval_type:\t" + String.valueOf(finfo.getDocValuesType()));
     }
-    
-    out.println("vectors:\t" + String.valueOf(finfo.hasVectors()));
-    out.println("attributes:\t" + finfo.attributes().toString());
+    out.println("norms:\t\t" + String.valueOf(finfo.hasNorms()));
     
     if (finfo.hasNorms()) {
       out.println("norm_type:\t" + String.valueOf(finfo.getNormType()));
     }
-    if (finfo.hasDocValues()) {
-      out.println("docval_type:\t" + String.valueOf(finfo.getDocValuesType()));
-    } else {
+    out.println("indexed:\t" + String.valueOf(finfo.isIndexed()));
+    IndexOptions indexOptions = finfo.getIndexOptions();
+    if (indexOptions != null) {
+      out.println("index_options:\t" + finfo.getIndexOptions().name());
+    }
+    out.println("payloads:\t" + String.valueOf(finfo.hasPayloads()));
+    out.println("vectors:\t" + String.valueOf(finfo.hasVectors()));
+    out.println("attributes:\t" + finfo.attributes().toString());
+    if (termList != null) {
 
-      if (termList != null) {
+      long numTerms = 0L;
+      long docCount = 0L;
+      long sumDocFreq = 0L;
+      long sumTotalTermFreq = 0L;
 
-        long numTerms = 0L;
-        long docCount = 0L;
-        long sumDocFreq = 0L;
-        long sumTotalTermFreq = 0L;
-
-        for (Terms t : termList) {
-          if (t != null) {
-            numTerms += t.size();
-            docCount += t.getDocCount();
-            sumDocFreq += t.getSumDocFreq();
-            sumTotalTermFreq += t.getSumTotalTermFreq();
-          }
+      for (Terms t : termList) {
+        if (t != null) {
+          numTerms += t.size();
+          docCount += t.getDocCount();
+          sumDocFreq += t.getSumDocFreq();
+          sumTotalTermFreq += t.getSumTotalTermFreq();
         }
-        if (numTerms < 0) {
-          numTerms = -1;
-        }
-        if (docCount < 0) {
-          docCount = -1;
-        }
-        if (sumDocFreq < 0) {
-          sumDocFreq = -1;
-        }
-        if (sumTotalTermFreq < 0) {
-          sumTotalTermFreq = -1;
-        }
-        out.println("num_terms:\t" + String.valueOf(numTerms));
-        out.println("doc_count:\t" + String.valueOf(docCount));
-        out.println("sum_doc_freq:\t" + String.valueOf(sumDocFreq));
-        out.println("sum_total_term_freq:\t" + String.valueOf(sumTotalTermFreq));
       }
+      if (numTerms < 0) {
+        numTerms = -1;
+      }
+      if (docCount < 0) {
+        docCount = -1;
+      }
+      if (sumDocFreq < 0) {
+        sumDocFreq = -1;
+      }
+      if (sumTotalTermFreq < 0) {
+        sumTotalTermFreq = -1;
+      }
+      out.println("num_terms:\t" + String.valueOf(numTerms));
+      out.println("doc_count:\t" + String.valueOf(docCount));
+      out.println("sum_doc_freq:\t" + String.valueOf(sumDocFreq));
+      out.println("sum_total_term_freq:\t" + String.valueOf(sumTotalTermFreq));
     }
   }
 
@@ -105,7 +104,7 @@ public class InfoCommand extends ClueCommand {
       out.println("maxdoc: " + r.maxDoc());
       out.println("num deleted docs: " + r.numDeletedDocs());
       out.println("segment count: " + leaves.size());
-      HashMap<String, Object[]> fields = new HashMap<String, Object[]>();
+      SortedMap<String, Object[]> fields = new TreeMap<String, Object[]>();
       for (AtomicReaderContext leaf : leaves) {
         AtomicReader ar = leaf.reader();
         FieldInfos fldInfos = ar.getFieldInfos();
