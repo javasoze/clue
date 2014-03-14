@@ -40,7 +40,7 @@ clue jar with only clue class files, used as a library:
      [clue-0.0.5.jar](https://github.com/javasoze/clue/releases/download/release-0.0.5/clue-0.0.5.jar)
 
 distribution
-     [clue.tar.gz](https://github.com/javasoze/clue/releases/download/release-0.0.4/clue.tar.gz)
+     [clue-0.0.5.tar.gz](https://github.com/javasoze/clue/releases/download/release-0.0.5/clue-0.0.5.tar.gz)
 
 ### Build:
 
