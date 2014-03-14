@@ -6,11 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.URI;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.Version;
 
 import com.senseidb.clue.commands.ClueCommand;
 import com.senseidb.clue.commands.HelpCommand;
