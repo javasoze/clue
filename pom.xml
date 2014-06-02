@@ -6,7 +6,7 @@
 	<artifactId>clue</artifactId>
 	<packaging>jar</packaging>
 	<name>clue</name>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 	<description>command line client for Apache Lucene</description>
 
 	<url>http://github.com/javasoze/clue</url>
@@ -98,27 +98,27 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>4.7.0</version>
+			<version>4.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-codecs</artifactId>
-			<version>4.7.0</version>
+			<version>4.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queries</artifactId>
-			<version>4.7.0</version>
+			<version>4.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queryparser</artifactId>
-			<version>4.7.0</version>
+			<version>4.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-facet</artifactId>
-			<version>4.7.0</version>
+			<version>4.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>

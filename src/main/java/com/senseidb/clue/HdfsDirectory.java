@@ -119,6 +119,11 @@ public class HdfsDirectory extends BaseDirectory {
       out.write(b, offset, length);
       currentPosition += length;
     }
+
+	@Override
+	public long getChecksum() throws IOException {
+	  return 0L;
+	}
     
   }
   

@@ -59,7 +59,7 @@ public class ClueContext {
     this.readerFactory.initialize(directory);
     this.queryBuilder = config.getQueryBuilder();
     this.queryBuilder.initialize("contents", analyzerQuery);
-    this.writerConfig = new IndexWriterConfig(Version.LUCENE_47, new StandardAnalyzer(Version.LUCENE_47));
+    this.writerConfig = new IndexWriterConfig(Version.LUCENE_48, new StandardAnalyzer(Version.LUCENE_48));
     this.termBytesRefDisplay = config.getTermBytesRefDisplay();
     this.payloadBytesRefDisplay = config.getPayloadBytesRefDisplay();
     this.writer = null;

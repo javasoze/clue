@@ -12,7 +12,7 @@ public class DefaultQueryBuilder implements QueryBuilder {
   @Override
   public void initialize(String defaultField, Analyzer analyzer)
       throws Exception {
-    parser = new QueryParser(Version.LUCENE_47, defaultField, analyzer);
+    parser = new QueryParser(Version.LUCENE_48, defaultField, analyzer);
     
   }
 

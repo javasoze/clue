@@ -60,7 +60,7 @@ public class ExportCommand extends ClueCommand {
     IndexWriter writer = null;
     
     try {
-      IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_47, null);
+      IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_48, null);
       if (isExportToText) {
         conf.setCodec(new SimpleTextCodec());
       }
