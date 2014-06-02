@@ -18,12 +18,14 @@ import com.senseidb.clue.api.IndexReaderFactory;
 import com.senseidb.clue.api.QueryBuilder;
 import com.senseidb.clue.commands.ClueCommand;
 import com.senseidb.clue.commands.DeleteCommand;
+import com.senseidb.clue.commands.DeleteUserCommitData;
 import com.senseidb.clue.commands.DirectoryCommand;
 import com.senseidb.clue.commands.DocSetInfoCommand;
 import com.senseidb.clue.commands.DocValCommand;
 import com.senseidb.clue.commands.ExitCommand;
 import com.senseidb.clue.commands.ExplainCommand;
 import com.senseidb.clue.commands.ExportCommand;
+import com.senseidb.clue.commands.GetUserCommitDataCommand;
 import com.senseidb.clue.commands.HelpCommand;
 import com.senseidb.clue.commands.IndexTrimCommand;
 import com.senseidb.clue.commands.InfoCommand;
@@ -32,6 +34,7 @@ import com.senseidb.clue.commands.NormsCommand;
 import com.senseidb.clue.commands.PostingsCommand;
 import com.senseidb.clue.commands.ReadonlyCommand;
 import com.senseidb.clue.commands.ReconstructCommand;
+import com.senseidb.clue.commands.SaveUserCommitData;
 import com.senseidb.clue.commands.SearchCommand;
 import com.senseidb.clue.commands.StoredFieldCommand;
 import com.senseidb.clue.commands.TermVectorCommand;
@@ -87,6 +90,9 @@ public class ClueContext {
     new ReconstructCommand(this);
     new ExportCommand(this);
     new IndexTrimCommand(this);
+    new GetUserCommitDataCommand(this);
+    new SaveUserCommitData(this);
+    new DeleteUserCommitData(this);
   }
   
   

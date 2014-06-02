@@ -1,6 +1,7 @@
 package com.senseidb.clue.commands;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class SaveUserCommitData extends ClueCommand {
 			writer.setCommitData(commitData);
 			writer.commit();
 			ctx.refreshReader();
+			out.println("commit data: " + Arrays.toString(args) +" saved.");
 		} else {
 			out.println("unable to open writer, index is in readonly mode");
 		}
