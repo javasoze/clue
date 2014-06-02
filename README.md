@@ -20,27 +20,27 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 0.0.4
+latest version: 0.0.5
 
 #### What's new in this release?
 
-* Add ability to investigate indexes on HDFS
-* Add command to dump the index
-* Add command to import from a dumped index
-* Add configuration support, now you can configure Clue to run your own custom code
-* Add index trimming functionlity: sometimes you want a smaller index to work with
-* lucene 4.5.1 upgrade
+* Made info command more readable
+* Added printing of IndexingOptions to infos command
+* Made printing of terms and payloads configurable
+* Added command to print out docid set status for each posting list
+* Bug fix: Store command is not adjusting docids correctly
+* Lucene 4.7.0 upgrade
 
-source: [release-0.0.4.zip](https://github.com/javasoze/clue/archive/release-0.0.4.zip)
+source: [release-0.0.5.zip](https://github.com/javasoze/clue/archive/release-0.0.5.zip)
 
 clue-all executable jar with all dependencies:
-     [clue-all-0.0.4.jar](https://github.com/javasoze/clue/releases/download/release-0.0.4/clue-all-0.0.4.jar)
+     [clue-all-0.0.5.jar](https://github.com/javasoze/clue/releases/download/release-0.0.5/clue-all-0.0.5.jar)
 
 clue jar with only clue class files, used as a library:
-     [clue-0.0.4.jar](https://github.com/javasoze/clue/releases/download/release-0.0.4/clue-0.0.4.jar)
+     [clue-0.0.5.jar](https://github.com/javasoze/clue/releases/download/release-0.0.5/clue-0.0.5.jar)
 
 distribution
-     [clue.tar.gz](https://github.com/javasoze/clue/releases/download/release-0.0.4/clue.tar.gz)
+     [clue-0.0.5.tar.gz](https://github.com/javasoze/clue/releases/download/release-0.0.5/clue-0.0.5.tar.gz)
 
 ### Build:
 
@@ -77,6 +77,7 @@ Command list:
 	IndexReader Factory: 	class com.senseidb.clue.api.DefaultIndexReaderFactory
 	delete - deletes a list of documents from searching via a query, input: query
 	directory - prints directory information
+	docsetinfo - doc id set info and stats
 	docval - gets doc value for a given doc, <field> <docid>, if <docid> not specified, all docs are shown
 	exit - exits program
 	explain - shows score explanation of a doc
