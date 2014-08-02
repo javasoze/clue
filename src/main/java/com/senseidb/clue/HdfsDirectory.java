@@ -70,7 +70,8 @@ public class HdfsDirectory extends BaseDirectory {
 
   @Override
   public IndexInput openInput(String name, IOContext context) throws IOException {
-    return new HDFSIndexInput(new Path(dir, name));
+    Path path = new Path(dir, name);
+    return new HDFSIndexInput("HDFSIndexInput(path=\"" + path.getName() + "\")", path);
   }
 
   private class HDFSIndexOutput extends IndexOutput {
@@ -96,11 +97,6 @@ public class HdfsDirectory extends BaseDirectory {
     @Override
     public long getFilePointer() {
       return currentPosition;
-    }
-
-    @Override
-    public void seek(long pos) throws IOException {
-      throw new UnsupportedOperationException("invalid call on seek");
     }
 
     @Override
@@ -130,11 +126,23 @@ public class HdfsDirectory extends BaseDirectory {
   private class HDFSIndexInput extends IndexInput {
     private final Path path;
     private final FSDataInputStream in;
+    private final long len;
 
-    private HDFSIndexInput(Path path) throws IOException {
-      super(path == null ? "" : path.getName());
+    private HDFSIndexInput(String resourceDesc, Path path) throws IOException {
+      super(resourceDesc);
       this.path = path;
       this.in = fs.open(path);
+      this.len = fs.getFileStatus(path).getLen();
+    }
+    
+    private HDFSIndexInput(String resourceDesc, Path path, long offset, long len) throws IOException {
+      super(resourceDesc);
+      this.path = path;
+      this.in = fs.open(path);
+      this.len = len;
+      if (offset > 0) {
+        in.seek(offset);
+      }
     }
 
     @Override
@@ -153,11 +161,7 @@ public class HdfsDirectory extends BaseDirectory {
 
     @Override
     public long length() {
-      try {
-        return fs.getFileStatus(path).getLen();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      return len;
     }
 
     @Override
@@ -166,13 +170,19 @@ public class HdfsDirectory extends BaseDirectory {
     }
 
     @Override
-    public void readBytes(byte[] b, int offset, int len) throws IOException {
+    public void readBytes(byte[] b, int offset, int len) throws IOException {      
       in.readFully(b, offset, len);
     }
 
     @Override
     public void seek(long pos) throws IOException {
       in.seek(pos);
+    }
+
+    @Override
+    public IndexInput slice(String sliceDescription, long offset, long length)
+        throws IOException {
+      return new HDFSIndexInput(sliceDescription, path, offset, length);
     }
   }
 }

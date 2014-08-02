@@ -13,6 +13,7 @@ import org.apache.lucene.index.FieldInfo.DocValuesType;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.SortedDocValues;
+import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.util.BytesRef;
 
@@ -51,12 +52,12 @@ public class DocValCommand extends ClueCommand {
         break;
       case BINARY:
         BinaryDocValues bv = (BinaryDocValues)docVals;
-        bv.get(subid, bytesRef);
+        bytesRef = bv.get(subid);
         val = bytesRef.utf8ToString();
         break;
       case SORTED: {
         SortedDocValues sv = (SortedDocValues)docVals;
-        sv.get(subid, bytesRef);
+        bytesRef = sv.get(subid);
         StringBuffer sb = new StringBuffer();
         sb.append("numTerms in field: ").append(sv.getValueCount()).append(", ");
         sb.append("value: [");
@@ -75,13 +76,33 @@ public class DocValCommand extends ClueCommand {
         sb.append("values: [");
         boolean firstPass = true;
         while ((nextOrd = sv.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS) {
-          sv.lookupOrd(nextOrd, bytesRef);
+          bytesRef = sv.lookupOrd(nextOrd);
           if (!firstPass) {
             sb.append(", ");
           }
           sb.append(bytesRef.utf8ToString());
           firstPass = false;
         }
+        sb.append("]");
+        val = sb.toString();
+        break;
+      }
+      case SORTED_NUMERIC: {
+        SortedNumericDocValues sv = (SortedNumericDocValues)docVals;
+        sv.setDocument(subid);        
+        int count = sv.count();
+        StringBuffer sb = new StringBuffer();
+        sb.append("numTerms in field: ").append(count).append(", ");
+        sb.append("values: [");
+        boolean firstPass = true;
+        for (int i = 0; i < count; ++i) {
+          long nextVal = sv.valueAt(i);
+          if (!firstPass) {
+            sb.append(", ");
+          }
+          sb.append(String.valueOf(nextVal));
+          firstPass = false;
+        }        
         sb.append("]");
         val = sb.toString();
         break;
@@ -111,6 +132,9 @@ public class DocValCommand extends ClueCommand {
     }
     else if (docValType == DocValuesType.SORTED) {
       docVals = atomicReader.getSortedDocValues(field);
+    }
+    else if (docValType == DocValuesType.SORTED_NUMERIC) {
+      docVals = atomicReader.getSortedNumericDocValues(field);
     }
     else if (docValType == DocValuesType.SORTED_SET) {
       docVals = atomicReader.getSortedSetDocValues(field);
