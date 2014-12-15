@@ -65,10 +65,9 @@ public class ClueApplication {
   }
   
   public void run() throws IOException {
-    BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
     while(true){
       System.out.print("> ");
-      String line = inReader.readLine();
+      String line = ctx.readCommand();
       if (line == null || line.isEmpty()) continue;
       line = line.trim();
       String[] parts = line.split("\\s");

@@ -1,9 +1,16 @@
 package com.senseidb.clue;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import jline.console.ConsoleReader;
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.Completer;
+import jline.console.completer.FileNameCompleter;
+import jline.console.completer.StringsCompleter;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -42,6 +49,7 @@ import com.senseidb.clue.commands.TermsCommand;
 
 public class ClueContext {
 
+  private final ConsoleReader consoleReader;
   private final IndexReaderFactory readerFactory;
   private final SortedMap<String, ClueCommand> cmdMap;
   private final boolean interactiveMode;
@@ -93,8 +101,27 @@ public class ClueContext {
     new GetUserCommitDataCommand(this);
     new SaveUserCommitData(this);
     new DeleteUserCommitData(this);
+
+    this.consoleReader = new ConsoleReader();
+    this.consoleReader.setBellEnabled(false);
+    initAutoCompletion();
   }
-  
+  void initAutoCompletion() {
+    LinkedList<Completer> completors = new LinkedList<Completer>();
+    completors.add(new StringsCompleter(cmdMap.keySet()));
+    completors.add(new FileNameCompleter());
+
+    consoleReader.addCompleter(new ArgumentCompleter(completors));
+  }
+  public String readCommand() {
+      String prompt = directory.getLockID()+"> ";
+      try {
+          return consoleReader.readLine(prompt);
+      } catch (IOException e) {
+          System.err.println("Error! Clue is unable to read line from stdin: " + e.getMessage());
+          throw new IllegalStateException("Unable to read command line!", e);
+      }
+  }
   
   public QueryBuilder getQueryBuilder() {
     return queryBuilder;
