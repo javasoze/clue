@@ -66,7 +66,6 @@ public class ClueApplication {
   
   public void run() throws IOException {
     while(true){
-      System.out.print("> ");
       String line = ctx.readCommand();
       if (line == null || line.isEmpty()) continue;
       line = line.trim();

@@ -114,13 +114,12 @@ public class ClueContext {
     consoleReader.addCompleter(new ArgumentCompleter(completors));
   }
   public String readCommand() {
-      String prompt = directory.getLockID()+"> ";
-      try {
-          return consoleReader.readLine(prompt);
-      } catch (IOException e) {
-          System.err.println("Error! Clue is unable to read line from stdin: " + e.getMessage());
-          throw new IllegalStateException("Unable to read command line!", e);
-      }
+    try {
+      return consoleReader.readLine("> ");
+    } catch (IOException e) {
+      System.err.println("Error! Clue is unable to read line from stdin: " + e.getMessage());
+      throw new IllegalStateException("Unable to read command line!", e);
+    }
   }
   
   public QueryBuilder getQueryBuilder() {
