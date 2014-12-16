@@ -1,6 +1,7 @@
 package com.senseidb.clue;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.SortedMap;
@@ -14,6 +15,9 @@ import jline.console.completer.StringsCompleter;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -109,9 +113,20 @@ public class ClueContext {
   void initAutoCompletion() {
     LinkedList<Completer> completors = new LinkedList<Completer>();
     completors.add(new StringsCompleter(cmdMap.keySet()));
+    completors.add(new StringsCompleter(fieldNames()));
     completors.add(new FileNameCompleter());
 
     consoleReader.addCompleter(new ArgumentCompleter(completors));
+  }
+  Collection<String> fieldNames() {
+    LinkedList<String> fieldNames = new LinkedList<String>();
+    for (AtomicReaderContext context : getIndexReader().leaves()) {
+      AtomicReader reader = context.reader();
+      for(FieldInfo info : reader.getFieldInfos()) {
+        fieldNames.add(info.name);
+      }
+    }
+    return fieldNames;
   }
   public String readCommand() {
     try {
