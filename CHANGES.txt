@@ -4,7 +4,7 @@ Version 0.0.4
 * Add command to dump the index
 * Add command to import from a dumped index
 * Add configuration support, now you can configure Clue to run your own custom code
-* Add index trimming functionlity: sometimes you want a smaller index to work with
+* Add index trimming functionality: sometimes you want a smaller index to work with
 * lucene 4.5.1 upgrade
 
 Version 0.0.3
@@ -20,7 +20,7 @@ Version 0.0.2
 
 * lucene 4.3 upgrade.
 * readonly support - you can toggle on/off readonly mode so you can view an index opened (for write) by another process.
-* better docvalue support - major speed on up viewing docvalues, and all types of docvalus are now supported: numeric, binary, sorted and sortedset.
+* better docvalue support - major speed on up viewing docvalues, and all types of docvalues are now supported: numeric, binary, sorted and sortedset.
 * bundle sample data and tool for producing a sample index exhibiting all features of the tool.
 
 Version 0.0.1
