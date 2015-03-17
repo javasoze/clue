@@ -12,7 +12,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.Version;
 
 import com.senseidb.clue.api.BytesRefDisplay;
 import com.senseidb.clue.api.IndexReaderFactory;
@@ -40,7 +39,7 @@ public class ClueContext {
     this.readerFactory.initialize(directory);
     this.queryBuilder = config.getQueryBuilder();
     this.queryBuilder.initialize("contents", analyzerQuery);
-    this.writerConfig = new IndexWriterConfig(Version.LUCENE_48, new StandardAnalyzer(Version.LUCENE_48));
+    this.writerConfig = new IndexWriterConfig(new StandardAnalyzer());
     this.termBytesRefDisplay = config.getTermBytesRefDisplay();
     this.payloadBytesRefDisplay = config.getPayloadBytesRefDisplay();
     this.writer = null;

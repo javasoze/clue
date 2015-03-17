@@ -4,8 +4,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.NumericDocValues;
@@ -70,13 +70,13 @@ public class NormsCommand extends ClueCommand {
       docidList = null;
     }
 
-    List<AtomicReaderContext> leaves = reader.leaves();
+    List<LeafReaderContext> leaves = reader.leaves();
     if (docidList != null && !docidList.isEmpty()) {
       for (int i = leaves.size() - 1; i >= 0; --i) {
-        AtomicReaderContext ctx = leaves.get(i);
+        LeafReaderContext ctx = leaves.get(i);
         for (Integer docid : docidList) {
           if (ctx.docBase <= docid) {
-            AtomicReader atomicReader = ctx.reader();
+            LeafReader atomicReader = ctx.reader();
             FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
             
             if (finfo == null || !finfo.hasNorms()) {
@@ -92,8 +92,8 @@ public class NormsCommand extends ClueCommand {
       return;
     } else {
       for (int i = 0; i < leaves.size(); ++i) {
-        AtomicReaderContext ctx = leaves.get(i);
-        AtomicReader atomicReader = ctx.reader();
+        LeafReaderContext ctx = leaves.get(i);
+        LeafReader atomicReader = ctx.reader();
         FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
 
         if (finfo == null || !finfo.hasNorms()) {

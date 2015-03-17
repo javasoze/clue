@@ -49,7 +49,7 @@ public class ExplainCommand extends ClueCommand {
       out.println("error in parsing docids: "+e.getMessage());
       return;
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     
     for (int i=0; i<args.length-1;++i) {
       buf.append(args[i]).append(" ");

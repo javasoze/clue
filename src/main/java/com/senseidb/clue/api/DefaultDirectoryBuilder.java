@@ -1,8 +1,8 @@
 package com.senseidb.clue.api;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.FileSystems;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +13,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import com.senseidb.clue.HdfsDirectory;
+import org.apache.lucene.store.NoLockFactory;
 
 public class DefaultDirectoryBuilder implements DirectoryBuilder {
 
@@ -27,11 +28,11 @@ public class DefaultDirectoryBuilder implements DirectoryBuilder {
     
     if (SUPPORTED_SCHEMES.contains(scheme)) {
       if ("file".equals(scheme)) {
-        return FSDirectory.open(new File(idxUri.getPath()));
+        return FSDirectory.open(FileSystems.getDefault().getPath(idxUri.getPath()));
       }
       else if ("hdfs".equals(scheme)){        
         Path hdfsPath = new Path(idxUri.getPath());
-        return new HdfsDirectory(hdfsPath, hdfsPath.getFileSystem(new Configuration()));
+        return new HdfsDirectory(NoLockFactory.INSTANCE, idxUri.getPath(), hdfsPath.getFileSystem(new Configuration()));
       }
       else {
         throw new IOException("unsupported protocol: " + scheme);

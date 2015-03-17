@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -35,7 +35,7 @@ public class TermsCommand extends ClueCommand {
 
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
-    String field = null;
+    String field;
     String termVal = null;
     try{
       field = args[0];
@@ -70,15 +70,15 @@ public class TermsCommand extends ClueCommand {
     }
         
     IndexReader reader = ctx.getIndexReader();
-    List<AtomicReaderContext> leaves = reader.leaves();
+    List<LeafReaderContext> leaves = reader.leaves();
     TreeMap<BytesRef,TermsEnum> termMap = null;
     HashMap<BytesRef,AtomicInteger> termCountMap = new HashMap<BytesRef,AtomicInteger>();
 
     int numCount = 0;
     int numPerPage = 20;
     
-    for (AtomicReaderContext leaf : leaves){
-      AtomicReader atomicReader = leaf.reader();
+    for (LeafReaderContext leaf : leaves){
+      LeafReader atomicReader = leaf.reader();
       
       Terms terms = atomicReader.fields().terms(field);
       
@@ -87,7 +87,7 @@ public class TermsCommand extends ClueCommand {
       }
       
       if (termMap == null){
-        termMap = new TreeMap<BytesRef,TermsEnum>(terms.getComparator());
+        termMap = new TreeMap<BytesRef,TermsEnum>();
       }
       
       

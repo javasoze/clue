@@ -25,9 +25,10 @@ public class PayloadTokenizer extends Tokenizer {
   private int count = 0;
   private Iterator<String> iter = null;
   
-  public PayloadTokenizer(String text) {
-    super(new StringReader(text));
-    this.tokens = text == null ? new String[0] : text.toLowerCase().split(",");
+  public PayloadTokenizer(String text)
+          throws IOException {
+    setReader(new StringReader(text));
+    this.tokens = text.toLowerCase().split(",");
     
     termAttr = addAttribute(CharTermAttribute.class);
     termAttr.resizeBuffer(text.length()); // maximum size necessary is the size of the input
@@ -37,7 +38,7 @@ public class PayloadTokenizer extends Tokenizer {
     offsetAttr = addAttribute(OffsetAttribute.class);
   }
 
-  private static final BytesRef intToByteArray(int value,BytesRef reuse) {
+  private static BytesRef intToByteArray(int value,BytesRef reuse) {
     ByteBuffer.wrap(reuse.bytes).putInt(value);
     return reuse;
   }

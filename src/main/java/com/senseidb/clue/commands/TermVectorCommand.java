@@ -3,8 +3,8 @@ package com.senseidb.clue.commands;
 import java.io.PrintStream;
 import java.util.List;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Terms;
@@ -41,12 +41,12 @@ public class TermVectorCommand extends ClueCommand {
     int doc = Integer.parseInt(args[1]);
     
     IndexReader reader = ctx.getIndexReader();
-    List<AtomicReaderContext> leaves = reader.leaves();
+    List<LeafReaderContext> leaves = reader.leaves();
     
     boolean found = false;
     boolean tvFound = false;
-    for (AtomicReaderContext ctx : leaves) {
-      AtomicReader atomicReader = ctx.reader();
+    for (LeafReaderContext ctx : leaves) {
+      LeafReader atomicReader = ctx.reader();
       FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
       if (finfo == null || !finfo.hasVectors()) continue;
       

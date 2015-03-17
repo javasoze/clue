@@ -5,11 +5,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfo.DocValuesType;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.SortedDocValues;
@@ -58,7 +58,7 @@ public class DocValCommand extends ClueCommand {
       case SORTED: {
         SortedDocValues sv = (SortedDocValues)docVals;
         bytesRef = sv.get(subid);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("numTerms in field: ").append(sv.getValueCount()).append(", ");
         sb.append("value: [");
         sb.append(bytesRef.utf8ToString());
@@ -71,7 +71,7 @@ public class DocValCommand extends ClueCommand {
         sv.setDocument(subid);
         long nextOrd;
         long count = sv.getValueCount();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("numTerms in field: ").append(count).append(", ");
         sb.append("values: [");
         boolean firstPass = true;
@@ -91,7 +91,7 @@ public class DocValCommand extends ClueCommand {
         SortedNumericDocValues sv = (SortedNumericDocValues)docVals;
         sv.setDocument(subid);        
         int count = sv.count();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("numTerms in field: ").append(count).append(", ");
         sb.append("values: [");
         boolean firstPass = true;
@@ -122,7 +122,7 @@ public class DocValCommand extends ClueCommand {
     }
   }
   
-  private Object readDocValues(String field, DocValuesType docValType, AtomicReader atomicReader) throws IOException{
+  private Object readDocValues(String field, DocValuesType docValType, LeafReader atomicReader) throws IOException{
     Object docVals = null;
     if (docValType == DocValuesType.NUMERIC) {
       docVals = atomicReader.getNumericDocValues(field);
@@ -143,11 +143,11 @@ public class DocValCommand extends ClueCommand {
   }
 
   private void showDocId(int docid, int docBase, String field,
-      AtomicReader atomicReader, PrintStream out, int segmentid)
+      LeafReader atomicReader, PrintStream out, int segmentid)
       throws Exception {
     FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
 
-    if (finfo == null || !finfo.hasDocValues()) {
+    if (finfo == null || finfo.getDocValuesType() == DocValuesType.NONE) {
       out.println("docvalue does not exist for field: " + field);
       return;
     }
@@ -183,13 +183,13 @@ public class DocValCommand extends ClueCommand {
     }
 
     IndexReader reader = ctx.getIndexReader();
-    List<AtomicReaderContext> leaves = reader.leaves();
+    List<LeafReaderContext> leaves = reader.leaves();
     if (docidList != null && !docidList.isEmpty()) {
       for (int i = leaves.size() - 1; i >= 0; --i) {
-        AtomicReaderContext ctx = leaves.get(i);
+        LeafReaderContext ctx = leaves.get(i);
         for (Integer docid : docidList) {
           if (ctx.docBase <= docid) {
-            AtomicReader atomicReader = ctx.reader();
+            LeafReader atomicReader = ctx.reader();
             showDocId(docid, ctx.docBase, field, atomicReader, out, i);
           }
         }
@@ -198,19 +198,18 @@ public class DocValCommand extends ClueCommand {
       return;
     } else {
       for (int i = 0; i < leaves.size(); ++i) {
-        AtomicReaderContext ctx = leaves.get(i);
-        AtomicReader atomicReader = ctx.reader();
+        LeafReaderContext ctx = leaves.get(i);
+        LeafReader atomicReader = ctx.reader();
         FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
 
-        if (finfo == null || !finfo.hasDocValues()) {
+        if (finfo == null || finfo.getDocValuesType() == DocValuesType.NONE) {
           out.println("docvalue does not exist for field: " + field);
           break;
         }
         
         DocValuesType docValType = finfo.getDocValuesType();
         BytesRef bref = new BytesRef();
-        
-        
+
         int maxDoc = atomicReader.maxDoc();
         
         for (int k = 0; k < maxDoc; ++k) {

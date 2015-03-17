@@ -12,137 +12,16 @@ import org.apache.lucene.store.BaseDirectory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
+import org.apache.lucene.store.LockFactory;
 
 public class HdfsDirectory extends BaseDirectory {
-  private final FileSystem fs;
-  private final Path dir;
+    private final FileSystem fs;
+    private final Path dir;
 
-  public HdfsDirectory(String name, FileSystem fs) {
-    this.fs = fs;
-    dir = new Path(name);
-  }
-
-  public HdfsDirectory(Path path, FileSystem fs) {
-    this.fs = fs;
-    dir = path;
-  }
-
-  @Override
-  public void close() throws IOException {
-    fs.close();
-  }
-
-  @Override
-  public IndexOutput createOutput(String name, IOContext context) throws IOException {
-    return new HDFSIndexOutput(new Path(dir, name));
-  }
-
-  @Override
-  public void sync(Collection<String> strings) throws IOException {
-  }
-
-  @Override
-  public void deleteFile(String name) throws IOException {
-    Path path = new Path(dir, name);
-    fs.delete(path, false);
-  }
-
-  @Override
-  public boolean fileExists(String name) throws IOException {
-    return fs.exists(new Path(dir, name));
-  }
-
-  @Override
-  public long fileLength(String name) throws IOException {
-    return fs.getFileStatus(new Path(dir, name)).getLen();
-  }
-
-  @Override
-  public String[] listAll() throws IOException {
-    FileStatus[] statuses = fs.listStatus(dir);
-    String[] files = new String[statuses.length];
-
-    for (int i = 0; i < statuses.length; i++) {
-      files[i] = statuses[i].getPath().getName();
-    }
-    return files;
-  }
-
-  @Override
-  public IndexInput openInput(String name, IOContext context) throws IOException {
-    Path path = new Path(dir, name);
-    return new HDFSIndexInput("HDFSIndexInput(path=\"" + path.getName() + "\")", path);
-  }
-
-  private class HDFSIndexOutput extends IndexOutput {
-
-    private final FSDataOutputStream out;
-    private long currentPosition;
-    
-    HDFSIndexOutput(Path path) throws IOException {
-      out = fs.create(path);
-      currentPosition = 0;
-    }
-    
-    @Override
-    public void flush() throws IOException {
-      out.flush();
-    }
-
-    @Override
-    public void close() throws IOException {
-      out.close();
-    }
-    
-    @Override
-    public long getFilePointer() {
-      return currentPosition;
-    }
-
-    @Override
-    public long length() throws IOException {
-      return currentPosition;
-    }
-
-    @Override
-    public void writeByte(byte b) throws IOException {
-      out.write(b & 0xFF);
-      currentPosition++;
-    }
-
-    @Override
-    public void writeBytes(byte[] b, int offset, int length) throws IOException {
-      out.write(b, offset, length);
-      currentPosition += length;
-    }
-
-	@Override
-	public long getChecksum() throws IOException {
-	  return 0L;
-	}
-    
-  }
-  
-  private class HDFSIndexInput extends IndexInput {
-    private final Path path;
-    private final FSDataInputStream in;
-    private final long len;
-
-    private HDFSIndexInput(String resourceDesc, Path path) throws IOException {
-      super(resourceDesc);
-      this.path = path;
-      this.in = fs.open(path);
-      this.len = fs.getFileStatus(path).getLen();
-    }
-    
-    private HDFSIndexInput(String resourceDesc, Path path, long offset, long len) throws IOException {
-      super(resourceDesc);
-      this.path = path;
-      this.in = fs.open(path);
-      this.len = len;
-      if (offset > 0) {
-        in.seek(offset);
-      }
+    public HdfsDirectory(LockFactory lockFactory, String name, FileSystem fs) {
+      super(lockFactory);
+      this.fs = fs;
+      dir = new Path(name);
     }
 
     @Override
@@ -151,39 +30,156 @@ public class HdfsDirectory extends BaseDirectory {
     }
 
     @Override
-    public long getFilePointer() {
-      try {
-        return in.getPos();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+    public IndexOutput createOutput(String name, IOContext context) throws IOException {
+      return new HDFSIndexOutput(name, new Path(dir, name));
+    }
+
+    @Override
+    public void sync(Collection<String> strings) throws IOException {
+    }
+
+    @Override
+    public void renameFile(String source, String dest)
+      throws IOException {
+    }
+
+    @Override
+    public void deleteFile(String name) throws IOException {
+        Path path = new Path(dir, name);
+        fs.delete(path, false);
+    }
+
+    @Override
+    public long fileLength(String name) throws IOException {
+        return fs.getFileStatus(new Path(dir, name)).getLen();
+    }
+
+    @Override
+    public String[] listAll() throws IOException {
+      FileStatus[] statuses = fs.listStatus(dir);
+      String[] files = new String[statuses.length];
+
+      for (int i = 0; i < statuses.length; i++) {
+        files[i] = statuses[i].getPath().getName();
       }
+      return files;
     }
 
     @Override
-    public long length() {
-      return len;
+    public IndexInput openInput(String name, IOContext context) throws IOException {
+      Path path = new Path(dir, name);
+      return new HDFSIndexInput("HDFSIndexInput(path=\"" + path.getName() + "\")", path);
     }
 
-    @Override
-    public byte readByte() throws IOException {
-      return in.readByte();
+    private class HDFSIndexOutput extends IndexOutput {
+
+        private final FSDataOutputStream out;
+        private long currentPosition;
+
+        /**
+         * Sole constructor.  resourceDescription should be non-null, opaque string
+         * describing this resource; it's returned from {@link #toString}.
+         *
+         */
+        protected HDFSIndexOutput(String resourceDescription, Path path)
+                throws IOException {
+            super(resourceDescription);
+            out = fs.create(path);
+            currentPosition = 0;
+        }
+
+        @Override
+        public void close() throws IOException {
+            out.close();
+        }
+
+        @Override
+        public long getFilePointer() {
+            return currentPosition;
+        }
+
+        @Override
+        public void writeByte(byte b) throws IOException {
+            out.write(b & 0xFF);
+            currentPosition++;
+        }
+
+        @Override
+        public void writeBytes(byte[] b, int offset, int length) throws IOException {
+            out.write(b, offset, length);
+            currentPosition += length;
+        }
+
+        @Override
+        public long getChecksum() throws IOException {
+            return 0L;
+        }
+
     }
 
-    @Override
-    public void readBytes(byte[] b, int offset, int len) throws IOException {      
-      in.readFully(b, offset, len);
-    }
+    private class HDFSIndexInput extends IndexInput
+    {
+        private final Path path;
+        private final FSDataInputStream in;
+        private final long len;
 
-    @Override
-    public void seek(long pos) throws IOException {
-      in.seek(pos);
-    }
+        private HDFSIndexInput(String resourceDesc, Path path) throws IOException
+        {
+            super(resourceDesc);
+            this.path = path;
+            this.in = fs.open(path);
+            this.len = fs.getFileStatus(path).getLen();
+        }
 
-    @Override
-    public IndexInput slice(String sliceDescription, long offset, long length)
-        throws IOException {
-      return new HDFSIndexInput(sliceDescription, path, offset, length);
+        private HDFSIndexInput(String resourceDesc, Path path, long offset, long len) throws IOException {
+            super(resourceDesc);
+            this.path = path;
+            this.in = fs.open(path);
+            this.len = len;
+            if (offset > 0) {
+                in.seek(offset);
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            fs.close();
+        }
+
+        @Override
+        public long getFilePointer() {
+            try {
+                return in.getPos();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public long length() {
+            return len;
+        }
+
+        @Override
+        public byte readByte() throws IOException {
+            return in.readByte();
+        }
+
+        @Override
+        public void readBytes(byte[] b, int offset, int len) throws IOException {
+            in.readFully(b, offset, len);
+        }
+
+        @Override
+        public void seek(long pos) throws IOException {
+            in.seek(pos);
+        }
+
+        @Override
+        public IndexInput slice(String sliceDescription, long offset, long length)
+                throws IOException {
+            return new HDFSIndexInput(sliceDescription, path, offset, length);
+        }
     }
-  }
 }
 

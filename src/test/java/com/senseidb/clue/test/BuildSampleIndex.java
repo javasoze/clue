@@ -3,6 +3,7 @@ package com.senseidb.clue.test;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.FileSystems;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.BinaryDocValuesField;
@@ -16,13 +17,12 @@ import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.Version;
 import org.json.JSONObject;
 
 public class BuildSampleIndex {
@@ -53,7 +53,7 @@ public class BuildSampleIndex {
     String tagsString = json.optString("tags");
     if (tagsString != null) {
       String[] parts = tagsString.split(",");
-      if (parts != null && parts.length > 0) {
+      if (parts.length > 0) {
         for (String part : parts) {
           doc.add(new SortedSetDocValuesField("tags", new BytesRef(part)));
           doc.add(new StringField("tags_indexed", part, Store.NO));
@@ -62,7 +62,6 @@ public class BuildSampleIndex {
       
       // store everything
       FieldType ft = new FieldType();
-      ft.setIndexed(true);
       ft.setOmitNorms(false);
       ft.setTokenized(true);
       ft.setStoreTermVectors(true);
@@ -89,11 +88,9 @@ public class BuildSampleIndex {
     }
     File f = new File(args[0]);
     BufferedReader reader = new BufferedReader(new FileReader(f));
-    
-    File idxDir = new File(args[1]);
-    
-    IndexWriterConfig idxWriterConfig = new IndexWriterConfig(Version.LUCENE_48, new StandardAnalyzer(Version.LUCENE_48));
-    Directory dir = FSDirectory.open(idxDir);
+
+    IndexWriterConfig idxWriterConfig = new IndexWriterConfig(new StandardAnalyzer());
+    Directory dir = FSDirectory.open(FileSystems.getDefault().getPath(args[1]));
     IndexWriter writer = new IndexWriter(dir, idxWriterConfig);
     int count = 0;
     while (true) {

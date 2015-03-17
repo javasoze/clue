@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.util.BytesRef;
@@ -42,14 +42,14 @@ public class StoredFieldCommand extends ClueCommand {
     int doc = Integer.parseInt(args[1]);
     
     IndexReader reader = ctx.getIndexReader();
-    List<AtomicReaderContext> leaves = reader.leaves();
+    List<LeafReaderContext> leaves = reader.leaves();
     
     boolean found = false;
     boolean stored = false;
     
     
-    for (AtomicReaderContext ctx : leaves) {
-      AtomicReader atomicReader = ctx.reader();
+    for (LeafReaderContext ctx : leaves) {
+      LeafReader atomicReader = ctx.reader();
       FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
       if (finfo == null) continue;
       

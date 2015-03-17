@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
@@ -40,17 +40,10 @@ public class InfoCommand extends ClueCommand {
   private static void toString(Object[] info, PrintStream out) throws IOException {
     FieldInfo finfo = (FieldInfo) info[0];
     List<Terms> termList = (List<Terms>) info[1];
-    out.println("name:\t\t" + finfo.name);    
-    out.println("docval:\t\t" + String.valueOf(finfo.hasDocValues()));
-    if (finfo.hasDocValues()) {
-      out.println("docval_type:\t" + String.valueOf(finfo.getDocValuesType()));
-    }
+    out.println("name:\t\t" + finfo.name);
+    out.println("docval_type:\t" + String.valueOf(finfo.getDocValuesType()));
     out.println("norms:\t\t" + String.valueOf(finfo.hasNorms()));
-    
-    if (finfo.hasNorms()) {
-      out.println("norm_type:\t" + String.valueOf(finfo.getNormType()));
-    }
-    out.println("indexed:\t" + String.valueOf(finfo.isIndexed()));
+
     IndexOptions indexOptions = finfo.getIndexOptions();
     if (indexOptions != null) {
       out.println("index_options:\t" + finfo.getIndexOptions().name());
@@ -98,15 +91,15 @@ public class InfoCommand extends ClueCommand {
     IndexReader r = ctx.getIndexReader();
     out.println("readonly mode: " + getContext().isReadOnlyMode());
 
-    List<AtomicReaderContext> leaves = r.leaves();
+    List<LeafReaderContext> leaves = r.leaves();
     if (args.length == 0) {
       out.println("numdocs: " + r.numDocs());
       out.println("maxdoc: " + r.maxDoc());
       out.println("num deleted docs: " + r.numDeletedDocs());
       out.println("segment count: " + leaves.size());
       SortedMap<String, Object[]> fields = new TreeMap<String, Object[]>();
-      for (AtomicReaderContext leaf : leaves) {
-        AtomicReader ar = leaf.reader();
+      for (LeafReaderContext leaf : leaves) {
+        LeafReader ar = leaf.reader();
         FieldInfos fldInfos = ar.getFieldInfos();
         Iterator<FieldInfo> finfoIter = fldInfos.iterator();
         
@@ -149,8 +142,8 @@ public class InfoCommand extends ClueCommand {
         return;
       }
 
-      AtomicReaderContext leaf = leaves.get(segid);
-      AtomicReader atomicReader = leaf.reader();
+      LeafReaderContext leaf = leaves.get(segid);
+      LeafReader atomicReader = leaf.reader();
 
       out.println("segment " + segid + ": ");
       out.println("doc base:\t" + leaf.docBase);
