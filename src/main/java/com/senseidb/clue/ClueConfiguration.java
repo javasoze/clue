@@ -7,7 +7,6 @@ import java.util.Properties;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.util.Version;
 
 import com.senseidb.clue.api.BytesRefDisplay;
 import com.senseidb.clue.api.DefaultDirectoryBuilder;
@@ -46,14 +45,9 @@ public class ClueConfiguration {
       T obj = (T) (Class.forName(className).newInstance());
       return obj;
     } catch (Exception e) {
-      try { 
-        T obj2 = (T) (Class.forName(className).getConstructor(Version.class).newInstance(Version.LUCENE_48));
-        return obj2; 
-      } catch (Exception e2) {
         System.out.println("unable to obtain instance of class: " + className);
         return defaultInstance;
       }
-    }
   }
   
   public Properties getProperties() {
@@ -63,7 +57,7 @@ public class ClueConfiguration {
   private ClueConfiguration(Properties config) { 
     this.config = config;
     analyzerQuery = getInstance(config.getProperty(ANALYZER_QUERY_PARAM), 
-        new StandardAnalyzer(Version.LUCENE_48));    
+        new StandardAnalyzer());
     dirBuilder = getInstance(config.getProperty(DIRECTORY_BUILDER_PARAM),
         new DefaultDirectoryBuilder());
     queryBuilder = getInstance(config.getProperty(QUERY_BUILDER_PARAM),

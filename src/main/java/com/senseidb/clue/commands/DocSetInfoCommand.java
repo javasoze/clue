@@ -4,8 +4,8 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.lucene.index.AtomicReader;
-import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Terms;
@@ -70,11 +70,11 @@ public class DocSetInfoCommand extends ClueCommand {
     }
     
     IndexReader reader = ctx.getIndexReader();
-    List<AtomicReaderContext> leaves = reader.leaves();
+    List<LeafReaderContext> leaves = reader.leaves();
     
 
-    for (AtomicReaderContext leaf : leaves) {
-      AtomicReader atomicReader = leaf.reader();
+    for (LeafReaderContext leaf : leaves) {
+      LeafReader atomicReader = leaf.reader();
       Terms terms = atomicReader.terms(field);
       if (terms == null){
         continue;
