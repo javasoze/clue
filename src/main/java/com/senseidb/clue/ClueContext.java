@@ -45,7 +45,8 @@ public class ClueContext {
     this.writer = null;
     this.interactiveMode = interactiveMode;
     this.cmdMap = new TreeMap<String, ClueCommand>();
-    this.readOnlyMode = false;
+    // default to readonly
+    this.readOnlyMode = true;
     
     // registers all the commands we currently support
     new HelpCommand(this);

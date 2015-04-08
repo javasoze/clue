@@ -34,7 +34,9 @@ public class DefaultIndexReaderFactory implements IndexReaderFactory {
 
   @Override
   public void shutdown() throws Exception {
-    reader.close();
-    reader = null;
+    if (reader != null) {
+      reader.close();
+      reader = null;
+    }
   }
 }

@@ -16,6 +16,7 @@ public class ClueApplication {
   
   private final ClueContext ctx;
   private final ClueCommand helpCommand;
+  private final Directory dir;
   
   private static ClueConfiguration config;
   
@@ -40,7 +41,7 @@ public class ClueApplication {
   }
   
   public ClueApplication(String idxLocation, boolean interactiveMode) throws Exception{
-    Directory dir = config.getDirBuilder().build(new URI(idxLocation));
+    dir = config.getDirBuilder().build(new URI(idxLocation));
     if (!DirectoryReader.indexExists(dir)){
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
@@ -81,16 +82,21 @@ public class ClueApplication {
     }
   }
   
+  public void shutdown() throws Exception {
+    ctx.shutdown();
+    dir.close();
+  }
+  
   
   public static void main(String[] args) throws Exception {
     if (args.length < 1){
       System.out.println("usage: <index location> <command> <command args>");
       System.exit(1);
     }
-    
+        
     String idxLocation = args[0];
     
-    ClueApplication app = null;
+    final ClueApplication app;
     
     if (args.length > 1){
       String cmd = args[1];
@@ -103,6 +109,7 @@ public class ClueApplication {
           System.arraycopy(args, 3, cmdArgs, 0, cmdArgs.length);
           app.ctx.setReadOnlyMode(true);
           app.handleCommand(cmd, cmdArgs, System.out);
+          app.shutdown();
         }
       }
       else {
@@ -111,10 +118,20 @@ public class ClueApplication {
         cmdArgs = new String[args.length - 2];
         System.arraycopy(args, 2, cmdArgs, 0, cmdArgs.length);
         app.handleCommand(cmd, cmdArgs, System.out);
+        app.shutdown();
       }
       return;
     }
     app = new ClueApplication(idxLocation, true);
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
+        try {
+          app.shutdown();
+        } catch (Exception e) {
+          e.printStackTrace();
+        } 
+      }
+    });
     app.run();
   }
 }
