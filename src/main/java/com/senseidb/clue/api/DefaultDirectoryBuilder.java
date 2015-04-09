@@ -35,19 +35,21 @@ public class DefaultDirectoryBuilder implements DirectoryBuilder {
         String filePath = idxUri.getPath();
         int delimIdx = filePath.indexOf("@");
         if (delimIdx >= 0) {
-          hadoopConfDir = filePath.substring(delimIdx);
+          hadoopConfDir = filePath.substring(delimIdx + 1);
+          filePath = filePath.substring(0, delimIdx);
         }
         if (hadoopConfDir == null) {
           hadoopConfDir = System.getProperty(HADOOP_CONFIFG_DIR);
         }
         Configuration config = new Configuration();
-        if (hadoopConfDir != null) {
-          Path hadoopConfPath = new Path(hadoopConfDir);          
+        if (hadoopConfDir != null && hadoopConfDir.trim().length() > 0) {
+          System.out.println("Hadoop configuration found at: " + hadoopConfDir);
+          Path hadoopConfPath = new Path(hadoopConfDir);
           config.addResource(new Path(hadoopConfPath,"core-site.xml"));
           config.addResource(new Path(hadoopConfPath,"hdfs-site.xml"));
           config.addResource(new Path(hadoopConfPath,"mapred-site.xml"));
         }
-        Path hdfsPath = new Path(idxUri.getPath());        
+        Path hdfsPath = new Path(filePath);        
         return new HdfsDirectory(NoLockFactory.INSTANCE, hdfsPath, config);
       }
       else {
