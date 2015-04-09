@@ -31,7 +31,15 @@ public class DefaultDirectoryBuilder implements DirectoryBuilder {
         return FSDirectory.open(FileSystems.getDefault().getPath(idxUri.getPath()));
       }
       else if ("hdfs".equals(scheme)){
-        String hadoopConfDir = System.getProperty(HADOOP_CONFIFG_DIR);
+        String hadoopConfDir = null;
+        String filePath = idxUri.getPath();
+        int delimIdx = filePath.indexOf("@");
+        if (delimIdx >= 0) {
+          hadoopConfDir = filePath.substring(delimIdx);
+        }
+        if (hadoopConfDir == null) {
+          hadoopConfDir = System.getProperty(HADOOP_CONFIFG_DIR);
+        }
         Configuration config = new Configuration();
         if (hadoopConfDir != null) {
           Path hadoopConfPath = new Path(hadoopConfDir);          

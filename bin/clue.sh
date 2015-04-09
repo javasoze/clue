@@ -8,9 +8,10 @@ dist=$bin/../target
 
 HEAP_OPTS="-Xmx1g -Xms1g -XX:NewSize=256m"
 JAVA_OPTS="-server -d64"
+#JAVA_DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y"
 
 MAIN_CLASS="com.senseidb.clue.ClueApplication"
 CLASSPATH=$CLASSPATH:$resources/:$lib/*:$dist/*:$1/ext/*
 
-(cd $bin/..; java $JAVA_OPTS $JMX_OPTS $HEAP_OPTS -classpath $CLASSPATH $MAIN_CLASS $@)
+(cd $bin/..; java $JAVA_OPTS $JAVA_DEBUG $HEAP_OPTS -classpath $CLASSPATH $MAIN_CLASS $@)
 
