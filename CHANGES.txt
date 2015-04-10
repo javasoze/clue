@@ -1,3 +1,13 @@
+
+Version 0.0.5
+
+* Made info command more readable
+* Added printing of IndexingOptions to infos command
+* Made printing of terms and payloads configurable
+* Added command to print out docid set status for each posting list
+* Bug fix: Store command is not adjusting docids correctly
+* Lucene 4.7.0 upgrade
+
 Version 0.0.4
 
 * Add ability to investigate indexes on HDFS
