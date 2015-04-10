@@ -135,9 +135,9 @@ public class TermsCommand extends ClueCommand {
       out.println(bytesRefPrinter.print(key)+" ("+count+") ");
       if (ctx.isInteractiveMode()){
         if (numCount % numPerPage == 0){
-          out.println("Ctrl-D to break");
+          out.println("Press q to break");
           int ch = System.in.read();
-          if (ch == -1) {
+          if (ch == 'q' || ch == 'Q') {
             out.flush();
             return;
           }
@@ -164,3 +164,4 @@ public class TermsCommand extends ClueCommand {
   }
 
 }
+
