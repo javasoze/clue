@@ -13,7 +13,7 @@ JAVA_OPTS="-server -d64 -Dhadoop.conf.dir=$HADOOP_CONF_DIR"
 #JAVA_DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y"
 
 MAIN_CLASS="com.senseidb.clue.ClueApplication"
-CLASSPATH=$CLASSPATH:$resources/:$lib/*:$dist/*:$1/ext/*
+CLASSPATH=$CLASSPATH:$resources/:$lib/*:$dist/*
 
 (cd $bin/..; java $JAVA_OPTS $JAVA_DEBUG $HEAP_OPTS -classpath $CLASSPATH $MAIN_CLASS $@)
 

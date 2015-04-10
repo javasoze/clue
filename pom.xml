@@ -65,6 +65,7 @@
 				<version>2.4</version>
 				<configuration>
 					<appendAssemblyId>false</appendAssemblyId>
+					<outputDirectory>${project.build.directory}/releases/</outputDirectory>
 					<finalName>clue-all-${project.version}</finalName>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
