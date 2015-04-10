@@ -1,3 +1,10 @@
+Version 0.0.6
+
+* Add support for autocompletion and history
+* Lucene 5.0 upgrade
+* Support/fix interacting with indexes on hdfs
+* Add support for sortednumericdv docvalue type
+* Adding cmd to read and save commit data
 
 Version 0.0.5
 
