@@ -24,23 +24,22 @@ latest version: 0.0.6
 
 #### What's new in this release?
 
-* Made info command more readable
-* Added printing of IndexingOptions to infos command
-* Made printing of terms and payloads configurable
-* Added command to print out docid set status for each posting list
-* Bug fix: Store command is not adjusting docids correctly
-* Lucene 4.7.0 upgrade
+* Add support for autocompletion and history
+* Lucene 5.0 upgrade
+* Support/fix interacting with indexes on hdfs
+* Add support for sortednumericdv docvalue type
+* Adding cmd to read and save commit data
 
-source: [release-0.0.5.zip](https://github.com/javasoze/clue/archive/release-0.0.5.zip)
+source: [release-0.0.6.zip](https://github.com/javasoze/clue/archive/release-0.0.6.zip)
 
 clue-all executable jar with all dependencies:
-     [clue-all-0.0.5.jar](https://github.com/javasoze/clue/releases/download/release-0.0.5/clue-all-0.0.5.jar)
+     [clue-all-0.0.6.jar](https://github.com/javasoze/clue/releases/download/release-0.0.6/clue-all-0.0.6.jar)
 
 clue jar with only clue class files, used as a library:
-     [clue-0.0.5.jar](https://github.com/javasoze/clue/releases/download/release-0.0.5/clue-0.0.5.jar)
+     [clue-0.0.6.jar](https://github.com/javasoze/clue/releases/download/release-0.0.6/clue-0.0.6.jar)
 
 distribution
-     [clue-0.0.5.tar.gz](https://github.com/javasoze/clue/releases/download/release-0.0.5/clue-0.0.5.tar.gz)
+     [clue-0.0.6.tar.gz](https://github.com/javasoze/clue/releases/download/release-0.0.6/clue-0.0.6.zip)
 
 ### Build:
 
