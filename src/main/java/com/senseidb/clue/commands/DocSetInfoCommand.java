@@ -79,8 +79,8 @@ public class DocSetInfoCommand extends ClueCommand {
       if (terms == null){
         continue;
       }
-      if (terms != null && termVal != null){
-        TermsEnum te = terms.iterator(null);
+      if (terms != null && termVal != null){        
+        TermsEnum te = terms.iterator();
         
         if (te.seekExact(new BytesRef(termVal))){
           DocsEnum iter = te.docs(atomicReader.getLiveDocs(), null);

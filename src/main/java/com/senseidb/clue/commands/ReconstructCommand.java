@@ -117,7 +117,7 @@ public class ReconstructCommand extends ClueCommand {
         Terms terms = atomicReader.terms(field);
         boolean hasPositions  = terms.hasPositions();
         
-        TermsEnum te = terms.iterator(null);
+        TermsEnum te = terms.iterator();
         if (hasPositions) {
           out.println(reconstructWithPositions(te, docID, atomicReader.getLiveDocs()));
         }

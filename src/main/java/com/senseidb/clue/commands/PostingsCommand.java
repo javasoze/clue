@@ -72,7 +72,7 @@ public class PostingsCommand extends ClueCommand {
       boolean hasPositions = terms.hasPositions();
       
       if (terms != null && termVal != null){
-        TermsEnum te = terms.iterator(null);
+        TermsEnum te = terms.iterator();
         int count = 0;
         if (te.seekExact(new BytesRef(termVal))){
           

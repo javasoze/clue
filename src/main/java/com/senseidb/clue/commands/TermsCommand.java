@@ -91,7 +91,7 @@ public class TermsCommand extends ClueCommand {
       }
       
       
-      TermsEnum te = terms.iterator(null);
+      TermsEnum te = terms.iterator();
       BytesRef termBytes;
       if (termVal != null){
         if (isExact){

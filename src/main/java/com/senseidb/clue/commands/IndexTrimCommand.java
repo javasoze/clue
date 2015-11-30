@@ -113,6 +113,11 @@ public class IndexTrimCommand extends ClueCommand {
             }
           };
         }
+
+        @Override
+        public String toString(String field) {
+          return field;
+        }
       };
   
       writer.deleteDocuments(new ConstantScoreQuery(f));

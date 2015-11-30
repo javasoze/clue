@@ -58,9 +58,7 @@ public class TermVectorCommand extends ClueCommand {
         Terms terms = atomicReader.getTermVector(docID, field);
         if (terms == null) continue;
         
-        TermsEnum te = null;
-      
-        te = terms.iterator(te);
+        TermsEnum te = terms.iterator();      
       
         BytesRef text = null;
         
