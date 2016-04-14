@@ -93,7 +93,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <lucene.version>5.4.0</lucene.version>
+        <lucene.version>6.0.0</lucene.version>
 	</properties>
 
 	<dependencies>
@@ -134,8 +134,19 @@
         </dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-core</artifactId>
-			<version>0.20.2</version>
+			<artifactId>hadoop-hdfs</artifactId>
+			<version>2.7.2</version>
+			<exclusions>
+              <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+              </exclusion>
+            </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-common</artifactId>
+			<version>2.7.2</version>
 			<exclusions>
               <exclusion>
                 <groupId>*</groupId>

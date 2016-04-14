@@ -1,23 +1,17 @@
 package com.senseidb.clue.commands;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.search.ConstantScoreQuery;
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.util.Bits;
+import org.apache.lucene.search.Query;
 
 import com.senseidb.clue.ClueContext;
-import com.senseidb.clue.util.IntArrayDocIdSetIterator;
+import com.senseidb.clue.util.MatchSomeDocsQuery;
 
 public class IndexTrimCommand extends ClueCommand {
 
@@ -68,6 +62,28 @@ public class IndexTrimCommand extends ClueCommand {
       throw new IllegalArgumentException("trim option: " + option + " not supported");
     }
   }
+  
+  private static Query buildDeleteQuery(final int percentToDelete) {
+    assert percentToDelete >= 0 && percentToDelete <= 100;
+    final Random rand = new Random();
+    return new MatchSomeDocsQuery() {
+      
+      @Override
+      public String toString(String field) {
+        return null;
+      }
+      
+      @Override
+      protected boolean match(int docId) {
+        int guess = rand.nextInt(100);
+        if (guess < percentToDelete) {
+          return true;
+        }
+        return false;
+      }
+    };
+    
+  }
 
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
@@ -76,9 +92,11 @@ public class IndexTrimCommand extends ClueCommand {
       return;
     }
     
-    double trimPercent = Double.parseDouble(args[0]);
+    int trimPercent = Integer.parseInt(args[0]);
     
-    
+    if (trimPercent < 0 || trimPercent > 100) {
+      throw new IllegalArgumentException("invalid percent: " + trimPercent);
+    }
     
     IndexWriter writer = ctx.getIndexWriter();    
     if (writer != null) {
@@ -88,39 +106,8 @@ public class IndexTrimCommand extends ClueCommand {
       out.println("force merge successful into 1 segment");
       
       IndexReader reader = ctx.getIndexReader();
-      int maxDoc = reader.maxDoc();
       
-      final int numDocsToDelete = (int) ((double) maxDoc * trimPercent / 100.0);
-      
-      final int[] docidsToDelete = getDocsToDelete(maxDoc, numDocsToDelete, args[1]);
-      
-      Filter f = new Filter() {
-  
-        @Override
-        public DocIdSet getDocIdSet(LeafReaderContext context, Bits acceptDocs) throws IOException {
-          return new DocIdSet() {
-
-              @Override
-              public long ramBytesUsed() {
-                  // todo this is not correct but is required for concrete class
-                return 0;
-              }
-
-              @Override
-              public DocIdSetIterator iterator() throws IOException {
-
-              return new IntArrayDocIdSetIterator(docidsToDelete);
-            }
-          };
-        }
-
-        @Override
-        public String toString(String field) {
-          return field;
-        }
-      };
-  
-      writer.deleteDocuments(new ConstantScoreQuery(f));
+      writer.deleteDocuments(buildDeleteQuery(trimPercent));
       writer.commit();
       writer.forceMerge(1);
       writer.commit();

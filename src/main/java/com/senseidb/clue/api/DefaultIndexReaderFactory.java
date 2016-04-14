@@ -2,6 +2,7 @@ package com.senseidb.clue.api;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.SegmentInfos;
 import org.apache.lucene.store.Directory;
 
 public class DefaultIndexReaderFactory implements IndexReaderFactory {
@@ -15,7 +16,7 @@ public class DefaultIndexReaderFactory implements IndexReaderFactory {
 
   @Override
   public void initialize(Directory idxDir) throws Exception {   
-    this.idxDir = idxDir;
+    this.idxDir = idxDir;    
     refreshReader();
   }
   

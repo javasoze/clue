@@ -3,11 +3,10 @@ package com.senseidb.clue.commands;
 import java.io.PrintStream;
 import java.util.List;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.DocsAndPositionsEnum;
-import org.apache.lucene.index.DocsEnum;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
@@ -63,6 +62,7 @@ public class PostingsCommand extends ClueCommand {
     List<LeafReaderContext> leaves = reader.leaves();
     int docBase = 0;
     int numPerPage = 20;
+    PostingsEnum postings = null;
     for (LeafReaderContext leaf : leaves){
       LeafReader atomicReader = leaf.reader();
       Terms terms = atomicReader.terms(field);
@@ -77,17 +77,20 @@ public class PostingsCommand extends ClueCommand {
         if (te.seekExact(new BytesRef(termVal))){
           
           if (hasPositions){
-            DocsAndPositionsEnum iter = te.docsAndPositions(atomicReader.getLiveDocs(), null);
+            postings = te.postings(postings, PostingsEnum.FREQS | 
+                                             PostingsEnum.PAYLOADS | 
+                                             PostingsEnum.POSITIONS | 
+                                             PostingsEnum.OFFSETS);
             
             int docid;
-            while((docid = iter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
+            while((docid = postings.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
               count++;
-              out.print("docid: "+(docid+docBase)+", freq: "+iter.freq()+", ");
-              for (int i=0;i<iter.freq();++i){
-                out.print("pos "+i+": "+iter.nextPosition());
-                out.print(", start offset: "+ iter.startOffset());
-                out.print(", end offset: "+ iter.endOffset());
-                BytesRef payload = iter.getPayload();
+              out.print("docid: "+(docid+docBase)+", freq: "+postings.freq()+", ");
+              for (int i=0; i<postings.freq(); ++i){
+                out.print("pos " + i + ": " + postings.nextPosition());
+                out.print(", start offset: " + postings.startOffset());
+                out.print(", end offset: "+ postings.endOffset());
+                BytesRef payload = postings.getPayload();
                 if (payload != null){
                   out.print(", payload: " + payloadPrinter.print(payload));
                 }
@@ -107,12 +110,12 @@ public class PostingsCommand extends ClueCommand {
             }
           }
           else{
-            DocsEnum iter = te.docs(atomicReader.getLiveDocs(), null);
+            postings = te.postings(postings, PostingsEnum.FREQS);
           
             int docid;
-            while((docid = iter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
+            while((docid = postings.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
               count++;
-              out.println("docid: "+(docid+docBase)+", freq: "+iter.freq());
+              out.println("docid: "+(docid+docBase)+", freq: "+postings.freq());
               if (ctx.isInteractiveMode()){
                 if (count % numPerPage == 0){
                   out.println("Ctrl-D to break");

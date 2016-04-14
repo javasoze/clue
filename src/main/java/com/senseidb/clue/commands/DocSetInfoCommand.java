@@ -4,10 +4,10 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.DocsEnum;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
@@ -73,6 +73,7 @@ public class DocSetInfoCommand extends ClueCommand {
     List<LeafReaderContext> leaves = reader.leaves();
     
 
+    PostingsEnum postingsEnum = null;
     for (LeafReaderContext leaf : leaves) {
       LeafReader atomicReader = leaf.reader();
       Terms terms = atomicReader.terms(field);
@@ -83,7 +84,7 @@ public class DocSetInfoCommand extends ClueCommand {
         TermsEnum te = terms.iterator();
         
         if (te.seekExact(new BytesRef(termVal))){
-          DocsEnum iter = te.docs(atomicReader.getLiveDocs(), null);
+          postingsEnum = te.postings(postingsEnum, PostingsEnum.FREQS);
           
           int docFreq = te.docFreq();
           
@@ -93,7 +94,8 @@ public class DocSetInfoCommand extends ClueCommand {
           int[] percentDocs = new int[PERCENTILES.length];
           
           int percentileIdx = 0;
-          while ((doc = iter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
+          
+          while ((doc = postingsEnum.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
             maxDocId = doc;
             if (minDocId == -1) {
               minDocId = doc;
@@ -116,8 +118,8 @@ public class DocSetInfoCommand extends ClueCommand {
           if (maxDocId > 0) {
             buckets = new int[maxDocId / bucketSize + 1];
             
-            iter = te.docs(atomicReader.getLiveDocs(), null);
-            while ((doc = iter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
+            postingsEnum = te.postings(postingsEnum, PostingsEnum.FREQS);
+            while ((doc = postingsEnum.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
               int bucketIdx = doc / bucketSize;
               buckets[bucketIdx]++;
             }

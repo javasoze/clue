@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -16,6 +17,8 @@ import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.SegmentCommitInfo;
+import org.apache.lucene.index.SegmentInfos;
 import org.apache.lucene.index.Terms;
 
 import com.senseidb.clue.ClueContext;
@@ -89,24 +92,36 @@ public class InfoCommand extends ClueCommand {
   @SuppressWarnings("unchecked")
   public void execute(String[] args, PrintStream out) throws Exception {
     IndexReader r = ctx.getIndexReader();
+    
     out.println("readonly mode: " + getContext().isReadOnlyMode());
 
+    if (r instanceof DirectoryReader) {
+      DirectoryReader dr = (DirectoryReader)r;
+      SegmentInfos sis = SegmentInfos.readLatestCommit(dr.directory()); // read infos from dir
+      for (SegmentCommitInfo commitInfo : sis) {
+        if (commitInfo != null) {          
+          out.println("Codec found: " + commitInfo.info.getCodec().getName());
+          break;
+        }
+      }
+    }
+    
     List<LeafReaderContext> leaves = r.leaves();
-    if (args.length == 0) {
+    if (args.length == 0) {      
       out.println("numdocs: " + r.numDocs());
       out.println("maxdoc: " + r.maxDoc());
       out.println("num deleted docs: " + r.numDeletedDocs());
       out.println("segment count: " + leaves.size());
       SortedMap<String, Object[]> fields = new TreeMap<String, Object[]>();
-      for (LeafReaderContext leaf : leaves) {
-        LeafReader ar = leaf.reader();
+      for (LeafReaderContext leaf : leaves) {        
+        LeafReader ar = leaf.reader();        
         FieldInfos fldInfos = ar.getFieldInfos();
         Iterator<FieldInfo> finfoIter = fldInfos.iterator();
         
         Fields flds = ar.fields();
         
         while (finfoIter.hasNext()) {
-          FieldInfo finfo = finfoIter.next();
+          FieldInfo finfo = finfoIter.next();          
           Object[] data = fields.get(finfo.name);
           Terms t = flds.terms(finfo.name);
           if (data == null) {

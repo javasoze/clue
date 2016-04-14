@@ -7,12 +7,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.DocsAndPositionsEnum;
-import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.Bits;
@@ -39,14 +38,14 @@ public class ReconstructCommand extends ClueCommand {
   public String reconstructWithPositions(TermsEnum te, int docid, Bits liveDocs) throws IOException{
     TreeMap<Integer,List<String>> docTextMap = new TreeMap<Integer,List<String>>();
     BytesRef text;
-    DocsAndPositionsEnum dpe = null;
+    PostingsEnum postings = null;
     while ((text = te.next()) != null) {
-      dpe = te.docsAndPositions(liveDocs, dpe);
-      int iterDoc = dpe.advance(docid);
+      postings = te.postings(postings, PostingsEnum.FREQS | PostingsEnum.POSITIONS);
+      int iterDoc = postings.advance(docid);
       if (iterDoc == docid) {
-        int freq = dpe.freq();
+        int freq = postings.freq();
         for (int i = 0; i < freq; ++i) {
-          int pos = dpe.nextPosition();
+          int pos = postings.nextPosition();
           List<String> textList = docTextMap.get(pos);
           if (textList == null) {
             textList = new ArrayList<String>();
@@ -70,10 +69,10 @@ public class ReconstructCommand extends ClueCommand {
   public String reconstructNoPositions(TermsEnum te, int docid, Bits liveDocs) throws IOException{
     List<String> textList = new ArrayList<String>();
     BytesRef text;
-    DocsEnum dpe = null;
+    PostingsEnum postings = null;
     while ((text = te.next()) != null) {
-      dpe = te.docs(liveDocs, dpe);
-      int iterDoc = dpe.advance(docid);
+      postings = te.postings(postings, PostingsEnum.FREQS);
+      int iterDoc = postings.advance(docid);
       if (iterDoc == docid) {
         textList.add(text.utf8ToString());
       }

@@ -1,13 +1,18 @@
 package com.senseidb.clue;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FsServerDefaults;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.lucene.store.BaseDirectory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
@@ -39,7 +44,7 @@ public class HdfsDirectory extends BaseDirectory {
   @Override
   public IndexOutput createOutput(String name, IOContext context)
       throws IOException {    
-    return new OutputStreamIndexOutput(name, fs.create(new Path(dir, name)), BUFFER_SIZE);
+    return new HdfsFileWriter(fs, new Path(dir, name), name);
   }
 
   @Override
@@ -81,6 +86,30 @@ public class HdfsDirectory extends BaseDirectory {
     Path path = new Path(dir, name);
     return new HdfsIndexInput(
         "HDFSIndexInput(path=\"" + path.getName() + "\")", fs, path, BUFFER_SIZE);    
+  }
+  
+  static class HdfsFileWriter extends OutputStreamIndexOutput {
+    
+    public static final String HDFS_SYNC_BLOCK = "clue.hdfs.sync.block";
+    public static final int BUFFER_SIZE = 16384;
+    
+    public HdfsFileWriter(FileSystem fileSystem, Path path, String name) throws IOException {
+      super("fileSystem=" + fileSystem + " path=" + path, name, getOutputStream(fileSystem, path), BUFFER_SIZE);
+    }
+    
+    private static final OutputStream getOutputStream(FileSystem fileSystem, Path path) throws IOException {
+      Configuration conf = fileSystem.getConf();      
+      FsServerDefaults fsDefaults = fileSystem.getServerDefaults(path);
+      EnumSet<CreateFlag> flags = EnumSet.of(CreateFlag.CREATE,
+          CreateFlag.OVERWRITE);
+      if (Boolean.getBoolean(HDFS_SYNC_BLOCK)) {
+        flags.add(CreateFlag.SYNC_BLOCK);
+      }
+      return fileSystem.create(path, FsPermission.getDefault()
+          .applyUMask(FsPermission.getUMask(conf)), flags, fsDefaults
+          .getFileBufferSize(), fsDefaults.getReplication(), fsDefaults
+          .getBlockSize(), null);
+    }
   }
 
   static class HdfsIndexInput extends CustomBufferedIndexInput {
@@ -128,5 +157,11 @@ public class HdfsDirectory extends BaseDirectory {
       clone.clone = true;
       return clone;
     }
+  }
+
+  @Override
+  public IndexOutput createTempOutput(String prefix, String suffix,
+      IOContext context) throws IOException {    
+    throw new UnsupportedOperationException();
   }
 }
