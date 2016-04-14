@@ -1,10 +1,7 @@
 package com.senseidb.clue.commands;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -26,41 +23,7 @@ public class IndexTrimCommand extends ClueCommand {
 
   @Override
   public String help() {
-    return "trims the index, <TRIM PERCENTAGE> <OPTIONS>, options are: head, tail, random"; 
-  }
-  
-  private static final Set<String> SUPPORTED_OPTIONS = new HashSet<String>(
-      Arrays.asList("head", "tail", "random"));
-  
-  static int[] getDocsToDelete(int maxDoc, int numDocsToDelete, String option) {
-    option = option.toLowerCase();
-    if (SUPPORTED_OPTIONS.contains(option)) {
-      int[] docs = new int[numDocsToDelete];
-      if ("head".equals(option) || "tail".equals(option)) {        
-        int start = "head".equals(option) ? 0 : maxDoc - numDocsToDelete;
-        for (int i = 0; i < numDocsToDelete; ++i ) {
-          docs[i] = i + start;
-        }
-      }
-      else {
-        // random case
-        HashSet<Integer> docsToDelete = new HashSet<Integer>(numDocsToDelete);
-        Random rand = new Random();
-        while (docsToDelete.size() < numDocsToDelete) {
-          int docid = rand.nextInt(maxDoc);
-          docsToDelete.add(docid);
-        }
-        int i = 0;
-        for (Integer docid : docsToDelete) {
-          docs[i++] = docid;
-        }
-        Arrays.sort(docs);
-      }
-      return docs;
-    }
-    else {
-      throw new IllegalArgumentException("trim option: " + option + " not supported");
-    }
+    return "trims the index, <TRIM PERCENTAGE>"; 
   }
   
   private static Query buildDeleteQuery(final int percentToDelete) {
@@ -87,8 +50,8 @@ public class IndexTrimCommand extends ClueCommand {
 
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length < 2) {
-      out.println("usage: <TRIM PERCENTAGE> <OPTIONS>");
+    if (args.length < 1) {
+      out.println("usage: <TRIM PERCENTAGE>");
       return;
     }
     
@@ -99,18 +62,11 @@ public class IndexTrimCommand extends ClueCommand {
     }
     
     IndexWriter writer = ctx.getIndexWriter();    
-    if (writer != null) {
-      out.println("force merge, expunge all deletes");
-      writer.forceMerge(1);
-      writer.commit();
-      out.println("force merge successful into 1 segment");
-      
+    if (writer != null) {      
       IndexReader reader = ctx.getIndexReader();
       
       writer.deleteDocuments(buildDeleteQuery(trimPercent));
-      writer.commit();
-      writer.forceMerge(1);
-      writer.commit();
+      writer.commit();      
       ctx.refreshReader();
       reader = ctx.getIndexReader();
       out.println("trim successful, index now contains: " + reader.numDocs() + " docs.");
