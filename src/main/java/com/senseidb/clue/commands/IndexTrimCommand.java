@@ -63,7 +63,7 @@ public class IndexTrimCommand extends ClueCommand {
     
     IndexWriter writer = ctx.getIndexWriter();    
     if (writer != null) {      
-      IndexReader reader = ctx.getIndexReader();
+      IndexReader reader;
       
       writer.deleteDocuments(buildDeleteQuery(trimPercent));
       writer.commit();      

@@ -60,7 +60,7 @@ public class TermVectorCommand extends ClueCommand {
         
         TermsEnum te = terms.iterator();      
       
-        BytesRef text = null;
+        BytesRef text;
         
         while ((text = te.next()) != null) {
           long tf = te.totalTermFreq();
