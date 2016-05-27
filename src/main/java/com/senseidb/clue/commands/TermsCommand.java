@@ -133,15 +133,13 @@ public class TermsCommand extends ClueCommand {
       BytesRef key = entry.getKey();
       AtomicInteger count = termCountMap.remove(key);
       out.println(bytesRefPrinter.print(key)+" ("+count+") ");
-      if (ctx.isInteractiveMode()){
-        if (numCount % numPerPage == 0){
+      if (ctx.isInteractiveMode() && numCount % numPerPage == 0){
           out.println("Press q to break");
           int ch = System.in.read();
           if (ch == 'q' || ch == 'Q') {
             out.flush();
             return;
           }
-        }
       }
       TermsEnum te = entry.getValue();
       BytesRef nextKey = null;

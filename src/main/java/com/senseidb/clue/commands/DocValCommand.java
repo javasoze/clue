@@ -215,15 +215,13 @@ public class DocValCommand extends ClueCommand {
         for (int k = 0; k < maxDoc; ++k) {
           
           showDocId(k + ctx.docBase, ctx.docBase, readDocValues(field, docValType, atomicReader), docValType, bref, out, i);
-          if (getContext().isInteractiveMode()){
-            if ((k+1) % numPerPage == 0){
+          if (getContext().isInteractiveMode() && (k+1) % numPerPage == 0){
               out.println("Ctrl-D to break");
               int ch = System.in.read();
               if (ch == -1) {
                 out.flush();
                 return;
               }
-            }
           }
         }
         out.flush();
