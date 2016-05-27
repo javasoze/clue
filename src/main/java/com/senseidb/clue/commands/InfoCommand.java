@@ -44,15 +44,15 @@ public class InfoCommand extends ClueCommand {
     FieldInfo finfo = (FieldInfo) info[0];
     List<Terms> termList = (List<Terms>) info[1];
     out.println("name:\t\t" + finfo.name);
-    out.println("docval_type:\t" + String.valueOf(finfo.getDocValuesType()));
-    out.println("norms:\t\t" + String.valueOf(finfo.hasNorms()));
+    out.println("docval_type:\t" + finfo.getDocValuesType());
+    out.println("norms:\t\t" + finfo.hasNorms());
 
     IndexOptions indexOptions = finfo.getIndexOptions();
     if (indexOptions != null) {
       out.println("index_options:\t" + finfo.getIndexOptions().name());
     }
-    out.println("payloads:\t" + String.valueOf(finfo.hasPayloads()));
-    out.println("vectors:\t" + String.valueOf(finfo.hasVectors()));
+    out.println("payloads:\t" + finfo.hasPayloads());
+    out.println("vectors:\t" + finfo.hasVectors());
     out.println("attributes:\t" + finfo.attributes().toString());
     if (termList != null) {
 
@@ -81,10 +81,10 @@ public class InfoCommand extends ClueCommand {
       if (sumTotalTermFreq < 0) {
         sumTotalTermFreq = -1;
       }
-      out.println("num_terms:\t" + String.valueOf(numTerms));
-      out.println("doc_count:\t" + String.valueOf(docCount));
-      out.println("sum_doc_freq:\t" + String.valueOf(sumDocFreq));
-      out.println("sum_total_term_freq:\t" + String.valueOf(sumTotalTermFreq));
+      out.println("num_terms:\t" + numTerms);
+      out.println("doc_count:\t" + docCount);
+      out.println("sum_doc_freq:\t" + sumDocFreq);
+      out.println("sum_total_term_freq:\t" + sumTotalTermFreq);
     }
   }
 
