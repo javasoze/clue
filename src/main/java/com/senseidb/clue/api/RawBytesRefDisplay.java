@@ -11,5 +11,5 @@ public class RawBytesRefDisplay extends BytesRefDisplay {
     return BytesRefPrinter.RawBytesPrinter;
   }
 
-  public static RawBytesRefDisplay INSTANCE = new RawBytesRefDisplay();
+  public static final RawBytesRefDisplay INSTANCE = new RawBytesRefDisplay();
 }

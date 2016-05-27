@@ -11,6 +11,6 @@ public class StringBytesRefDisplay extends BytesRefDisplay {
     return BytesRefPrinter.UTFPrinter;
   }
   
-  public static StringBytesRefDisplay INSTANCE = new StringBytesRefDisplay();
+  public static final StringBytesRefDisplay INSTANCE = new StringBytesRefDisplay();
 
 }
