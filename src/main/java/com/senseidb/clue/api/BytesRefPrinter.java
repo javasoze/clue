@@ -2,8 +2,7 @@ package com.senseidb.clue.api;
 
 import org.apache.lucene.util.BytesRef;
 
-public interface BytesRefPrinter {
-  String print(BytesRef bytesRef);
+public interface BytesRefPrinter {  
   
   public static BytesRefPrinter UTFPrinter = new BytesRefPrinter() {
 
@@ -22,4 +21,7 @@ public interface BytesRefPrinter {
     }
     
   };
+  
+  String print(BytesRef bytesRef);
+  
 }

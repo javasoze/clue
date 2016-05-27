@@ -18,6 +18,11 @@ import com.senseidb.clue.ClueContext;
 public class DocSetInfoCommand extends ClueCommand {
 
   private static final int DEFAULT_BUCKET_SIZE = 1000;
+  
+  private static double[] PERCENTILES = new double[] {
+      50.0, 75.0, 90.0, 95.0, 99.0
+    };
+  
   public DocSetInfoCommand(ClueContext ctx) {
     super(ctx);
   }
@@ -31,10 +36,6 @@ public class DocSetInfoCommand extends ClueCommand {
   public String help() {
     return "doc id set info and stats";
   }
-  
-  private static double[] PERCENTILES = new double[] {
-    50.0, 75.0, 90.0, 95.0, 99.0
-  };
 
   @Override
   public void execute(String[] args, PrintStream out) throws Exception {

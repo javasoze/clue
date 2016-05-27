@@ -28,6 +28,17 @@ public class ClueApplication {
     }
   }
   
+  public ClueApplication(String idxLocation, boolean interactiveMode) throws Exception{
+      dir = config.getDirBuilder().build(new URI(idxLocation));
+      if (!DirectoryReader.indexExists(dir)){
+        System.out.println("lucene index does not exist at: "+idxLocation);
+        System.exit(1);
+      }
+          
+      ctx = newContext(dir, config, interactiveMode);
+      helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
+    }
+  
   public ClueContext getContext() {
     return ctx;
   }
@@ -38,17 +49,6 @@ public class ClueApplication {
   
   public ClueContext newContext(Directory dir, ClueConfiguration config, boolean interactiveMode) throws Exception {
     return new ClueContext(dir, config, interactiveMode);
-  }
-  
-  public ClueApplication(String idxLocation, boolean interactiveMode) throws Exception{
-    dir = config.getDirBuilder().build(new URI(idxLocation));
-    if (!DirectoryReader.indexExists(dir)){
-      System.out.println("lucene index does not exist at: "+idxLocation);
-      System.exit(1);
-    }
-        
-    ctx = newContext(dir, config, interactiveMode);
-    helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
   
   public void handleCommand(String cmdName, String[] args, PrintStream out){
