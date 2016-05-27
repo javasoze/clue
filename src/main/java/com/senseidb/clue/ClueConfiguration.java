@@ -37,6 +37,29 @@ public class ClueConfiguration {
   
   private final Properties config;
   
+  private ClueConfiguration(Properties config) { 
+      this.config = config;
+      analyzerQuery = getInstance(config.getProperty(ANALYZER_QUERY_PARAM), 
+          new StandardAnalyzer());
+      dirBuilder = getInstance(config.getProperty(DIRECTORY_BUILDER_PARAM),
+          new DefaultDirectoryBuilder());
+      queryBuilder = getInstance(config.getProperty(QUERY_BUILDER_PARAM),
+          new DefaultQueryBuilder());
+      indexReaderFactory = getInstance(config.getProperty(INDEX_READER_FACTORY_PARAM),
+          new DefaultIndexReaderFactory());
+      termBytesRefDisplay = getInstance(config.getProperty(TERM_BYTESREF_DISPLAY),
+          StringBytesRefDisplay.INSTANCE);
+      payloadBytesRefDisplay = getInstance(config.getProperty(PAYLOAD_BYTESREF_DISPLAY),
+          RawBytesRefDisplay.INSTANCE);
+      
+      System.out.println("Analyzer: \t\t" + analyzerQuery.getClass());
+      System.out.println("Query Builder: \t\t" + queryBuilder.getClass());
+      System.out.println("Directory Builder: \t" + dirBuilder.getClass());
+      System.out.println("IndexReader Factory: \t" + indexReaderFactory.getClass());
+      System.out.println("Term Bytesref Display: \t" + termBytesRefDisplay.getClass());
+      System.out.println("Payload Bytesref Display: \t" + payloadBytesRefDisplay.getClass());
+    }
+  
   private static <T> T getInstance(String className, T defaultInstance) {
     try {
       if (className == null) {
@@ -52,29 +75,6 @@ public class ClueConfiguration {
   
   public Properties getProperties() {
     return config;
-  }
-
-  private ClueConfiguration(Properties config) { 
-    this.config = config;
-    analyzerQuery = getInstance(config.getProperty(ANALYZER_QUERY_PARAM), 
-        new StandardAnalyzer());
-    dirBuilder = getInstance(config.getProperty(DIRECTORY_BUILDER_PARAM),
-        new DefaultDirectoryBuilder());
-    queryBuilder = getInstance(config.getProperty(QUERY_BUILDER_PARAM),
-        new DefaultQueryBuilder());
-    indexReaderFactory = getInstance(config.getProperty(INDEX_READER_FACTORY_PARAM),
-        new DefaultIndexReaderFactory());
-    termBytesRefDisplay = getInstance(config.getProperty(TERM_BYTESREF_DISPLAY),
-        StringBytesRefDisplay.INSTANCE);
-    payloadBytesRefDisplay = getInstance(config.getProperty(PAYLOAD_BYTESREF_DISPLAY),
-        RawBytesRefDisplay.INSTANCE);
-    
-    System.out.println("Analyzer: \t\t" + analyzerQuery.getClass());
-    System.out.println("Query Builder: \t\t" + queryBuilder.getClass());
-    System.out.println("Directory Builder: \t" + dirBuilder.getClass());
-    System.out.println("IndexReader Factory: \t" + indexReaderFactory.getClass());
-    System.out.println("Term Bytesref Display: \t" + termBytesRefDisplay.getClass());
-    System.out.println("Payload Bytesref Display: \t" + payloadBytesRefDisplay.getClass());
   }
 
   public Analyzer getAnalyzerQuery() {

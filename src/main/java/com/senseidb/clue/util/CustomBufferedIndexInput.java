@@ -39,12 +39,6 @@ public abstract class CustomBufferedIndexInput extends IndexInput {
   private int bufferLength = 0; // end of valid bytes
   private int bufferPosition = 0; // next byte to read  
   
-  @Override
-  public byte readByte() throws IOException {
-    if (bufferPosition >= bufferLength) refill();
-    return buffer[bufferPosition++];
-  }
-  
   public CustomBufferedIndexInput(String resourceDesc) {
     this(resourceDesc, BUFFER_SIZE);
   }
@@ -53,6 +47,12 @@ public abstract class CustomBufferedIndexInput extends IndexInput {
     super(resourceDesc);
     checkBufferSize(bufferSize);
     this.bufferSize = bufferSize;
+  }
+  
+  @Override
+  public byte readByte() throws IOException {
+    if (bufferPosition >= bufferLength) refill();
+    return buffer[bufferPosition++];
   }
   
   private void checkBufferSize(int bufferSize) {
