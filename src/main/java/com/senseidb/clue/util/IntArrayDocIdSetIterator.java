@@ -85,13 +85,16 @@ public class IntArrayDocIdSetIterator extends DocIdSetIterator{
         }
 
         if (cursor>=docids.length){
-          return docid = NO_MORE_DOCS;
+          docid = NO_MORE_DOCS;
+          return docid;
         }
-        return (docid = docids[cursor]);
+        docid = docids[cursor];
+        return docid;
       }
       else{
         cursor = docids.length-1;
-        return (docid = NO_MORE_DOCS);
+        docid = NO_MORE_DOCS;
+        return docid;
       }
     }
     else{
