@@ -97,15 +97,13 @@ public class PostingsCommand extends ClueCommand {
                 out.print(";");
               }
               out.println();
-              if (ctx.isInteractiveMode()){
-                if (count % numPerPage == 0){
+              if (ctx.isInteractiveMode() && count % numPerPage == 0){
                   out.println("Ctrl-D to break");
                   int ch = System.in.read();
                   if (ch == -1) {
                     out.flush();
                     return;
                   }
-                }
               }
             }
           }
@@ -116,15 +114,13 @@ public class PostingsCommand extends ClueCommand {
             while((docid = postings.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS){
               count++;
               out.println("docid: "+(docid+docBase)+", freq: "+postings.freq());
-              if (ctx.isInteractiveMode()){
-                if (count % numPerPage == 0){
+              if (ctx.isInteractiveMode() && count % numPerPage == 0){
                   out.println("Ctrl-D to break");
                   int ch = System.in.read();
                   if (ch == -1) {
                     out.flush();
                     return;
                   }
-                }
               }
             }
           }
