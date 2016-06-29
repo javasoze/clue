@@ -31,7 +31,7 @@ public class SearchCommand extends ClueCommand {
   public void execute(String[] args, PrintStream out) throws Exception {
     IndexReader r = ctx.getIndexReader();
     IndexSearcher searcher = new IndexSearcher(r);
-    Query q = null;
+    Query q;
     if (args.length == 0){
       q = new MatchAllDocsQuery();
     }
