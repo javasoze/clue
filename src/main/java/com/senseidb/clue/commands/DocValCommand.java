@@ -21,7 +21,9 @@ import com.senseidb.clue.ClueContext;
 
 public class DocValCommand extends ClueCommand {
 
-  public DocValCommand(ClueContext ctx) {
+  private static final String NUM_TERMS_IN_FIELD = "numTerms in field: ";
+
+public DocValCommand(ClueContext ctx) {
     super(ctx);
   }
 
@@ -59,7 +61,7 @@ public class DocValCommand extends ClueCommand {
         SortedDocValues sv = (SortedDocValues)docVals;
         bytesRef = sv.get(subid);
         StringBuilder sb = new StringBuilder();
-        sb.append("numTerms in field: ").append(sv.getValueCount()).append(", ");
+        sb.append(NUM_TERMS_IN_FIELD).append(sv.getValueCount()).append(", ");
         sb.append("value: [");
         sb.append(bytesRef.utf8ToString());
         sb.append("]");
@@ -72,7 +74,7 @@ public class DocValCommand extends ClueCommand {
         long nextOrd;
         long count = sv.getValueCount();
         StringBuilder sb = new StringBuilder();
-        sb.append("numTerms in field: ").append(count).append(", ");
+        sb.append(NUM_TERMS_IN_FIELD).append(count).append(", ");
         sb.append("values: [");
         boolean firstPass = true;
         while ((nextOrd = sv.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS) {
@@ -92,7 +94,7 @@ public class DocValCommand extends ClueCommand {
         sv.setDocument(subid);        
         int count = sv.count();
         StringBuilder sb = new StringBuilder();
-        sb.append("numTerms in field: ").append(count).append(", ");
+        sb.append(NUM_TERMS_IN_FIELD).append(count).append(", ");
         sb.append("values: [");
         boolean firstPass = true;
         for (int i = 0; i < count; ++i) {
