@@ -12,7 +12,17 @@ import org.apache.lucene.util.Bits;
 public abstract class MatchSomeDocsQuery extends Query {
   
   protected abstract boolean match(int docId);
-  
+
+  @Override
+  public boolean equals(Object obj) {
+    return this == obj;
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }  
+
   @Override
   public Weight createWeight(IndexSearcher searcher, boolean needsScores) {
     return new RandomAccessWeight(this) {

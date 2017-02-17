@@ -52,7 +52,10 @@ public class HdfsDirectory extends BaseDirectory {
   }
 
   @Override
-  public void renameFile(String source, String dest) throws IOException {
+  public void syncMetaData() throws IOException {}
+
+  @Override
+  public void rename(String source, String dest) throws IOException {
   }
 
   @Override
