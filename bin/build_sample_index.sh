@@ -5,12 +5,10 @@ bin=`cd "$bin"; pwd`
 
 lib=$bin/../target/lib
 dist=$bin/../target
-classes=$bin/../target/test-classes
 
 HEAP_OPTS="-Xmx1g -Xms1g -XX:NewSize=256m"
 JAVA_OPTS="-server -d64"
 
 MAIN_CLASS="com.senseidb.clue.test.BuildSampleIndex"
-CLASSPATH=$resources/:$classes/:$lib/*:$dist/*:$1/ext/*
 
-java $JAVA_OPTS $JMX_OPTS $HEAP_OPTS -classpath $CLASSPATH $MAIN_CLASS $bin/../src/test/resources/cars.json $@
+java $JAVA_OPTS $JMX_OPTS $HEAP_OPTS -cp $dist/clue-6.2.0-0.0.1-SNAPSHOT.jar $MAIN_CLASS $bin/../src/main/resources/cars.json $@
