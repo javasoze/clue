@@ -20,26 +20,11 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 0.0.6
+latest version: 6.2.0-1.0.0
 
 #### What's new in this release?
 
-* Add support for autocompletion and history
-* Lucene 5.0 upgrade
-* Support/fix interacting with indexes on hdfs
-* Add support for sortednumericdv docvalue type
-* Adding cmd to read and save commit data
-
-source: [release-0.0.6.zip](https://github.com/javasoze/clue/archive/release-0.0.6.zip)
-
-clue-all executable jar with all dependencies:
-     [clue-all-0.0.6.jar](https://github.com/javasoze/clue/releases/download/release-0.0.6/clue-all-0.0.6.jar)
-
-clue jar with only clue class files, used as a library:
-     [clue-0.0.6.jar](https://github.com/javasoze/clue/releases/download/release-0.0.6/clue-0.0.6.jar)
-
-distribution
-     [clue-0.0.6.zip](https://github.com/javasoze/clue/releases/download/release-0.0.6/clue-0.0.6.zip)
+See [Release Note](https://github.com/javasoze/clue/releases/tag/release-6.2.0-1.0.0)
 
 ### Build:
 
@@ -47,13 +32,13 @@ mvn package
 
 This will create 2 artifacts in the target directory:
 
-1. clue-xxx.jar
+1. ```original-clue-${VERSION}.jar```
 
    jar file containing all clue classes.
 
-2. clue-all-xxx.jar
+2. ```clue-${VERSION}.jar```
 
-   executable jar file containing all clue classes as well as all runtime dependencies, e.g. java -jar clue-all-xxx.jar works
+   executable jar file containing all clue classes as well as all runtime dependencies, e.g. ```java -jar clue-${VERSION}.jar``` works
 
 ### Run:
 
