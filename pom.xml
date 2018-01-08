@@ -6,7 +6,7 @@
 	<artifactId>clue</artifactId>
 	<packaging>jar</packaging>
 	<name>clue</name>
-	<version>0.0.7-SNAPSHOT</version>
+	<version>6.2.0-0.0.1-SNAPSHOT</version>
 	<description>command line client for Apache Lucene</description>
 
 	<url>http://github.com/javasoze/clue</url>
@@ -32,6 +32,12 @@
 			<email>john.wang@gmail.com</email>
 		</developer>
 	</developers>
+    
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mainClass>com.senseidb.clue.ClueApplication</mainClass>
+        <lucene.version>6.2.0</lucene.version>
+	</properties>
 
 	<!-- Set the compiler to java6 -->
 	<build>
@@ -40,61 +46,45 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.8</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<appendAssemblyId>false</appendAssemblyId>
-					<outputDirectory>${project.build.directory}/releases/</outputDirectory>
-					<finalName>clue-all-${project.version}</finalName>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifest>
-							<mainClass>com.senseidb.clue.ClueApplication</mainClass>
-							<packageName>com.senseidb.clue</packageName>
-						</manifest>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                            <artifactId>maven-shade-plugin</artifactId>
+                            <version>2.4.1</version>
+                            <configuration>
+                                <createDependencyReducedPom>true</createDependencyReducedPom>
+                                <transformers>
+                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                        <mainClass>${mainClass}</mainClass>
+                                    </transformer>
+                                </transformers>
+                                <!-- exclude signed Manifests -->
+                                <filters>
+                                    <filter>
+                                        <artifact>*:*</artifact>
+                                        <excludes>
+                                            <exclude>META-INF/*.SF</exclude>
+                                            <exclude>META-INF/*.DSA</exclude>
+                                            <exclude>META-INF/*.RSA</exclude>
+                                        </excludes>
+                                    </filter>
+                                </filters>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>shade</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+              </plugin>
 		</plugins>
 	</build>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <lucene.version>6.2.0</lucene.version>
-	</properties>
 
 	<dependencies>
 		<dependency>
@@ -105,6 +95,11 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-codecs</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-backward-codecs</artifactId>
 			<version>${lucene.version}</version>
 		</dependency>
 		<dependency>
@@ -164,7 +159,6 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20140107</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>jline</groupId>

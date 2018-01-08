@@ -3,3 +3,6 @@ my-idx
 .settings/
 .project
 .classpath
+.idea/
+*.iml
+dependency-reduced-pom.xml

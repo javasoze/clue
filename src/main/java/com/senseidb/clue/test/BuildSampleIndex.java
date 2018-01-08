@@ -85,6 +85,7 @@ public class BuildSampleIndex {
   public static void main(String[] args) throws Exception{
     if (args.length != 2) {
       System.out.println("usage: source_file index_dir");
+      System.exit(1);
     }
     File f = new File(args[0]);
     BufferedReader reader = new BufferedReader(new FileReader(f));
