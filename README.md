@@ -20,11 +20,11 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 6.2.0-1.0.0
+latest version: 6.6.2-1.0.0
 
 #### What's new in this release?
 
-See [Release Note](https://github.com/javasoze/clue/releases/tag/release-6.2.0-1.0.0)
+See [Release Note](https://github.com/javasoze/clue/releases/tag/release-6.6.2-1.0.0)
 
 ### Build:
 
