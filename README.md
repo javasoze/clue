@@ -71,9 +71,9 @@ Command list:
 
     using configuration file found at: /Users/johnwang/github/clue/config/clue.conf
 	Analyzer: 		class org.apache.lucene.analysis.standard.StandardAnalyzer
-	Query Builder: 		class com.senseidb.clue.api.DefaultQueryBuilder
-	Directory Builder: 	class com.senseidb.clue.api.DefaultDirectoryBuilder
-	IndexReader Factory: 	class com.senseidb.clue.api.DefaultIndexReaderFactory
+	Query Builder: 		class DefaultQueryBuilder
+	Directory Builder: 	class DefaultDirectoryBuilder
+	IndexReader Factory: 	class DefaultIndexReaderFactory
 	delete - deletes a list of documents from searching via a query, input: query
 	directory - prints directory information
 	docsetinfo - doc id set info and stats
