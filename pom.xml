@@ -2,11 +2,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.senseidb.clue</groupId>
+    <groupId>io.dashbase.clue</groupId>
     <artifactId>clue</artifactId>
     <packaging>jar</packaging>
     <name>clue</name>
-    <version>6.2.0-1.0.0</version>
+    <version>6.6.2-1.0.0</version>
     <description>command line client for Apache Lucene</description>
 
     <url>http://github.com/javasoze/clue</url>
@@ -35,8 +35,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClass>com.senseidb.clue.ClueApplication</mainClass>
-        <lucene.version>6.2.0</lucene.version>
+        <mainClass>io.dashbase.clue.ClueApplication</mainClass>
+        <lucene.version>6.6.2</lucene.version>
     </properties>
 
     <!-- Set the compiler to java6 -->
@@ -86,6 +86,14 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+                        <!-- Enabling the use of FTP -->
+                        <extension>
+                                <groupId>org.kuali.maven.wagons</groupId>
+                                <artifactId>maven-s3-wagon</artifactId>
+                                <version>1.2.1</version>
+                        </extension>
+        </extensions>
     </build>
 
     <dependencies>
@@ -188,46 +196,14 @@
     </repositories>
 
     <distributionManagement>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>sonatype nexus staging repository</name>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>sonatype nexus snapshots repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+            <snapshotRepository>
+                    <id>repo.dashbase.io</id>
+                    <url>s3://repo.dashbase.io/snapshot</url>
+            </snapshotRepository>
+            <repository>
+                    <id>repo.dashbase.io</id>
+                    <url>s3://repo.dashbase.io/snapshot</url>
+            </repository>
+      </distributionManagement>
 </project>
 

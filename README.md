@@ -20,11 +20,11 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 6.2.0-1.0.0
+latest version: 6.6.2-1.0.0
 
 #### What's new in this release?
 
-See [Release Note](https://github.com/javasoze/clue/releases/tag/release-6.2.0-1.0.0)
+See [Release Note](https://github.com/javasoze/clue/releases/tag/release-6.6.2-1.0.0)
 
 ### Build:
 
@@ -56,9 +56,9 @@ Command list:
 
     using configuration file found at: /Users/johnwang/github/clue/config/clue.conf
 	Analyzer: 		class org.apache.lucene.analysis.standard.StandardAnalyzer
-	Query Builder: 		class com.senseidb.clue.api.DefaultQueryBuilder
-	Directory Builder: 	class com.senseidb.clue.api.DefaultDirectoryBuilder
-	IndexReader Factory: 	class com.senseidb.clue.api.DefaultIndexReaderFactory
+	Query Builder: 		class io.dashbase.clue.api.DefaultQueryBuilder
+	Directory Builder: 	class io.dashbase.clue.api.DefaultDirectoryBuilder
+	IndexReader Factory: 	class io.dashbase.clue.api.DefaultIndexReaderFactory
 	delete - deletes a list of documents from searching via a query, input: query
 	directory - prints directory information
 	docsetinfo - doc id set info and stats
