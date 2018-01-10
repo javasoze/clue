@@ -3,6 +3,8 @@ package io.dashbase.clue.commands;
 import java.io.PrintStream;
 import java.util.Random;
 
+import io.dashbase.clue.util.DocIdMatcher;
+import io.dashbase.clue.util.MatcherDocIdSetIterator;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Query;
@@ -28,24 +30,8 @@ public class IndexTrimCommand extends ClueCommand {
   
   private static Query buildDeleteQuery(final int percentToDelete) {
     assert percentToDelete >= 0 && percentToDelete <= 100;
-    final Random rand = new Random();
-    return new MatchSomeDocsQuery() {
-      
-      @Override
-      public String toString(String field) {
-        return null;
-      }
-      
-      @Override
-      protected boolean match(int docId) {
-        int guess = rand.nextInt(100);
-        if (guess < percentToDelete) {
-          return true;
-        }
-        return false;
-      }
-    };
-    
+
+    return new MatchSomeDocsQuery(new MatcherDocIdSetIterator(DocIdMatcher.newRandomMatcher(percentToDelete)));
   }
 
   @Override
