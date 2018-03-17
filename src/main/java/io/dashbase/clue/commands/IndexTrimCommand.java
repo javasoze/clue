@@ -31,7 +31,7 @@ public class IndexTrimCommand extends ClueCommand {
   private static Query buildDeleteQuery(final int percentToDelete) {
     assert percentToDelete >= 0 && percentToDelete <= 100;
 
-    return new MatchSomeDocsQuery(new MatcherDocIdSetIterator(DocIdMatcher.newRandomMatcher(percentToDelete)));
+    return new MatchSomeDocsQuery(new MatcherDocIdSetIterator(DocIdMatcher.newRandomMatcher(percentToDelete), Integer.MAX_VALUE));
   }
 
   @Override
