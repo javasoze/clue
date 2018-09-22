@@ -20,7 +20,7 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 6.6.2-1.0.0
+latest version: 7.4.0-1.0.0
 
 #### What's new in this release?
 
