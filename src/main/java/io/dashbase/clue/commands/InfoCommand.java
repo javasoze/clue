@@ -117,13 +117,11 @@ public class InfoCommand extends ClueCommand {
         LeafReader ar = leaf.reader();        
         FieldInfos fldInfos = ar.getFieldInfos();
         Iterator<FieldInfo> finfoIter = fldInfos.iterator();
-        
-        Fields flds = ar.fields();
-        
+
         while (finfoIter.hasNext()) {
           FieldInfo finfo = finfoIter.next();          
           Object[] data = fields.get(finfo.name);
-          Terms t = flds.terms(finfo.name);
+          Terms t = ar.terms(finfo.name);
           if (data == null) {
             data = new Object[2];
             LinkedList<Terms> termsList = new LinkedList<Terms>();
@@ -167,13 +165,12 @@ public class InfoCommand extends ClueCommand {
       out.println("num deleted docs:\t" + atomicReader.numDeletedDocs());
 
       FieldInfos fields = atomicReader.getFieldInfos();
-      Fields flds = atomicReader.fields();
 
       out.println("number of fields: " + fields.size());
 
       for (int i = 0; i < fields.size(); ++i) {
         FieldInfo finfo = fields.fieldInfo(i);
-        Terms te = flds.terms(finfo.name);
+        Terms te = atomicReader.terms(finfo.name);
         out.println("=================================== Field "+finfo.name+" ===================================");
         toString(new Object[] { finfo, Arrays.asList(te) }, out);
       }

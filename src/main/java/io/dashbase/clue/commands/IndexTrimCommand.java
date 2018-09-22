@@ -1,14 +1,14 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.Random;
-
+import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.util.DocIdMatcher;
+import io.dashbase.clue.util.MatchSomeDocsQuery;
+import io.dashbase.clue.util.MatcherDocIdSetIterator;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Query;
 
-import io.dashbase.clue.ClueContext;
-import io.dashbase.clue.util.MatchSomeDocsQuery;
+import java.io.PrintStream;
 
 public class IndexTrimCommand extends ClueCommand {
 
@@ -26,26 +26,9 @@ public class IndexTrimCommand extends ClueCommand {
     return "trims the index, <TRIM PERCENTAGE>"; 
   }
   
-  private static Query buildDeleteQuery(final int percentToDelete) {
+  private static Query buildDeleteQuery(final int percentToDelete, int maxDoc) {
     assert percentToDelete >= 0 && percentToDelete <= 100;
-    final Random rand = new Random();
-    return new MatchSomeDocsQuery() {
-      
-      @Override
-      public String toString(String field) {
-        return null;
-      }
-      
-      @Override
-      protected boolean match(int docId) {
-        int guess = rand.nextInt(100);
-        if (guess < percentToDelete) {
-          return true;
-        }
-        return false;
-      }
-    };
-    
+    return new MatchSomeDocsQuery(new MatcherDocIdSetIterator(DocIdMatcher.newRandomMatcher(percentToDelete), maxDoc));
   }
 
   @Override
@@ -65,7 +48,7 @@ public class IndexTrimCommand extends ClueCommand {
     if (writer != null) {      
       IndexReader reader = ctx.getIndexReader();
       
-      writer.deleteDocuments(buildDeleteQuery(trimPercent));
+      writer.deleteDocuments(buildDeleteQuery(trimPercent, reader.maxDoc()));
       writer.commit();      
       ctx.refreshReader();
       reader = ctx.getIndexReader();

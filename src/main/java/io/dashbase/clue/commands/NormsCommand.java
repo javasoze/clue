@@ -33,7 +33,11 @@ public class NormsCommand extends ClueCommand {
       PrintStream out, int segmentid) throws Exception {
     int subid = docid - docBase;
     if (docVals != null) {
-      String val = String.valueOf(docVals.get(subid));
+      String val = null;
+
+      if (docVals.advanceExact(subid)) {
+        val = String.valueOf(docVals.longValue());
+      }
 
       if (val == null) {
         out.println("cannot read norm for docid: " + docid + ", subid: " + subid);

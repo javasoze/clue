@@ -79,7 +79,7 @@ public class TermsCommand extends ClueCommand {
     for (LeafReaderContext leaf : leaves){
       LeafReader atomicReader = leaf.reader();
       
-      Terms terms = atomicReader.fields().terms(field);
+      Terms terms = atomicReader.terms(field);
       
       if (terms == null) {
         continue;

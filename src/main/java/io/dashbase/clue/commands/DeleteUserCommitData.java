@@ -1,6 +1,9 @@
 package io.dashbase.clue.commands;
 
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import io.dashbase.clue.ClueContext;
@@ -26,17 +29,19 @@ public class DeleteUserCommitData extends ClueCommand {
 	public void execute(String[] args, PrintStream out) throws Exception {
 		IndexWriter writer = ctx.getIndexWriter();
 		if (writer != null) {
-			if (args.length > 0) {				
-			  Map<String, String> commitData = writer.getCommitData();
-			  if (commitData != null && commitData.size() > 0) {
-			  	if (commitData.remove(args[0]) != null) {
-			      writer.setCommitData(commitData);
-			      writer.commit();
-			      ctx.refreshReader();
-			      out.println("commit data: " + args[0] +" removed.");
-			  	} else {
-			  		out.println("no commit data with the key: " + args[0] +", no action taken");
-			  	}
+			if (args.length > 0) {
+				Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
+				List<Map.Entry<String, String>> commitList = new LinkedList<>();
+				for (Map.Entry<String, String> dataEntry : commitData) {
+					if (!dataEntry.equals(args[0])) {
+						commitList.add(dataEntry);
+					}
+				}
+			  if (commitList.size() > 0) {
+				  writer.setLiveCommitData(commitList);
+				  writer.commit();
+				  ctx.refreshReader();
+				  out.println("commit data: " + args[0] +" removed.");
 			  } else {
 			  	out.println("no commit data found, no action taken");
 			  }

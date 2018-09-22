@@ -1,17 +1,17 @@
 package io.dashbase.clue.util;
 
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.*;
+
 import java.io.IOException;
 
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.RandomAccessWeight;
-import org.apache.lucene.search.Weight;
-import org.apache.lucene.util.Bits;
+public final class MatchSomeDocsQuery extends Query {
 
-public abstract class MatchSomeDocsQuery extends Query {
-  
-  protected abstract boolean match(int docId);
+  private final DocIdSetIterator docIdSetIterator;
+
+  public MatchSomeDocsQuery(DocIdSetIterator docIdSetIterator) {
+    this.docIdSetIterator = docIdSetIterator;
+  }
 
   @Override
   public boolean equals(Object obj) {
@@ -21,27 +21,26 @@ public abstract class MatchSomeDocsQuery extends Query {
   @Override
   public int hashCode() {
     return toString().hashCode();
-  }  
+  }
 
   @Override
-  public Weight createWeight(IndexSearcher searcher, boolean needsScores) {
-    return new RandomAccessWeight(this) {
+  public String toString(String s) {
+    return "matchsome: " + docIdSetIterator;
+  }
+
+  @Override
+  public Weight createWeight(IndexSearcher searcher, boolean needsScores, float boost) throws IOException {
+    return new ConstantScoreWeight(this, 1.0f) {
       @Override
-      protected Bits getMatchingDocs(LeafReaderContext context) throws IOException {
-        final int maxDoc = context.reader().maxDoc();
-        return new Bits() {
+      public Scorer scorer(LeafReaderContext leafReaderContext) throws IOException {
 
-          @Override
-          public boolean get(int index) {
-            return match(index);
-          }
+        return new ConstantScoreScorer(this, score(), docIdSetIterator);
+      }
 
-          @Override
-          public int length() {
-            return maxDoc;
-          }          
-        };
-      }   
+      @Override
+      public boolean isCacheable(LeafReaderContext leafReaderContext) {
+        return false;
+      }
     };
   }
 }

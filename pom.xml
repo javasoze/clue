@@ -6,7 +6,7 @@
     <artifactId>clue</artifactId>
     <packaging>jar</packaging>
     <name>clue</name>
-    <version>6.6.2-1.0.0</version>
+    <version>7.4.0-1.0.0</version>
     <description>command line client for Apache Lucene</description>
 
     <url>http://github.com/javasoze/clue</url>
@@ -36,7 +36,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>io.dashbase.clue.ClueApplication</mainClass>
-        <lucene.version>6.6.2</lucene.version>
+        <lucene.version>7.4.0</lucene.version>
     </properties>
 
     <!-- Set the compiler to java6 -->

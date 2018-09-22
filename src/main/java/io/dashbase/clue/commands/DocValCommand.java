@@ -44,68 +44,76 @@ public DocValCommand(ClueContext ctx) {
     int subid = docid - docBase;
     if (docVals != null) {
 
-      String val;
+      String val = null;
 
       switch (docValType) {
       case NUMERIC:
         NumericDocValues dv = (NumericDocValues)docVals;
-        val = String.valueOf(dv.get(subid));
+        if (dv.advanceExact(subid)) {
+          val = String.valueOf(dv.longValue());
+        }
         break;
       case BINARY:
         BinaryDocValues bv = (BinaryDocValues)docVals;
-        bytesRef = bv.get(subid);
-        val = bytesRef.utf8ToString();
+        if (bv.advanceExact(subid)) {
+          bytesRef = bv.binaryValue();
+          val = bytesRef.utf8ToString();
+        }
         break;
       case SORTED: {
         SortedDocValues sv = (SortedDocValues)docVals;
-        bytesRef = sv.get(subid);
-        StringBuilder sb = new StringBuilder();
-        sb.append(NUM_TERMS_IN_FIELD).append(sv.getValueCount()).append(", ");
-        sb.append("value: [");
-        sb.append(bytesRef.utf8ToString());
-        sb.append("]");
-        val = sb.toString();
+        if (sv.advanceExact(subid)) {
+          bytesRef = sv.binaryValue();
+          StringBuilder sb = new StringBuilder();
+          sb.append(NUM_TERMS_IN_FIELD).append(sv.getValueCount()).append(", ");
+          sb.append("value: [");
+          sb.append(bytesRef.utf8ToString());
+          sb.append("]");
+          val = sb.toString();
+        }
         break;
       }
       case SORTED_SET: {
         SortedSetDocValues sv = (SortedSetDocValues)docVals;
-        sv.setDocument(subid);
-        long nextOrd;
-        long count = sv.getValueCount();
-        StringBuilder sb = new StringBuilder();
-        sb.append(NUM_TERMS_IN_FIELD).append(count).append(", ");
-        sb.append("values: [");
-        boolean firstPass = true;
-        while ((nextOrd = sv.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS) {
-          bytesRef = sv.lookupOrd(nextOrd);
-          if (!firstPass) {
-            sb.append(", ");
+        if (sv.advanceExact(subid)) {
+          long nextOrd;
+          long count = sv.getValueCount();
+          StringBuilder sb = new StringBuilder();
+          sb.append(NUM_TERMS_IN_FIELD).append(count).append(", ");
+          sb.append("values: [");
+          boolean firstPass = true;
+          while ((nextOrd = sv.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS) {
+            bytesRef = sv.lookupOrd(nextOrd);
+            if (!firstPass) {
+              sb.append(", ");
+            }
+            sb.append(bytesRef.utf8ToString());
+            firstPass = false;
           }
-          sb.append(bytesRef.utf8ToString());
-          firstPass = false;
+          sb.append("]");
+          val = sb.toString();
         }
-        sb.append("]");
-        val = sb.toString();
         break;
       }
       case SORTED_NUMERIC: {
         SortedNumericDocValues sv = (SortedNumericDocValues)docVals;
-        sv.setDocument(subid);        
-        int count = sv.count();
-        StringBuilder sb = new StringBuilder();
-        sb.append(NUM_TERMS_IN_FIELD).append(count).append(", ");
-        sb.append("values: [");
-        boolean firstPass = true;
-        for (int i = 0; i < count; ++i) {
-          long nextVal = sv.valueAt(i);
-          if (!firstPass) {
-            sb.append(", ");
+        if (sv.advanceExact(subid)) {
+          int count = sv.docValueCount();
+          StringBuilder sb = new StringBuilder();
+          sb.append(NUM_TERMS_IN_FIELD).append(count).append(", ");
+          sb.append("values: [");
+          boolean firstPass = true;
+          for (int i = 0; i < count; ++i) {
+            long nextVal = sv.nextValue();
+            if (!firstPass) {
+              sb.append(", ");
+            }
+            sb.append(String.valueOf(nextVal));
+            firstPass = false;
           }
-          sb.append(String.valueOf(nextVal));
-          firstPass = false;
-        }        
-        sb.append("]");
-        val = sb.toString();
+          sb.append("]");
+          val = sb.toString();
+        }
         break;
       }
       default:

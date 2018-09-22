@@ -1,9 +1,7 @@
 package io.dashbase.clue.commands;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.lucene.index.IndexWriter;
 
@@ -32,12 +30,14 @@ public class SaveUserCommitData extends ClueCommand {
 			if (args.length != 2) {
 				throw new IllegalArgumentException("expected 2 arguments indicating key and value");
 			}
-			Map<String, String> commitData = writer.getCommitData();
-			if (commitData == null) {
-				commitData= new HashMap<String, String>();
+			Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
+			HashMap<String, String> commitMap = new HashMap<>();
+			if (commitData != null) {
+				for (Map.Entry<String, String> entry : commitData) {
+					commitMap.put(entry.getKey(), entry.getValue());
+				}
 			}
-			commitData.put(args[0], args[1]);
-			writer.setCommitData(commitData);
+			writer.setLiveCommitData(commitData);
 			writer.commit();
 			ctx.refreshReader();
 			out.println("commit data: " + Arrays.toString(args) +" saved.");
