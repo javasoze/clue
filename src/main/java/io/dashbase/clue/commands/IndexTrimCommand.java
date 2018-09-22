@@ -1,16 +1,14 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.Random;
-
+import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.util.DocIdMatcher;
+import io.dashbase.clue.util.MatchSomeDocsQuery;
 import io.dashbase.clue.util.MatcherDocIdSetIterator;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Query;
 
-import io.dashbase.clue.ClueContext;
-import io.dashbase.clue.util.MatchSomeDocsQuery;
+import java.io.PrintStream;
 
 public class IndexTrimCommand extends ClueCommand {
 
