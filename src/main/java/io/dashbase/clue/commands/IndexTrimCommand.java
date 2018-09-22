@@ -28,10 +28,9 @@ public class IndexTrimCommand extends ClueCommand {
     return "trims the index, <TRIM PERCENTAGE>"; 
   }
   
-  private static Query buildDeleteQuery(final int percentToDelete) {
+  private static Query buildDeleteQuery(final int percentToDelete, int maxDoc) {
     assert percentToDelete >= 0 && percentToDelete <= 100;
-
-    return new MatchSomeDocsQuery(new MatcherDocIdSetIterator(DocIdMatcher.newRandomMatcher(percentToDelete)));
+    return new MatchSomeDocsQuery(new MatcherDocIdSetIterator(DocIdMatcher.newRandomMatcher(percentToDelete), maxDoc));
   }
 
   @Override
@@ -51,7 +50,7 @@ public class IndexTrimCommand extends ClueCommand {
     if (writer != null) {      
       IndexReader reader = ctx.getIndexReader();
       
-      writer.deleteDocuments(buildDeleteQuery(trimPercent));
+      writer.deleteDocuments(buildDeleteQuery(trimPercent, reader.maxDoc()));
       writer.commit();      
       ctx.refreshReader();
       reader = ctx.getIndexReader();
