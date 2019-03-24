@@ -3,6 +3,7 @@ package io.dashbase.clue;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
+import java.util.Optional;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;
@@ -13,14 +14,14 @@ import io.dashbase.clue.commands.HelpCommand;
 public class ClueApplication {
   
   private final ClueContext ctx;
-  private final ClueCommand helpCommand;
+  private final Optional<ClueCommand> helpCommand;
   private final Directory dir;
   
-  private static ClueConfiguration config;
+  private static ClueAppConfiguration config;
   
   static {
     try {
-      config = ClueConfiguration.load();
+      config = ClueAppConfiguration.load();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -30,16 +31,16 @@ public class ClueApplication {
     return ctx;
   }
   
-  public ClueConfiguration getConfiguration() {
+  public ClueAppConfiguration getConfiguration() {
     return config;
   }
   
-  public ClueContext newContext(Directory dir, ClueConfiguration config, boolean interactiveMode) throws Exception {
+  public ClueContext newContext(Directory dir, ClueAppConfiguration config, boolean interactiveMode) throws Exception {
     return new ClueContext(dir, config, interactiveMode);
   }
   
   public ClueApplication(String idxLocation, boolean interactiveMode) throws Exception{
-    dir = config.getDirBuilder().build(new URI(idxLocation));
+    dir = config.dirBuilder.build(idxLocation);
     if (!DirectoryReader.indexExists(dir)){
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
@@ -50,13 +51,13 @@ public class ClueApplication {
   }
   
   public void handleCommand(String cmdName, String[] args, PrintStream out){
-    ClueCommand cmd = ctx.getCommand(cmdName);
-    if (cmd == null){
+    Optional<ClueCommand> cmd = ctx.getCommand(cmdName);
+    if (!cmd.isPresent()){
       out.println(cmdName+" is not supported:");
       cmd = helpCommand;
     }
     try{
-      cmd.execute(args, out);
+      cmd.get().execute(args, out);
     }
     catch(Exception e){
       e.printStackTrace();

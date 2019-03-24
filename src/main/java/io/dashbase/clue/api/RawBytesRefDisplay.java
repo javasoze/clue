@@ -1,8 +1,8 @@
 package io.dashbase.clue.api;
 
-public class RawBytesRefDisplay extends BytesRefDisplay {
+public class RawBytesRefDisplay implements BytesRefDisplay {
 
-  private RawBytesRefDisplay() {
+  public RawBytesRefDisplay() {
     
   }
   

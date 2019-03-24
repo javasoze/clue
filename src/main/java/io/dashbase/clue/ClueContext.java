@@ -1,8 +1,6 @@
 package io.dashbase.clue;
 
-import io.dashbase.clue.api.BytesRefDisplay;
-import io.dashbase.clue.api.IndexReaderFactory;
-import io.dashbase.clue.api.QueryBuilder;
+import io.dashbase.clue.api.*;
 import io.dashbase.clue.commands.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
@@ -17,6 +15,7 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Optional;
 
 public class ClueContext {
 
@@ -28,21 +27,21 @@ public class ClueContext {
   private final Directory directory;
   private final IndexWriterConfig writerConfig;
   private final QueryBuilder queryBuilder;
-  private final Analyzer analyzerQuery;
+  private final AnalyzerFactory analyzerFactory;
   private final BytesRefDisplay termBytesRefDisplay;
   private final BytesRefDisplay payloadBytesRefDisplay;
   
-  public ClueContext(Directory dir, ClueConfiguration config, boolean interactiveMode) 
+  public ClueContext(Directory dir, ClueAppConfiguration config, boolean interactiveMode)
       throws Exception {
     this.directory = dir;
-    this.analyzerQuery = config.getAnalyzerQuery();
-    this.readerFactory = config.getIndexReaderFactory();
+    this.analyzerFactory = config.analyzerFactory;
+    this.readerFactory = config.indexReaderFactory;
     this.readerFactory.initialize(directory);
-    this.queryBuilder = config.getQueryBuilder();
-    this.queryBuilder.initialize("contents", analyzerQuery);
+    this.queryBuilder = config.queryBuilder;
+    this.queryBuilder.initialize("contents", analyzerFactory.forQuery());
     this.writerConfig = new IndexWriterConfig(new StandardAnalyzer());
-    this.termBytesRefDisplay = config.getTermBytesRefDisplay();
-    this.payloadBytesRefDisplay = config.getPayloadBytesRefDisplay();
+    this.termBytesRefDisplay = new StringBytesRefDisplay();
+    this.payloadBytesRefDisplay = new StringBytesRefDisplay();
     this.writer = null;
     this.interactiveMode = interactiveMode;
     
@@ -108,7 +107,7 @@ public class ClueContext {
   }
 
   public Analyzer getAnalyzerQuery() {
-    return analyzerQuery;
+    return analyzerFactory.forQuery();
   }
   
   public BytesRefDisplay getTermBytesRefDisplay() {
@@ -136,7 +135,7 @@ public class ClueContext {
     return registry.isReadonly();
   }
   
-  public ClueCommand getCommand(String cmd){
+  public Optional<ClueCommand> getCommand(String cmd){
     return registry.getCommand(cmd);
   }
   

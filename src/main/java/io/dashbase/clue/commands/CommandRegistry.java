@@ -40,21 +40,22 @@ public class CommandRegistry {
         }
     }
 
-    public ClueCommand getCommand(String cmd){
+    public Optional<ClueCommand> getCommand(String cmd){
 
         ClueCommand command = cmdMap.get(cmd);
-        if (readonly) {
-            if (command.getClass().isAnnotationPresent(Readonly.class)) {
-                return command;
-            } else {
-                return new FilterCommand(command) {
-                    public void execute(String[] args, PrintStream out) throws Exception {
-                        out.println("read-only mode, command: " + getName() + " is not allowed");
-                    }
-                };
+        if (command != null) {
+            if (readonly) {
+                if (!command.getClass().isAnnotationPresent(Readonly.class)) {
+                    command = new FilterCommand(command) {
+                        public void execute(String[] args, PrintStream out) throws Exception {
+                            out.println("read-only mode, command: " + getName() + " is not allowed");
+                        }
+                    };
+                }
             }
+            return Optional.of(command);
         } else {
-            return command;
+            return Optional.empty();
         }
     }
 }
