@@ -29,12 +29,12 @@ public final class MatchSomeDocsQuery extends Query {
   }
 
   @Override
-  public Weight createWeight(IndexSearcher searcher, boolean needsScores, float boost) throws IOException {
+  public Weight createWeight(IndexSearcher searcher, ScoreMode scoreMode, float boost) throws IOException {
     return new ConstantScoreWeight(this, 1.0f) {
       @Override
       public Scorer scorer(LeafReaderContext leafReaderContext) throws IOException {
 
-        return new ConstantScoreScorer(this, score(), docIdSetIterator);
+        return new ConstantScoreScorer(this, score(), scoreMode, docIdSetIterator);
       }
 
       @Override
