@@ -13,6 +13,7 @@ import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.util.BytesRef;
 
+@Readonly
 public class StoredFieldCommand extends ClueCommand {
 
   public StoredFieldCommand(ClueContext ctx) {

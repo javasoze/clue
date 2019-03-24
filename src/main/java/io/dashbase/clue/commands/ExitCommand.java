@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class ExitCommand extends ClueCommand {
 
   public ExitCommand(ClueContext ctx) {

@@ -10,6 +10,7 @@ import org.apache.lucene.store.FSDirectory;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class ExportCommand extends ClueCommand {
 
   public ExportCommand(ClueContext ctx) {

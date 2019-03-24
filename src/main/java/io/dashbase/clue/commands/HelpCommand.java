@@ -6,6 +6,7 @@ import java.util.Map;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class HelpCommand extends ClueCommand {
 
   public static final String CMD_NAME = "help";
@@ -25,8 +26,7 @@ public class HelpCommand extends ClueCommand {
 
   @Override
   public void execute(String[] args, PrintStream out) {
-    Map<String, ClueCommand> cmdMap = ctx.getCommandMap();
-    Collection<ClueCommand> commands = cmdMap.values();
+    Collection<ClueCommand> commands = ctx.getCommandRegistry().getAvailableCommands();
     
     for (ClueCommand cmd : commands){
       out.println(cmd.getName()+" - " + cmd.help());

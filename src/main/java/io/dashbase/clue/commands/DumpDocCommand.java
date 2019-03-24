@@ -12,6 +12,7 @@ import org.apache.lucene.util.BytesRef;
 import java.io.PrintStream;
 import java.util.List;
 
+@Readonly
 public class DumpDocCommand extends ClueCommand {
 
     public DumpDocCommand(ClueContext ctx) {

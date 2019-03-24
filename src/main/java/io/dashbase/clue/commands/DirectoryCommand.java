@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class DirectoryCommand extends ClueCommand {
 
   public DirectoryCommand(ClueContext ctx) {

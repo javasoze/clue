@@ -18,6 +18,7 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
 
+@Readonly
 public class ReconstructCommand extends ClueCommand {
 
   public ReconstructCommand(ClueContext ctx) {

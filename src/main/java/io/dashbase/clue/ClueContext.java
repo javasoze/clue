@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import io.dashbase.clue.commands.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
@@ -26,36 +27,12 @@ import org.apache.lucene.store.Directory;
 import io.dashbase.clue.api.BytesRefDisplay;
 import io.dashbase.clue.api.IndexReaderFactory;
 import io.dashbase.clue.api.QueryBuilder;
-import io.dashbase.clue.commands.ClueCommand;
-import io.dashbase.clue.commands.DeleteCommand;
-import io.dashbase.clue.commands.DeleteUserCommitData;
-import io.dashbase.clue.commands.DirectoryCommand;
-import io.dashbase.clue.commands.DocSetInfoCommand;
-import io.dashbase.clue.commands.DocValCommand;
-import io.dashbase.clue.commands.DumpDocCommand;
-import io.dashbase.clue.commands.ExitCommand;
-import io.dashbase.clue.commands.ExplainCommand;
-import io.dashbase.clue.commands.ExportCommand;
-import io.dashbase.clue.commands.GetUserCommitDataCommand;
-import io.dashbase.clue.commands.HelpCommand;
-import io.dashbase.clue.commands.IndexTrimCommand;
-import io.dashbase.clue.commands.InfoCommand;
-import io.dashbase.clue.commands.MergeCommand;
-import io.dashbase.clue.commands.NormsCommand;
-import io.dashbase.clue.commands.PostingsCommand;
-import io.dashbase.clue.commands.ReadonlyCommand;
-import io.dashbase.clue.commands.ReconstructCommand;
-import io.dashbase.clue.commands.SaveUserCommitData;
-import io.dashbase.clue.commands.SearchCommand;
-import io.dashbase.clue.commands.StoredFieldCommand;
-import io.dashbase.clue.commands.TermVectorCommand;
-import io.dashbase.clue.commands.TermsCommand;
 
 public class ClueContext {
 
   private final ConsoleReader consoleReader;
   private final IndexReaderFactory readerFactory;
-  private final SortedMap<String, ClueCommand> cmdMap;
+  private final CommandRegistry registry = new CommandRegistry();
   private final boolean interactiveMode;
   private IndexWriter writer;
   private final Directory directory;
@@ -79,7 +56,6 @@ public class ClueContext {
     this.payloadBytesRefDisplay = config.getPayloadBytesRefDisplay();
     this.writer = null;
     this.interactiveMode = interactiveMode;
-    this.cmdMap = new TreeMap<String, ClueCommand>();
     // default to readonly
     this.readOnlyMode = true;
     
@@ -115,7 +91,7 @@ public class ClueContext {
   
   void initAutoCompletion() {
     LinkedList<Completer> completors = new LinkedList<Completer>();
-    completors.add(new StringsCompleter(cmdMap.keySet()));
+    completors.add(new StringsCompleter(registry.commandNames()));
     completors.add(new StringsCompleter(fieldNames()));
     completors.add(new FileNameCompleter());
 
@@ -159,10 +135,10 @@ public class ClueContext {
 
   public void registerCommand(ClueCommand cmd){
     String cmdName = cmd.getName();
-    if (cmdMap.containsKey(cmdName)){
+    if (registry.exists(cmdName)){
       throw new IllegalArgumentException(cmdName+" exists!");
     }
-    cmdMap.put(cmdName, cmd);
+    registry.registerCommand(cmd);
   }
   
   public boolean isInteractiveMode(){
@@ -174,11 +150,11 @@ public class ClueContext {
   }
   
   public ClueCommand getCommand(String cmd){
-    return cmdMap.get(cmd);
+    return registry.getCommand(cmd);
   }
   
-  public Map<String, ClueCommand> getCommandMap(){
-    return cmdMap;
+  public CommandRegistry getCommandRegistry(){
+    return registry;
   }
   
   public IndexReader getIndexReader(){

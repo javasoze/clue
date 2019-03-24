@@ -9,6 +9,7 @@ import org.apache.lucene.index.IndexReader;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class GetUserCommitDataCommand extends ClueCommand {
 
 	public GetUserCommitDataCommand(ClueContext ctx) {

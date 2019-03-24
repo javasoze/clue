@@ -23,6 +23,7 @@ import org.apache.lucene.index.Terms;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class InfoCommand extends ClueCommand {
 
   public InfoCommand(ClueContext ctx) {

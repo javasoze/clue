@@ -11,6 +11,7 @@ import org.apache.lucene.search.TopDocs;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class SearchCommand extends ClueCommand {
 
   public SearchCommand(ClueContext ctx) {

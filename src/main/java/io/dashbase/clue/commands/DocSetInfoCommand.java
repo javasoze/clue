@@ -14,6 +14,7 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BytesRef;
 
+@Readonly
 public class DocSetInfoCommand extends ClueCommand {
 
   private static final int DEFAULT_BUCKET_SIZE = 1000;

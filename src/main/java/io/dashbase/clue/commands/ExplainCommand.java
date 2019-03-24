@@ -10,6 +10,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
+@Readonly
 public class ExplainCommand extends ClueCommand {
 
  

@@ -15,6 +15,7 @@ import org.apache.lucene.util.BytesRef;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class PostingsCommand extends ClueCommand {
 
   public PostingsCommand(ClueContext ctx) {

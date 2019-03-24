@@ -12,6 +12,7 @@ import org.apache.lucene.index.NumericDocValues;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class NormsCommand extends ClueCommand {
 
   public NormsCommand(ClueContext ctx) {

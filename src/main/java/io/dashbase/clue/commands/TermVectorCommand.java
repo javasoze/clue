@@ -12,6 +12,7 @@ import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.BytesRef;
 
+@Readonly
 public class TermVectorCommand extends ClueCommand {
 
   public TermVectorCommand(ClueContext ctx) {

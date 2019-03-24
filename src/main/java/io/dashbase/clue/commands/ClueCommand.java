@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import io.dashbase.clue.ClueContext;
 
 public abstract class ClueCommand {
+
   protected ClueContext ctx;
   
   public ClueCommand(ClueContext ctx){

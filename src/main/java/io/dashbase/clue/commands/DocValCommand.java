@@ -18,6 +18,7 @@ import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.util.BytesRef;
 
+@Readonly
 public class DocValCommand extends ClueCommand {
 
   private static final String NUM_TERMS_IN_FIELD = "numTerms in field: ";
