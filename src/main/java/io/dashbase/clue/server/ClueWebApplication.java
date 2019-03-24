@@ -1,12 +1,30 @@
 package io.dashbase.clue.server;
 
+import io.dashbase.clue.ClueContext;
 import io.dropwizard.Application;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Environment;
 
 public class ClueWebApplication extends Application<ClueWebConfiguration> {
 
-    @Override
-    public void run(ClueWebConfiguration clueWebConfiguration, Environment environment) throws Exception {
+    public static void main(String[] args) throws Exception {
+        new ClueWebApplication().run(args);
+    }
 
+    @Override
+    public void run(ClueWebConfiguration conf, Environment environment) throws Exception {
+        final ClueContext ctx = new ClueContext(conf.dir, conf.clue, true);
+        environment.jersey().register(new ClueCommandResource(ctx));
+        environment.lifecycle().manage(new Managed() {
+
+            @Override
+            public void start() throws Exception {
+            }
+
+            @Override
+            public void stop() throws Exception {
+                ctx.shutdown();
+            }
+        });
     }
 }

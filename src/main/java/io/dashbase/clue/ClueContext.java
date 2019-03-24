@@ -31,9 +31,9 @@ public class ClueContext {
   private final BytesRefDisplay termBytesRefDisplay;
   private final BytesRefDisplay payloadBytesRefDisplay;
   
-  public ClueContext(Directory dir, ClueAppConfiguration config, boolean interactiveMode)
+  public ClueContext(String dir, ClueAppConfiguration config, boolean interactiveMode)
       throws Exception {
-    this.directory = dir;
+    this.directory = config.dirBuilder.build(dir);
     this.analyzerFactory = config.analyzerFactory;
     this.readerFactory = config.indexReaderFactory;
     this.readerFactory.initialize(directory);
@@ -74,7 +74,7 @@ public class ClueContext {
     this.consoleReader.setBellEnabled(false);
     initAutoCompletion();
   }
-  
+
   void initAutoCompletion() {
     LinkedList<Completer> completors = new LinkedList<Completer>();
     completors.add(new StringsCompleter(registry.commandNames()));
@@ -184,6 +184,7 @@ public class ClueContext {
       readerFactory.shutdown();
     } 
     finally{
+      directory.close();
       if (writer != null) {
         writer.close();
       }

@@ -15,7 +15,6 @@ public class ClueApplication {
   
   private final ClueContext ctx;
   private final Optional<ClueCommand> helpCommand;
-  private final Directory dir;
   
   private static ClueAppConfiguration config;
   
@@ -35,18 +34,19 @@ public class ClueApplication {
     return config;
   }
   
-  public ClueContext newContext(Directory dir, ClueAppConfiguration config, boolean interactiveMode) throws Exception {
+  public ClueContext newContext(String dir, ClueAppConfiguration config, boolean interactiveMode) throws Exception {
     return new ClueContext(dir, config, interactiveMode);
   }
   
   public ClueApplication(String idxLocation, boolean interactiveMode) throws Exception{
-    dir = config.dirBuilder.build(idxLocation);
-    if (!DirectoryReader.indexExists(dir)){
+    ctx = newContext(idxLocation, config, interactiveMode);
+
+    if (!DirectoryReader.indexExists(ctx.getDirectory())){
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
     }
         
-    ctx = newContext(dir, config, interactiveMode);
+
     helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
   
@@ -81,7 +81,6 @@ public class ClueApplication {
   
   public void shutdown() throws Exception {
     ctx.shutdown();
-    dir.close();
   }
   
   
