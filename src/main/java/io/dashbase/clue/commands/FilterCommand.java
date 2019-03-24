@@ -5,7 +5,7 @@ import java.io.PrintStream;
 public class FilterCommand extends ClueCommand {
     protected final ClueCommand delegate;
     public FilterCommand(ClueCommand cmd) {
-        super(cmd.ctx);
+        super(cmd.ctx, true);
         this.delegate = cmd;
     }
 

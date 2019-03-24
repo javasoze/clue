@@ -7,10 +7,16 @@ import io.dashbase.clue.ClueContext;
 public abstract class ClueCommand {
 
   protected ClueContext ctx;
-  
+
   public ClueCommand(ClueContext ctx){
+    this(ctx, false);
+  }
+
+  public ClueCommand(ClueContext ctx, boolean skipRegistration){
     this.ctx = ctx;
-    this.ctx.registerCommand(this);
+    if (!skipRegistration) {
+      this.ctx.registerCommand(this);
+    }
   }
   
   public ClueContext getContext(){

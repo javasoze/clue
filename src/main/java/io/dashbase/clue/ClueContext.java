@@ -1,32 +1,22 @@
 package io.dashbase.clue;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import io.dashbase.clue.api.BytesRefDisplay;
+import io.dashbase.clue.api.IndexReaderFactory;
+import io.dashbase.clue.api.QueryBuilder;
 import io.dashbase.clue.commands.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.Directory;
 
-import io.dashbase.clue.api.BytesRefDisplay;
-import io.dashbase.clue.api.IndexReaderFactory;
-import io.dashbase.clue.api.QueryBuilder;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class ClueContext {
 
@@ -36,7 +26,6 @@ public class ClueContext {
   private final boolean interactiveMode;
   private IndexWriter writer;
   private final Directory directory;
-  private boolean readOnlyMode;
   private final IndexWriterConfig writerConfig;
   private final QueryBuilder queryBuilder;
   private final Analyzer analyzerQuery;
@@ -56,8 +45,6 @@ public class ClueContext {
     this.payloadBytesRefDisplay = config.getPayloadBytesRefDisplay();
     this.writer = null;
     this.interactiveMode = interactiveMode;
-    // default to readonly
-    this.readOnlyMode = true;
     
     // registers all the commands we currently support
     new HelpCommand(this);
@@ -146,7 +133,7 @@ public class ClueContext {
   }
   
   public boolean isReadOnlyMode() {
-    return readOnlyMode;
+    return registry.isReadonly();
   }
   
   public ClueCommand getCommand(String cmd){
@@ -162,7 +149,7 @@ public class ClueContext {
   }
   
   public IndexWriter getIndexWriter(){
-    if (readOnlyMode) return null;
+    if (registry.isReadonly()) return null;
     if (writer == null) {
       try {
         writer = new IndexWriter(directory, writerConfig);
@@ -178,7 +165,7 @@ public class ClueContext {
   }
   
   public void setReadOnlyMode(boolean readOnlyMode) {
-    this.readOnlyMode = readOnlyMode;
+    this.registry.setReadonly(readOnlyMode);
     if (writer != null) {
       try {
         writer.close();
