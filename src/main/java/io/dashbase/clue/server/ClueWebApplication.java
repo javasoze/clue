@@ -14,9 +14,9 @@ public class ClueWebApplication extends Application<ClueWebConfiguration> {
     @Override
     public void run(ClueWebConfiguration conf, Environment environment) throws Exception {
         final ClueContext ctx = new ClueContext(conf.dir, conf.clue, true);
+        ctx.setReadOnlyMode(true);
         environment.jersey().register(new ClueCommandResource(ctx));
         environment.lifecycle().manage(new Managed() {
-
             @Override
             public void start() throws Exception {
             }

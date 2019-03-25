@@ -2,11 +2,6 @@ package io.dashbase.clue;
 
 import io.dashbase.clue.api.*;
 import io.dashbase.clue.commands.*;
-import jline.console.ConsoleReader;
-import jline.console.completer.ArgumentCompleter;
-import jline.console.completer.Completer;
-import jline.console.completer.FileNameCompleter;
-import jline.console.completer.StringsCompleter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.*;
@@ -18,8 +13,6 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 public class ClueContext {
-
-  private final ConsoleReader consoleReader;
   private final IndexReaderFactory readerFactory;
   private final CommandRegistry registry = new CommandRegistry();
   private final boolean interactiveMode;
@@ -47,7 +40,6 @@ public class ClueContext {
     
     // registers all the commands we currently support
     new HelpCommand(this);
-    new ExitCommand(this);
     new InfoCommand(this);
     new DocValCommand(this);
     new SearchCommand(this);
@@ -69,20 +61,8 @@ public class ClueContext {
     new SaveUserCommitData(this);
     new DeleteUserCommitData(this);
     new DumpDocCommand(this);
-
-    this.consoleReader = new ConsoleReader();
-    this.consoleReader.setBellEnabled(false);
-    initAutoCompletion();
   }
 
-  void initAutoCompletion() {
-    LinkedList<Completer> completors = new LinkedList<Completer>();
-    completors.add(new StringsCompleter(registry.commandNames()));
-    completors.add(new StringsCompleter(fieldNames()));
-    completors.add(new FileNameCompleter());
-
-    consoleReader.addCompleter(new ArgumentCompleter(completors));
-  }
   Collection<String> fieldNames() {
     LinkedList<String> fieldNames = new LinkedList<String>();
     for (LeafReaderContext context : getIndexReader().leaves()) {
@@ -92,14 +72,6 @@ public class ClueContext {
       }
     }
     return fieldNames;
-  }
-  public String readCommand() {
-    try {
-      return consoleReader.readLine("> ");
-    } catch (IOException e) {
-      System.err.println("Error! Clue is unable to read line from stdin: " + e.getMessage());
-      throw new IllegalStateException("Unable to read command line!", e);
-    }
   }
   
   public QueryBuilder getQueryBuilder() {

@@ -5,12 +5,15 @@ import io.dashbase.clue.commands.ClueCommand;
 import io.dashbase.clue.commands.HelpCommand;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Path("/clue")
@@ -29,6 +32,14 @@ public class ClueCommandResource {
             }
         }
         return  args;
+    }
+
+    @GET
+    @Path("commands")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Collection<String> commands() {
+        Set<String> registeredCommands = ctx.getCommandRegistry().commandNames();
+        return registeredCommands;
     }
 
     @GET

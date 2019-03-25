@@ -3,8 +3,11 @@ package io.dashbase.clue;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import io.dashbase.clue.client.CmdlineHelper;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;
 
@@ -17,6 +20,8 @@ public class ClueApplication {
   private final Optional<ClueCommand> helpCommand;
   
   private static ClueAppConfiguration config;
+
+  private CmdlineHelper cmdlineHelper;
   
   static {
     try {
@@ -45,7 +50,6 @@ public class ClueApplication {
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
     }
-        
 
     helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
@@ -63,12 +67,27 @@ public class ClueApplication {
       e.printStackTrace();
     }
   }
-  
+
   public void run() throws IOException {
+    CmdlineHelper helper = new CmdlineHelper(new Supplier<Collection<String>>() {
+      @Override
+      public Collection<String> get() {
+        return ctx.getCommandRegistry().commandNames();
+      }
+    }, new Supplier<Collection<String>>() {
+      @Override
+      public Collection<String> get() {
+        return ctx.fieldNames();
+      }
+    });
+
     while(true){
-      String line = ctx.readCommand();
+      String line = helper.readCommand();
       if (line == null || line.isEmpty()) continue;
       line = line.trim();
+      if ("exit".equals(line)) {
+        return;
+      }
       String[] parts = line.split("\\s");
       if (parts.length > 0){
         String cmd = parts[0];
