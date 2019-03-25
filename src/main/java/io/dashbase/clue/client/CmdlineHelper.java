@@ -1,15 +1,20 @@
 package io.dashbase.clue.client;
 
+import io.dashbase.clue.api.QueryBuilder;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class CmdlineHelper {
@@ -40,5 +45,25 @@ public class CmdlineHelper {
             System.err.println("Error! Clue is unable to read line from stdin: " + e.getMessage());
             throw new IllegalStateException("Unable to read command line!", e);
         }
+    }
+
+    public static String toString(List<String> list) {
+        StringBuilder buf = new StringBuilder();
+        for (String s : list) {
+            buf.append(s).append(" ");
+        }
+        return buf.toString().trim();
+    }
+
+    public static Query toQuery(List<String> list, QueryBuilder queryBuilder) throws Exception {
+        String qstring = toString(list);
+        Query q = null;
+        if (qstring == null || qstring.isEmpty() || qstring.equals("*")){
+            q = new MatchAllDocsQuery();
+        }
+        else{
+            q = queryBuilder.build(qstring);
+        }
+        return q;
     }
 }

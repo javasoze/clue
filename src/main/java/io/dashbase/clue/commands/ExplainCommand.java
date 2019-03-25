@@ -1,11 +1,13 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.client.CmdlineHelper;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 import java.io.PrintStream;
@@ -31,14 +33,15 @@ public class ExplainCommand extends ClueCommand {
 
   @Override
   protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-q", "--query").required(true).help("query");
+    parser.addArgument("-q", "--query").nargs("*").required(true).help("query");
     parser.addArgument("-d", "--docs").type(Integer.class).nargs("*").help("doc ids, e.g. d1 d2 d3");
     return parser;
   }
 
   @Override
   public void execute(Namespace args, PrintStream out) throws Exception {
-    String qstring = args.getString("query");
+    List<String> qlist = args.getList("query");
+    String qstring = CmdlineHelper.toString(qlist);
 
     List<Integer> docidList = args.getList("docs");
 
@@ -47,12 +50,14 @@ public class ExplainCommand extends ClueCommand {
     Query q = null;
 
     try{
-      q = ctx.getQueryBuilder().build(qstring);
+      q = CmdlineHelper.toQuery(qlist, ctx.getQueryBuilder());
     }
     catch(Exception e){
       out.println("cannot parse query: "+e.getMessage());
       return;
     }
+
+    out.println("parsed query: "+q);
     
     for (Integer docid : docidList) {
       Explanation expl = searcher.explain(q, docid);

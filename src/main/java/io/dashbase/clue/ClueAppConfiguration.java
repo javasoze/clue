@@ -3,6 +3,8 @@ package io.dashbase.clue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.dashbase.clue.api.*;
+import io.dashbase.clue.commands.CommandRegistrar;
+import io.dashbase.clue.commands.DefaultCommandRegistrar;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,6 +15,7 @@ public class ClueAppConfiguration  {
     public DirectoryBuilder dirBuilder = new DefaultDirectoryBuilder();
     public IndexReaderFactory indexReaderFactory = new DefaultIndexReaderFactory();
     public AnalyzerFactory analyzerFactory = new DefaultAnalyzerFactory();
+    public CommandRegistrar commandRegistrar = new DefaultCommandRegistrar();
 
     private static final String CLUE_CONF_FILE = "clue.yml";
     private static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());

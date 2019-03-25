@@ -1,7 +1,8 @@
 package io.dashbase.clue;
 
 import io.dashbase.clue.api.*;
-import io.dashbase.clue.commands.*;
+import io.dashbase.clue.commands.ClueCommand;
+import io.dashbase.clue.commands.CommandRegistry;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.*;
@@ -37,30 +38,7 @@ public class ClueContext {
     this.payloadBytesRefDisplay = new StringBytesRefDisplay();
     this.writer = null;
     this.interactiveMode = interactiveMode;
-    
-    // registers all the commands we currently support
-    new HelpCommand(this);
-    new InfoCommand(this);
-    new DocValCommand(this);
-    new SearchCommand(this);
-    new TermsCommand(this);
-    new PostingsCommand(this);
-    new DocSetInfoCommand(this);
-    new MergeCommand(this);
-    new DeleteCommand(this);
-    new ReadonlyCommand(this);
-    new DirectoryCommand(this);
-    new ExplainCommand(this);
-    new NormsCommand(this);
-    new TermVectorCommand(this);
-    new StoredFieldCommand(this);
-    new ReconstructCommand(this);
-    new ExportCommand(this);
-    new IndexTrimCommand(this);
-    new GetUserCommitDataCommand(this);
-    new SaveUserCommitData(this);
-    new DeleteUserCommitData(this);
-    new DumpDocCommand(this);
+    config.commandRegistrar.registerCommands(this);
   }
 
   Collection<String> fieldNames() {

@@ -37,6 +37,7 @@ public class PostingsCommand extends ClueCommand {
   @Override
   protected ArgumentParser buildParser(ArgumentParser parser) {
     parser.addArgument("-f", "--field").required(true).help("field and term, e.g. field:term");
+    parser.addArgument("-n", "--num").type(Integer.class).setDefault(20).help("num per page, default 20");
     return parser;
   }
 
@@ -64,7 +65,7 @@ public class PostingsCommand extends ClueCommand {
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();
     int docBase = 0;
-    int numPerPage = 20;
+    int numPerPage = args.getInt("num");
     PostingsEnum postings = null;
     for (LeafReaderContext leaf : leaves){
       LeafReader atomicReader = leaf.reader();
