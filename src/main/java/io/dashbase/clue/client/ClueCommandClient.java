@@ -17,11 +17,11 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import javax.net.ssl.*;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -115,7 +115,8 @@ public class ClueCommandClient {
 
 
     public void handleCommand(String cmdName, String[] args, PrintStream out) throws Exception {
-        Call<ResponseBody> call = svc.command(cmdName, null);
+        String argString = CmdlineHelper.toString(Arrays.asList(args));
+        Call<ResponseBody> call = svc.command(cmdName, argString);
 
         Response<ResponseBody> response = call.execute();
         try ( ResponseBody responseBody = response.body() ) {
@@ -172,10 +173,13 @@ public class ClueCommandClient {
             System.exit(1);
         }
 
-        URL url = new URL(args[0]);
+        String remoteLocation = args[0];
+        if (!remoteLocation.startsWith("http://") || !remoteLocation.startsWith("https://")) {
+            remoteLocation = "http://" + remoteLocation;
+        }
 
+        URL url = new URL(remoteLocation);
         ClueCommandClient client = new ClueCommandClient(url);
-        ClueCommandService svc = client.service();
         client.run();
     }
 }
