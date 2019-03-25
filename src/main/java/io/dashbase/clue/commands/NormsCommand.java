@@ -4,6 +4,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.FieldInfo;
@@ -51,29 +53,23 @@ public class NormsCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length < 1) {
-      out.println("usage: field doc1,doc2...");
-      return;
-    }
-    String field = args[0];
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field name");
+    parser.addArgument("-d", "--docs").type(Integer.class).nargs("*").help("doc ids, e.g. d1 d2 d3");
+    parser.addArgument("-n", "--num").type(Integer.class).setDefault(20).help("num per page");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    String field = args.getString("field");
     
     IndexReader reader = getContext().getIndexReader();
     
     
-    List<Integer> docidList = new ArrayList<Integer>();
+    List<Integer> docidList = args.getList("docs");
 
-    int numPerPage = 20;
-    
-    try {
-      String[] docListStrings = args[1].split(",");
-      for (String s : docListStrings) {
-        docidList.add(Integer.parseInt(s));
-      }
-    } catch (Exception e) {
-      out.println("invalid docid, all docs are shown");
-      docidList = null;
-    }
+    int numPerPage = args.getInt("num");
 
     List<LeafReaderContext> leaves = reader.leaves();
     if (docidList != null && !docidList.isEmpty()) {

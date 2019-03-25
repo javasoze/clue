@@ -2,6 +2,8 @@ package io.dashbase.clue.commands;
 
 import java.io.PrintStream;
 
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -29,19 +31,22 @@ public class SearchCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-q", "--query").required(true);
+    parser.addArgument("-n", "--num").type(Integer.class).setDefault(10);
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
     IndexReader r = ctx.getIndexReader();
     IndexSearcher searcher = new IndexSearcher(r);
+    String qstring = args.get("query");
     Query q = null;
-    if (args.length == 0){
+    if (qstring == null || qstring.trim().isEmpty() || qstring.trim().equals("*")){
       q = new MatchAllDocsQuery();
     }
     else{
-      StringBuilder buf = new StringBuilder();
-      for (String s : args){
-        buf.append(s).append(" ");
-      }
-      String qstring = buf.toString();
       try{
         q = ctx.getQueryBuilder().build(qstring);
       }
@@ -52,9 +57,11 @@ public class SearchCommand extends ClueCommand {
     }
     
     out.println("parsed query: "+q);
+
+    int count = args.getInt("num");
     
     long start = System.currentTimeMillis();
-    TopDocs td = searcher.search(q, 10);
+    TopDocs td = searcher.search(q, count);
     long end = System.currentTimeMillis();
     
     out.println("numhits: " + td.totalHits);

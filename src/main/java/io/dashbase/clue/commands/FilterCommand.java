@@ -1,5 +1,7 @@
 package io.dashbase.clue.commands;
 
+import net.sourceforge.argparse4j.inf.Namespace;
+
 import java.io.PrintStream;
 
 public class FilterCommand extends ClueCommand {
@@ -20,7 +22,7 @@ public class FilterCommand extends ClueCommand {
     }
 
     @Override
-    public void execute(String[] args, PrintStream out) throws Exception {
+    public void execute(Namespace args, PrintStream out) throws Exception {
         delegate.execute(args, out);
     }
 }

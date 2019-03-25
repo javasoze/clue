@@ -2,12 +2,16 @@ package io.dashbase.clue;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import io.dashbase.clue.client.CmdlineHelper;
+import net.sourceforge.argparse4j.helper.HelpScreenException;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;
 
@@ -17,8 +21,7 @@ import io.dashbase.clue.commands.HelpCommand;
 public class ClueApplication {
   
   private final ClueContext ctx;
-  private final Optional<ClueCommand> helpCommand;
-  
+
   private static ClueAppConfiguration config;
 
   private CmdlineHelper cmdlineHelper;
@@ -50,21 +53,37 @@ public class ClueApplication {
       System.out.println("lucene index does not exist at: "+idxLocation);
       System.exit(1);
     }
-
-    helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
   }
   
-  public void handleCommand(String cmdName, String[] args, PrintStream out){
+  public static void handleCommand(ClueContext ctx, String cmdName, String[] args, PrintStream out){
+    Optional<ClueCommand> helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
     Optional<ClueCommand> cmd = ctx.getCommand(cmdName);
     if (!cmd.isPresent()){
       out.println(cmdName+" is not supported:");
       cmd = helpCommand;
     }
+
+    ClueCommand clueCommand = cmd.get();
+    Namespace ns = null;
+
+    try {
+      ns = clueCommand.parseArgs(args);
+    } catch(HelpScreenException he) {
+        out.println(he.getMessage());
+        return;
+    } catch (ArgumentParserException ape) {
+        out.println(ape.getMessage());
+        PrintWriter writer = new PrintWriter(out);
+        ape.getParser().printHelp(writer);
+        writer.flush();
+        return;
+    }
+
     try{
-      cmd.get().execute(args, out);
+      cmd.get().execute(ns, out);
     }
     catch(Exception e){
-      e.printStackTrace();
+      e.printStackTrace(out);
     }
   }
 
@@ -93,7 +112,7 @@ public class ClueApplication {
         String cmd = parts[0];
         String[] cmdArgs = new String[parts.length - 1];
         System.arraycopy(parts, 1, cmdArgs, 0, cmdArgs.length);
-        handleCommand(cmd, cmdArgs, System.out);
+        handleCommand(ctx, cmd, cmdArgs, System.out);
       }
     }
   }
@@ -123,7 +142,7 @@ public class ClueApplication {
           cmdArgs = new String[args.length - 3];
           System.arraycopy(args, 3, cmdArgs, 0, cmdArgs.length);
           app.ctx.setReadOnlyMode(true);
-          app.handleCommand(cmd, cmdArgs, System.out);
+          app.handleCommand(app.ctx, cmd, cmdArgs, System.out);
           app.shutdown();
         }
       }
@@ -132,7 +151,7 @@ public class ClueApplication {
         String[] cmdArgs;
         cmdArgs = new String[args.length - 2];
         System.arraycopy(args, 2, cmdArgs, 0, cmdArgs.length);
-        app.handleCommand(cmd, cmdArgs, System.out);
+        app.handleCommand(app.ctx, cmd, cmdArgs, System.out);
         app.shutdown();
       }
       return;

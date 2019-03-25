@@ -3,6 +3,8 @@ package io.dashbase.clue.commands;
 import java.io.PrintStream;
 
 import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 @Readonly
 public class ReadonlyCommand extends ClueCommand {
@@ -22,12 +24,14 @@ public class ReadonlyCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    
-    boolean readonly = true;
-    if (args.length > 0) { 
-      readonly = Boolean.parseBoolean(args[0]);
-    }
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("readonly").type(Boolean.class).nargs(1).help("readonly true/false");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    boolean readonly = args.getBoolean("readonly");
     getContext().setReadOnlyMode(readonly);
     out.println("readonly mode is now: "+readonly);
   }

@@ -4,6 +4,8 @@ import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.util.DocIdMatcher;
 import io.dashbase.clue.util.MatchSomeDocsQuery;
 import io.dashbase.clue.util.MatcherDocIdSetIterator;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Query;
@@ -32,13 +34,15 @@ public class IndexTrimCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length < 1) {
-      out.println("usage: <TRIM PERCENTAGE>");
-      return;
-    }
-    
-    int trimPercent = Integer.parseInt(args[0]);
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-p", "--percent").type(Integer.class)
+            .required(true).help("percent to trim");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    int trimPercent = args.getInt("percent");
     
     if (trimPercent < 0 || trimPercent > 100) {
       throw new IllegalArgumentException("invalid percent: " + trimPercent);

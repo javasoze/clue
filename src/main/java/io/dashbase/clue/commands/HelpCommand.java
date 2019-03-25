@@ -2,9 +2,9 @@ package io.dashbase.clue.commands;
 
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Map;
 
 import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 @Readonly
 public class HelpCommand extends ClueCommand {
@@ -25,7 +25,7 @@ public class HelpCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) {
+  public void execute(Namespace args, PrintStream out) {
     Collection<ClueCommand> commands = ctx.getCommandRegistry().getAvailableCommands();
     
     for (ClueCommand cmd : commands){

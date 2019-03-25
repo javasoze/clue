@@ -1,5 +1,7 @@
 package io.dashbase.clue.commands;
 
+import net.sourceforge.argparse4j.inf.Namespace;
+
 import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,7 +49,7 @@ public class CommandRegistry {
             if (readonly) {
                 if (!command.getClass().isAnnotationPresent(Readonly.class)) {
                     command = new FilterCommand(command) {
-                        public void execute(String[] args, PrintStream out) throws Exception {
+                        public void execute(Namespace args, PrintStream out) throws Exception {
                             out.println("read-only mode, command: " + getName() + " is not allowed");
                         }
                     };

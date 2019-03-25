@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
@@ -84,17 +86,18 @@ public class ReconstructCommand extends ClueCommand {
     return buf.toString();
   }
 
-  
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length != 2) {
-      out.println("usage: field doc");
-      return;
-    }
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field name");
+    parser.addArgument("-d", "--doc").type(Integer.class).required(true).help("doc id");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    String field = args.getString("field");
     
-    String field = args[0];
-    
-    int doc = Integer.parseInt(args[1]);
+    int doc = args.getInt("doc");
     
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();

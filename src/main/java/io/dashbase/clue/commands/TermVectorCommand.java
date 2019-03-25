@@ -1,16 +1,13 @@
 package io.dashbase.clue.commands;
 
+import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.lucene.index.*;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.PrintStream;
 import java.util.List;
-
-import io.dashbase.clue.ClueContext;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.util.BytesRef;
 
 @Readonly
 public class TermVectorCommand extends ClueCommand {
@@ -30,15 +27,18 @@ public class TermVectorCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length != 2) {
-      out.println("usage: field doc1,doc2...");
-      return;
-    }
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field name");
+    parser.addArgument("-d", "--doc").required(true).type(Integer.class).help("docid");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+
+    String field = args.getString("field");
     
-    String field = args[0];
-    
-    int doc = Integer.parseInt(args[1]);
+    int doc = args.getInt("doc");
     
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();

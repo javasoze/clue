@@ -3,6 +3,7 @@ package io.dashbase.clue.commands;
 import java.io.PrintStream;
 
 import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 @Readonly
 public class DirectoryCommand extends ClueCommand {
@@ -22,7 +23,7 @@ public class DirectoryCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
+  public void execute(Namespace args, PrintStream out) throws Exception {
     out.println(getContext().getDirectory());
   }
 
