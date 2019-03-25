@@ -1,14 +1,15 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+
+import java.io.PrintStream;
+import java.util.List;
 
 @Readonly
 public class ExplainCommand extends ClueCommand {
@@ -29,38 +30,22 @@ public class ExplainCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length < 2) {
-      out.println("usage: query docs");
-      return;
-    }
-    
-    
-    String docString = args[args.length - 1];
-    String[] docList = docString.split(",");
-    
-    List<Integer> docidList = new ArrayList<Integer>();
-    try {
-      for (String s : docList) {
-        docidList.add(Integer.parseInt(s));
-      }
-    }
-    catch(Exception e) {
-      out.println("error in parsing docids: "+e.getMessage());
-      return;
-    }
-    StringBuilder buf = new StringBuilder();
-    
-    for (int i=0; i<args.length-1;++i) {
-      buf.append(args[i]).append(" ");
-    }
-    
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-q", "--query").required(true).help("query");
+    parser.addArgument("-d", "--docs").type(Integer.class).nargs("*").help("doc ids, e.g. d1 d2 d3");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    String qstring = args.getString("query");
+
+    List<Integer> docidList = args.getList("docs");
+
     IndexReader r = ctx.getIndexReader();
     IndexSearcher searcher = new IndexSearcher(r);
     Query q = null;
-    
-    String qstring = buf.toString();
-    
+
     try{
       q = ctx.getQueryBuilder().build(qstring);
     }

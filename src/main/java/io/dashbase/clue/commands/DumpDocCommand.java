@@ -2,6 +2,8 @@ package io.dashbase.clue.commands;
 
 
 import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -30,14 +32,14 @@ public class DumpDocCommand extends ClueCommand {
     }
 
     @Override
-    public void execute(String[] args, PrintStream out) throws Exception {
-        if (args.length != 1) {
-            out.println("usage: doc");
-            return;
-        }
+    protected ArgumentParser buildParser(ArgumentParser parser) {
+        parser.addArgument("-d", "--doc").type(Integer.class).required(true).help("doc id");
+        return parser;
+    }
 
-        int doc = Integer.parseInt(args[0]);
-
+    @Override
+    public void execute(Namespace args, PrintStream out) throws Exception {
+        int doc = args.getInt("doc");
         IndexReader reader = ctx.getIndexReader();
         List<LeafReaderContext> leaves = reader.leaves();
 

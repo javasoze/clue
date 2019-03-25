@@ -1,10 +1,12 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-
 import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Query;
+
+import java.io.PrintStream;
 
 public class DeleteCommand extends ClueCommand {
 
@@ -21,15 +23,17 @@ public class DeleteCommand extends ClueCommand {
   public String help() {
     return "deletes a list of documents from searching via a query, input: query";
   }
-  
+
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-q", "--query").required(true);
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
     Query q = null;
-    StringBuilder buf = new StringBuilder();
-    for (String s : args){
-      buf.append(s).append(" ");
-    }
-    String qstring = buf.toString();
+    String qstring = args.getString("query");
     try{
       q = ctx.getQueryBuilder().build(qstring);
     }
@@ -38,7 +42,7 @@ public class DeleteCommand extends ClueCommand {
       return;
     }
     
-    out.println("parsed query: "+q);
+    out.println("parsed query: " + q);
     
     if (q != null){
       IndexWriter writer = ctx.getIndexWriter();

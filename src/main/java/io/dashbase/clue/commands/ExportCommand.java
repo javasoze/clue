@@ -3,6 +3,8 @@ package io.dashbase.clue.commands;
 import java.io.PrintStream;
 import java.nio.file.FileSystems;
 
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.codecs.simpletext.SimpleTextCodec;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -28,26 +30,16 @@ public class ExportCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length < 1) {
-      out.println("usage: export output bin/text (default text)");
-      return;
-    }
-    
-    boolean isExportToText;
-    
-    try {
-      if ("bin".equals(args[1])) {
-        isExportToText = false;
-      }
-      else {
-        isExportToText = true;
-      }
-    }
-    catch (Exception e) {
-      isExportToText = true;
-    }
-    
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-t", "--text").type(Boolean.class)
+            .setDefault(true).help("export to text");
+    parser.addArgument("-o", "--output").required(true).help("output directory");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    boolean isExportToText = args.getBoolean("text");
     if (isExportToText) {
       System.out.println("exporting index to text");
     }
@@ -55,7 +47,7 @@ public class ExportCommand extends ClueCommand {
       System.out.println("exporting index to binary");
     }
 
-    FSDirectory fsdir = FSDirectory.open(FileSystems.getDefault().getPath(args[0]));
+    FSDirectory fsdir = FSDirectory.open(FileSystems.getDefault().getPath(args.getString("output")));
     
     IndexWriter writer = null;
     

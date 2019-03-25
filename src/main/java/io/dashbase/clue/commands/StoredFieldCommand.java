@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -31,15 +33,18 @@ public class StoredFieldCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length != 2) {
-      out.println("usage: field doc");
-      return;
-    }
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field name");
+    parser.addArgument("-d", "--doc").type(Integer.class).required(true).help("docid");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+
+    String field = args.getString("field");
     
-    String field = args[0];
-    
-    int doc = Integer.parseInt(args[1]);
+    int doc = args.getInt("doc");
     
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();

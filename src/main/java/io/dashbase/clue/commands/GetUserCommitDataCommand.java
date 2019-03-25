@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 
@@ -27,7 +28,7 @@ public class GetUserCommitDataCommand extends ClueCommand {
 	}
 
 	@Override
-	public void execute(String[] args, PrintStream out) throws Exception {
+	public void execute(Namespace args, PrintStream out) throws Exception {
 		IndexReader reader = ctx.getIndexReader();
 		if (reader instanceof DirectoryReader) {
 			DirectoryReader dirReader = (DirectoryReader) reader;

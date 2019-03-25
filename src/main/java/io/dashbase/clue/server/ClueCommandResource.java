@@ -1,5 +1,6 @@
 package io.dashbase.clue.server;
 
+import io.dashbase.clue.ClueApplication;
 import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.commands.ClueCommand;
 import io.dashbase.clue.commands.HelpCommand;
@@ -61,15 +62,8 @@ public class ClueCommandResource {
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 try {
                     PrintStream ps = new PrintStream(os);
-                    if (!cmdFound.get()) {
-                        ps.println("command " + cmd + " not found");
-                    }
-                    if (command != null) {
-                        command.execute(commandArgs, ps);
-                    }
+                    ClueApplication.handleCommand(ctx, cmd, commandArgs, ps);
                     ps.flush();
-                } catch (IOException ioe) {
-                    throw ioe;
                 } catch (Exception e) {
                     throw new WebApplicationException(e);
                 }

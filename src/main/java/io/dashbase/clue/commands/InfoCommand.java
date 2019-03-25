@@ -1,27 +1,13 @@
 package io.dashbase.clue.commands;
 
+import io.dashbase.clue.ClueContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.lucene.index.*;
+
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.FieldInfos;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.SegmentCommitInfo;
-import org.apache.lucene.index.SegmentInfos;
-import org.apache.lucene.index.Terms;
-
-import io.dashbase.clue.ClueContext;
+import java.util.*;
 
 @Readonly
 public class InfoCommand extends ClueCommand {
@@ -90,8 +76,15 @@ public class InfoCommand extends ClueCommand {
   }
 
   @Override
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-s", "--seg").type(Integer.class)
+            .setDefault(-1).help("segment id");
+    return parser;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
-  public void execute(String[] args, PrintStream out) throws Exception {
+  public void execute(Namespace args, PrintStream out) throws Exception {
     IndexReader r = ctx.getIndexReader();
     
     out.println("readonly mode: " + getContext().isReadOnlyMode());
@@ -108,7 +101,8 @@ public class InfoCommand extends ClueCommand {
     }
     
     List<LeafReaderContext> leaves = r.leaves();
-    if (args.length == 0) {      
+    int segid = args.getInt("seg");
+    if (segid < 0) {
       out.println("numdocs: " + r.numDocs());
       out.println("maxdoc: " + r.maxDoc());
       out.println("num deleted docs: " + r.numDeletedDocs());
@@ -144,18 +138,6 @@ public class InfoCommand extends ClueCommand {
         toString(finfo, out);
       }
     } else {
-      int segid;
-      try {
-        segid = Integer.parseInt(args[0]);
-        if (segid < 0 || segid >= leaves.size()) {
-          throw new IllegalArgumentException("invalid segment");
-        }
-      } catch (Exception e) {
-        out.println("segment id must be a number betweem 0 and "
-            + (leaves.size() - 1));
-        return;
-      }
-
       LeafReaderContext leaf = leaves.get(segid);
       LeafReader atomicReader = leaf.reader();
 

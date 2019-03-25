@@ -9,6 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.api.BytesRefPrinter;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.IndexReader;
@@ -34,16 +36,16 @@ public class TermsCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    String field;
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field and term, e.g. field:term");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    String field = args.getString("field");
     String termVal = null;
-    try{
-      field = args[0];
-    }
-    catch(Exception e){
-      field = null;
-    }
-    
+
     if (field != null){
       String[] parts = field.split(":");
       if (parts.length > 1){
