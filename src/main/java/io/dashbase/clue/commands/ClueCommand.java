@@ -11,7 +11,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 public abstract class ClueCommand {
 
   protected ClueContext ctx;
-  private final ArgumentParser parser;
+  private ArgumentParser parser;
 
   public ClueCommand(ClueContext ctx){
     this(ctx, false);
@@ -22,13 +22,15 @@ public abstract class ClueCommand {
     if (!skipRegistration) {
       this.ctx.registerCommand(this);
     }
-    this.parser = buildParser(ArgumentParsers.newFor(getName())
-            .build().defaultHelp(true).description(help()));
   }
 
   public final Namespace parseArgs(String[] args) throws ArgumentParserException {
      if (parser == null) {
-       return null;
+       this.parser = buildParser(ArgumentParsers.newFor(getName())
+               .build().defaultHelp(true).description(help()));
+       if (parser == null) {
+         return null;
+       }
      }
      return parser.parseArgs(args);
   }

@@ -28,7 +28,7 @@ public class ReadonlyCommand extends ClueCommand {
 
   @Override
   protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("readonly").type(Boolean.class).nargs(1).help("readonly true/false");
+    parser.addArgument("readonly").type(Boolean.class).nargs("?").help("readonly true/false");
     return parser;
   }
 
@@ -38,5 +38,4 @@ public class ReadonlyCommand extends ClueCommand {
     ctx.setReadOnlyMode(readonly);
     out.println("readonly mode is now: "+readonly);
   }
-
 }

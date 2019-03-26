@@ -174,7 +174,7 @@ public class ClueCommandClient {
         }
 
         String remoteLocation = args[0];
-        if (!remoteLocation.startsWith("http://") || !remoteLocation.startsWith("https://")) {
+        if (!remoteLocation.startsWith("http://") && !remoteLocation.startsWith("https://")) {
             remoteLocation = "http://" + remoteLocation;
         }
 
