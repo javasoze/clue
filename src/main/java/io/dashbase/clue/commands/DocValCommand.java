@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.*;
@@ -15,8 +16,11 @@ public class DocValCommand extends ClueCommand {
 
   private static final String NUM_TERMS_IN_FIELD = "numTerms in field: ";
 
-public DocValCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public DocValCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -210,7 +214,7 @@ public DocValCommand(ClueContext ctx) {
         for (int k = 0; k < maxDoc; ++k) {
           
           showDocId(k + ctx.docBase, ctx.docBase, readDocValues(field, docValType, atomicReader), docValType, bref, out, i);
-          if (getContext().isInteractiveMode() && (k+1) % numPerPage == 0){
+          if (this.ctx.isInteractiveMode() && (k+1) % numPerPage == 0){
               out.println("Ctrl-D to break");
               int ch = System.in.read();
               if (ch == -1) {

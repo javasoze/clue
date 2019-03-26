@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -13,8 +14,11 @@ import io.dashbase.clue.ClueContext;
 @Readonly
 public class GetUserCommitDataCommand extends ClueCommand {
 
-	public GetUserCommitDataCommand(ClueContext ctx) {
+	private final LuceneContext ctx;
+
+	public GetUserCommitDataCommand(LuceneContext ctx) {
 		super(ctx);
+		this.ctx = ctx;
 	}
 
 	@Override

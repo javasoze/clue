@@ -1,6 +1,6 @@
 package io.dashbase.clue.commands;
 
-import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexWriter;
@@ -10,8 +10,10 @@ import java.io.PrintStream;
 
 public class DeleteCommand extends ClueCommand {
 
-  public DeleteCommand(ClueContext ctx) {
+  private final LuceneContext luceneContext;
+  public DeleteCommand(LuceneContext ctx) {
     super(ctx);
+    this.luceneContext = ctx;
   }
 
   @Override
@@ -35,7 +37,7 @@ public class DeleteCommand extends ClueCommand {
     Query q = null;
     String qstring = args.getString("query");
     try{
-      q = ctx.getQueryBuilder().build(qstring);
+      q = luceneContext.getQueryBuilder().build(qstring);
     }
     catch(Exception e){
       out.println("cannot parse query: "+e.getMessage());
@@ -45,11 +47,11 @@ public class DeleteCommand extends ClueCommand {
     out.println("parsed query: " + q);
     
     if (q != null){
-      IndexWriter writer = ctx.getIndexWriter();
+      IndexWriter writer = luceneContext.getIndexWriter();
       if (writer != null) {
         writer.deleteDocuments(q);
         writer.commit();
-        ctx.refreshReader();
+        luceneContext.refreshReader();
       }
       else {
         out.println("unable to open writer, index is in readonly mode");

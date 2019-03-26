@@ -2,6 +2,7 @@ package io.dashbase.clue.commands;
 
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.document.Document;
@@ -17,8 +18,11 @@ import java.util.List;
 @Readonly
 public class DumpDocCommand extends ClueCommand {
 
-    public DumpDocCommand(ClueContext ctx) {
+    private final LuceneContext ctx;
+
+    public DumpDocCommand(LuceneContext ctx) {
         super(ctx);
+        this.ctx = ctx;
     }
 
     @Override

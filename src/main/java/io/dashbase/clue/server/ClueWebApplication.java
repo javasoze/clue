@@ -1,6 +1,6 @@
 package io.dashbase.clue.server;
 
-import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import io.dropwizard.Application;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Environment;
@@ -13,7 +13,7 @@ public class ClueWebApplication extends Application<ClueWebConfiguration> {
 
     @Override
     public void run(ClueWebConfiguration conf, Environment environment) throws Exception {
-        final ClueContext ctx = new ClueContext(conf.dir, conf.clue, true);
+        final LuceneContext ctx = new LuceneContext(conf.dir, conf.clue, true);
         ctx.setReadOnlyMode(true);
         environment.jersey().register(new ClueCommandResource(ctx));
         environment.lifecycle().manage(new Managed() {

@@ -3,6 +3,7 @@ package io.dashbase.clue.commands;
 import java.io.PrintStream;
 import java.nio.file.FileSystems;
 
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.codecs.simpletext.SimpleTextCodec;
@@ -15,8 +16,11 @@ import io.dashbase.clue.ClueContext;
 @Readonly
 public class ExportCommand extends ClueCommand {
 
-  public ExportCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public ExportCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override

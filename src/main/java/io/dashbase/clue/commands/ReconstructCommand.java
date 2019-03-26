@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.FieldInfo;
@@ -23,8 +24,11 @@ import org.apache.lucene.util.BytesRef;
 @Readonly
 public class ReconstructCommand extends ClueCommand {
 
-  public ReconstructCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public ReconstructCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override

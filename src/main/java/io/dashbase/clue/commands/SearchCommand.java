@@ -3,6 +3,7 @@ package io.dashbase.clue.commands;
 import java.io.PrintStream;
 import java.util.List;
 
+import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.client.CmdlineHelper;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -18,8 +19,11 @@ import io.dashbase.clue.ClueContext;
 @Readonly
 public class SearchCommand extends ClueCommand {
 
-  public SearchCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public SearchCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override

@@ -20,7 +20,7 @@ import io.dashbase.clue.commands.HelpCommand;
 
 public class ClueApplication {
   
-  private final ClueContext ctx;
+  private final LuceneContext ctx;
 
   private static ClueAppConfiguration config;
 
@@ -42,8 +42,8 @@ public class ClueApplication {
     return config;
   }
   
-  public ClueContext newContext(String dir, ClueAppConfiguration config, boolean interactiveMode) throws Exception {
-    return new ClueContext(dir, config, interactiveMode);
+  public LuceneContext newContext(String dir, ClueAppConfiguration config, boolean interactiveMode) throws Exception {
+    return new LuceneContext(dir, config, interactiveMode);
   }
   
   public ClueApplication(String idxLocation, boolean interactiveMode) throws Exception{

@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.util.DocIdMatcher;
 import io.dashbase.clue.util.MatchSomeDocsQuery;
 import io.dashbase.clue.util.MatcherDocIdSetIterator;
@@ -14,8 +15,11 @@ import java.io.PrintStream;
 
 public class IndexTrimCommand extends ClueCommand {
 
-  public IndexTrimCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public IndexTrimCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override

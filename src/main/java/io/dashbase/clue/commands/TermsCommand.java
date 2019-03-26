@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.api.BytesRefPrinter;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -21,8 +22,11 @@ import org.apache.lucene.util.BytesRef;
 @Readonly
 public class TermsCommand extends ClueCommand {
 
-  public TermsCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public TermsCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override

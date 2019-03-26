@@ -1,24 +1,21 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.*;
 
-import io.dashbase.clue.ClueContext;
+import java.io.PrintStream;
+import java.util.List;
 
 @Readonly
 public class NormsCommand extends ClueCommand {
 
-  public NormsCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public NormsCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -64,7 +61,7 @@ public class NormsCommand extends ClueCommand {
   public void execute(Namespace args, PrintStream out) throws Exception {
     String field = args.getString("field");
     
-    IndexReader reader = getContext().getIndexReader();
+    IndexReader reader = ctx.getIndexReader();
     
     
     List<Integer> docidList = args.getList("docs");
@@ -107,7 +104,7 @@ public class NormsCommand extends ClueCommand {
         for (int k = 0; k < maxDoc; ++k) {
           
           showDocId(k + ctx.docBase, ctx.docBase, atomicReader.getNormValues(field), out, i);
-          if (getContext().isInteractiveMode() && (k+1) % numPerPage == 0){
+          if (this.ctx.isInteractiveMode() && (k+1) % numPerPage == 0){
               out.println("Ctrl-D to break");
               int ch = System.in.read();
               if (ch == -1) {

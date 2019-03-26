@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexReader;
@@ -20,8 +21,11 @@ import org.apache.lucene.util.BytesRef;
 public class DocSetInfoCommand extends ClueCommand {
 
   private static final int DEFAULT_BUCKET_SIZE = 1000;
-  public DocSetInfoCommand(ClueContext ctx) {
+
+  private final LuceneContext ctx;
+  public DocSetInfoCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override

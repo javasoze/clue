@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexWriter;
@@ -11,8 +12,11 @@ import java.util.Map;
 
 public class SaveUserCommitData extends ClueCommand {
 
-	public SaveUserCommitData(ClueContext ctx) {
+	private final LuceneContext ctx;
+
+	public SaveUserCommitData(LuceneContext ctx) {
 		super(ctx);
+		this.ctx = ctx;
 	}
 
 	@Override

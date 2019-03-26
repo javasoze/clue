@@ -1,18 +1,12 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.ClueContext;
-
-import java.util.HashSet;
-import java.util.Set;
+import io.dashbase.clue.LuceneContext;
 
 public class DefaultCommandRegistrar implements CommandRegistrar {
-
-    public DefaultCommandRegistrar() {
-
-    }
     @Override
-    public void registerCommands(ClueContext ctx) {
-        Set<ClueCommand> commandSet = new HashSet<>();
+    public void registerCommands(ClueContext clueCtx) {
+        LuceneContext ctx = (LuceneContext)clueCtx;
         // registers all the commands we currently support
         new HelpCommand(ctx);
         new InfoCommand(ctx);

@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexWriter;
@@ -12,8 +13,10 @@ import java.util.Map;
 
 public class DeleteUserCommitData extends ClueCommand {
 
-	public DeleteUserCommitData(ClueContext ctx) {
+	private final LuceneContext luceneContext;
+	public DeleteUserCommitData(LuceneContext ctx) {
 		super(ctx);
+		this.luceneContext = ctx;
 	}
 
 	@Override
@@ -34,7 +37,7 @@ public class DeleteUserCommitData extends ClueCommand {
 
 	@Override
 	public void execute(Namespace args, PrintStream out) throws Exception {
-		IndexWriter writer = ctx.getIndexWriter();
+		IndexWriter writer = luceneContext.getIndexWriter();
 		if (writer != null) {
 			String key = args.get("key");
 			Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
@@ -47,7 +50,7 @@ public class DeleteUserCommitData extends ClueCommand {
 		    if (commitList.size() > 0) {
 			  writer.setLiveCommitData(commitList);
 			  writer.commit();
-			  ctx.refreshReader();
+				luceneContext.refreshReader();
 			  out.println("commit data: " + key +" removed.");
 		    } else {
 			  out.println("no commit data found, no action taken");
