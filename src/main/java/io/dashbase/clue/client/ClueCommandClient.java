@@ -114,14 +114,18 @@ public class ClueCommandClient {
     }
 
 
-    public void handleCommand(String cmdName, String[] args, PrintStream out) throws Exception {
-        String argString = CmdlineHelper.toString(Arrays.asList(args));
-        Call<ResponseBody> call = svc.command(cmdName, argString);
+    public void handleCommand(String cmdName, String[] args, PrintStream out) {
+        try {
+            String argString = CmdlineHelper.toString(Arrays.asList(args));
+            Call<ResponseBody> call = svc.command(cmdName, argString);
 
-        Response<ResponseBody> response = call.execute();
-        try ( ResponseBody responseBody = response.body() ) {
-            InputStream is = responseBody.byteStream();
-            is.transferTo(System.out);
+            Response<ResponseBody> response = call.execute();
+            try (ResponseBody responseBody = response.body()) {
+                InputStream is = responseBody.byteStream();
+                is.transferTo(System.out);
+            }
+        } catch (Exception e) {
+            e.printStackTrace(out);
         }
     }
 
@@ -176,6 +180,9 @@ public class ClueCommandClient {
         String remoteLocation = args[0];
         if (!remoteLocation.startsWith("http://") && !remoteLocation.startsWith("https://")) {
             remoteLocation = "http://" + remoteLocation;
+        }
+        if (!remoteLocation.equals("/")) {
+            remoteLocation = remoteLocation + "/";
         }
 
         URL url = new URL(remoteLocation);
