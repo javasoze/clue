@@ -68,11 +68,7 @@ public class ClueApplication {
 
     try {
       ns = clueCommand.parseArgs(args);
-    } catch(HelpScreenException he) {
-        out.println(he.getMessage());
-        return;
     } catch (ArgumentParserException ape) {
-        out.println(ape.getMessage());
         PrintWriter writer = new PrintWriter(out);
         ape.getParser().printHelp(writer);
         writer.flush();

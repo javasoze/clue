@@ -33,12 +33,12 @@ public class SearchCommand extends ClueCommand {
 
   @Override
   public String help() {
-    return "executes a query against the index, input: <query string>";
+    return "executes a query against the index";
   }
 
   @Override
   protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-q", "--query").nargs("*").setDefault("*");
+    parser.addArgument("-q", "--query").nargs("*").setDefault(new String[]{"*"});
     parser.addArgument("-n", "--num").type(Integer.class).setDefault(10);
     return parser;
   }
