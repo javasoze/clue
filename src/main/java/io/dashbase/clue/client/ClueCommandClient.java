@@ -154,7 +154,7 @@ public class ClueCommandClient {
             if (line == null || line.isEmpty()) continue;
             line = line.trim();
             if ("exit".equals(line)) {
-                break;
+                System.exit(0);
             }
             String[] parts = line.split("\\s");
             if (parts.length > 0){
