@@ -60,12 +60,12 @@ public class ClueCommandResource {
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
+                PrintStream ps = new PrintStream(os);
                 try {
-                    PrintStream ps = new PrintStream(os);
                     ClueApplication.handleCommand(ctx, cmd, commandArgs, ps);
                     ps.flush();
                 } catch (Exception e) {
-                    throw new WebApplicationException(e);
+                    e.printStackTrace(ps);
                 }
             }
         };
