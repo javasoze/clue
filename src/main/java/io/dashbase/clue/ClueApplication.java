@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import io.dashbase.clue.client.CmdlineHelper;
+import io.dashbase.clue.util.AsciiArt;
 import net.sourceforge.argparse4j.helper.HelpScreenException;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -119,6 +120,7 @@ public class ClueApplication {
   
   
   public static void main(String[] args) throws Exception {
+    AsciiArt.drawString("Clue", "$", System.out);
     if (args.length < 1){
       System.out.println("usage: <index location> <command> <command args>");
       System.exit(1);
