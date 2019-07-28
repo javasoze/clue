@@ -2,7 +2,6 @@ package io.dashbase.clue.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dashbase.clue.util.AsciiArt;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
@@ -173,7 +172,6 @@ public class ClueCommandClient {
 
 
     public static void main(String[] args) throws Exception {
-        AsciiArt.drawString("Clue", "$", System.out);
         if (args.length != 1){
             System.out.println("usage: <url>");
             System.exit(1);
