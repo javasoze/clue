@@ -1,0 +1,3 @@
+# default config
+queryBuilder:
+  type: default

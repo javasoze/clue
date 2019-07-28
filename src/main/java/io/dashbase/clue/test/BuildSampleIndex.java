@@ -1,29 +1,21 @@
 package io.dashbase.clue.test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.FileSystems;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.BinaryDocValuesField;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoubleDocValuesField;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.*;
 import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.NumericDocValuesField;
-import org.apache.lucene.document.SortedDocValuesField;
-import org.apache.lucene.document.SortedSetDocValuesField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
-import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.FileSystems;
 
 public class BuildSampleIndex {
 
@@ -36,21 +28,20 @@ public class BuildSampleIndex {
   
   static final String CONTENTS_FIELD = "contents";
   
-  static Document buildDoc(JSONObject json) throws Exception{
+  static Document buildDoc(JsonNode json) throws Exception{
     Document doc = new Document();
+    doc.add(new NumericDocValuesField("id", json.get("id").longValue()));
+    doc.add(new DoubleDocValuesField("price", json.get("price").doubleValue()));
+    doc.add(new TextField("contents", json.get("contents").textValue(), Store.NO));
+    doc.add(new NumericDocValuesField("year", json.get("year").longValue()));
+    doc.add(new NumericDocValuesField("mileage", json.get("mileage").longValue()));
     
-    doc.add(new NumericDocValuesField("id", json.getLong("id")));
-    doc.add(new DoubleDocValuesField("price", json.optDouble("price")));
-    doc.add(new TextField("contents", json.optString("contents"), Store.NO));
-    doc.add(new NumericDocValuesField("year", json.optInt("year")));
-    doc.add(new NumericDocValuesField("mileage", json.optInt("mileage")));
+    addMetaString(doc,"color", json.get("color").textValue());
+    addMetaString(doc,"category", json.get("category").textValue());
+    addMetaString(doc,"makemodel", json.get("makemodel").textValue());
+    addMetaString(doc,"city", json.get("city").textValue());
     
-    addMetaString(doc,"color", json.optString("color"));
-    addMetaString(doc,"category", json.optString("category"));
-    addMetaString(doc,"makemodel", json.optString("makemodel"));
-    addMetaString(doc,"city", json.optString("city"));
-    
-    String tagsString = json.optString("tags");
+    String tagsString = json.get("tags").textValue();
     if (tagsString != null) {
       String[] parts = tagsString.split(",");
       if (parts.length > 0) {
@@ -90,6 +81,8 @@ public class BuildSampleIndex {
     File f = new File(args[0]);
     BufferedReader reader = new BufferedReader(new FileReader(f));
 
+    ObjectMapper mapper = new ObjectMapper();
+
     IndexWriterConfig idxWriterConfig = new IndexWriterConfig(new StandardAnalyzer());
     Directory dir = FSDirectory.open(FileSystems.getDefault().getPath(args[1]));
     IndexWriter writer = new IndexWriter(dir, idxWriterConfig);
@@ -97,8 +90,7 @@ public class BuildSampleIndex {
     while (true) {
       String line = reader.readLine();
       if (line == null) break;
-      
-      JSONObject json = new JSONObject(line);
+      JsonNode json = mapper.readTree(line);
       Document doc = buildDoc(json);
       writer.addDocument(doc);
       count++;

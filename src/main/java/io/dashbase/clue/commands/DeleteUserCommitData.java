@@ -1,18 +1,22 @@
 package io.dashbase.clue.commands;
 
+import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.lucene.index.IndexWriter;
+
 import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import io.dashbase.clue.ClueContext;
-import org.apache.lucene.index.IndexWriter;
-
 public class DeleteUserCommitData extends ClueCommand {
 
-	public DeleteUserCommitData(ClueContext ctx) {
+	private final LuceneContext luceneContext;
+	public DeleteUserCommitData(LuceneContext ctx) {
 		super(ctx);
+		this.luceneContext = ctx;
 	}
 
 	@Override
@@ -26,32 +30,33 @@ public class DeleteUserCommitData extends ClueCommand {
 	}
 
 	@Override
-	public void execute(String[] args, PrintStream out) throws Exception {
-		IndexWriter writer = ctx.getIndexWriter();
+	protected ArgumentParser buildParser(ArgumentParser parser) {
+		parser.addArgument("-k", "--key").required(true).help("commit data key");
+		return parser;
+	}
+
+	@Override
+	public void execute(Namespace args, PrintStream out) throws Exception {
+		IndexWriter writer = luceneContext.getIndexWriter();
 		if (writer != null) {
-			if (args.length > 0) {
-				Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
-				List<Map.Entry<String, String>> commitList = new LinkedList<>();
-				for (Map.Entry<String, String> dataEntry : commitData) {
-					if (!dataEntry.equals(args[0])) {
-						commitList.add(dataEntry);
-					}
+			String key = args.get("key");
+			Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
+			List<Map.Entry<String, String>> commitList = new LinkedList<>();
+			for (Map.Entry<String, String> dataEntry : commitData) {
+				if (!dataEntry.equals(key)) {
+					commitList.add(dataEntry);
 				}
-			  if (commitList.size() > 0) {
-				  writer.setLiveCommitData(commitList);
-				  writer.commit();
-				  ctx.refreshReader();
-				  out.println("commit data: " + args[0] +" removed.");
-			  } else {
-			  	out.println("no commit data found, no action taken");
-			  }
-				
-			} else {
-				out.println("no delete key given, no action taken");
-			}			
+			}
+		    if (commitList.size() > 0) {
+			  writer.setLiveCommitData(commitList);
+			  writer.commit();
+				luceneContext.refreshReader();
+			  out.println("commit data: " + key +" removed.");
+		    } else {
+			  out.println("no commit data found, no action taken");
+		    }
 		} else {
 			out.println("unable to open writer, index is in readonly mode");
 		}
 	}
-
 }

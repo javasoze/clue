@@ -1,16 +1,22 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.*;
-
+import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexWriter;
 
-import io.dashbase.clue.ClueContext;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SaveUserCommitData extends ClueCommand {
 
-	public SaveUserCommitData(ClueContext ctx) {
+	private final LuceneContext ctx;
+
+	public SaveUserCommitData(LuceneContext ctx) {
 		super(ctx);
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -24,12 +30,18 @@ public class SaveUserCommitData extends ClueCommand {
 	}
 
 	@Override
-	public void execute(String[] args, PrintStream out) throws Exception {
+	protected ArgumentParser buildParser(ArgumentParser parser) {
+		parser.addArgument("-k", "--key").required(true);
+		parser.addArgument("-v", "--value").required(true);
+		return parser;
+	}
+
+	@Override
+	public void execute(Namespace args, PrintStream out) throws Exception {
 		IndexWriter writer = ctx.getIndexWriter();
+		String key = args.getString("key");
+		String val = args.getString("value");
 		if (writer != null) {
-			if (args.length != 2) {
-				throw new IllegalArgumentException("expected 2 arguments indicating key and value");
-			}
 			Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
 			HashMap<String, String> commitMap = new HashMap<>();
 			if (commitData != null) {
@@ -37,10 +49,11 @@ public class SaveUserCommitData extends ClueCommand {
 					commitMap.put(entry.getKey(), entry.getValue());
 				}
 			}
-			writer.setLiveCommitData(commitData);
+			commitMap.put(key, val);
+			writer.setLiveCommitData(commitMap.entrySet());
 			writer.commit();
 			ctx.refreshReader();
-			out.println("commit data: " + Arrays.toString(args) +" saved.");
+			out.println(String.format("commit data key: %s, val: %s  saved.", key, val));
 		} else {
 			out.println("unable to open writer, index is in readonly mode");
 		}

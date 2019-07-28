@@ -3,7 +3,10 @@ package io.dashbase.clue.commands;
 import java.io.PrintStream;
 import java.util.List;
 
+import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.api.BytesRefPrinter;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -15,10 +18,14 @@ import org.apache.lucene.util.BytesRef;
 
 import io.dashbase.clue.ClueContext;
 
+@Readonly
 public class PostingsCommand extends ClueCommand {
 
-  public PostingsCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public PostingsCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -32,16 +39,17 @@ public class PostingsCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    String field = null;
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field and term, e.g. field:term");
+    parser.addArgument("-n", "--num").type(Integer.class).setDefault(20).help("num per page, default 20");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    String field = args.getString("field");
     String termVal = null;
-    try{
-      field = args[0];
-    }
-    catch(Exception e){
-      field = null;
-    }
-    
+
     if (field != null){
       String[] parts = field.split(":");
       if (parts.length > 1){
@@ -61,7 +69,7 @@ public class PostingsCommand extends ClueCommand {
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();
     int docBase = 0;
-    int numPerPage = 20;
+    int numPerPage = args.getInt("num");
     PostingsEnum postings = null;
     for (LeafReaderContext leaf : leaves){
       LeafReader atomicReader = leaf.reader();

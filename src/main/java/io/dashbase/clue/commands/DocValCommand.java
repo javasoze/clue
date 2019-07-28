@@ -1,29 +1,26 @@
 package io.dashbase.clue.commands;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.dashbase.clue.ClueContext;
-import org.apache.lucene.index.DocValuesType;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.BinaryDocValues;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SortedDocValues;
-import org.apache.lucene.index.SortedNumericDocValues;
-import org.apache.lucene.index.SortedSetDocValues;
+import io.dashbase.clue.LuceneContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.lucene.index.*;
 import org.apache.lucene.util.BytesRef;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.List;
+
+@Readonly
 public class DocValCommand extends ClueCommand {
 
   private static final String NUM_TERMS_IN_FIELD = "numTerms in field: ";
 
-public DocValCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public DocValCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -167,29 +164,22 @@ public DocValCommand(ClueContext ctx) {
     
     showDocId(docid, docBase, readDocValues(field, docValType, atomicReader), docValType, bref, out, segmentid);
   }
-  
-  @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length < 1) {
-      out.println("usage: field doc1,doc2...");
-      return;
-    }
-    
-    String field = args[0];
-    
-    List<Integer> docidList = new ArrayList<Integer>();
 
-    int numPerPage = 20;
+  @Override
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field name");
+    parser.addArgument("-d", "--docs").type(Integer.class).nargs("*").help("doc ids, e.g. d1 d2 d3");
+    parser.addArgument("-n", "--num").type(Integer.class).setDefault(20).help("num per page");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    String field = args.getString("field");
     
-    try {
-      String[] docListStrings = args[1].split(",");
-      for (String s : docListStrings) {
-        docidList.add(Integer.parseInt(s));
-      }
-    } catch (Exception e) {
-      out.println("invalid docid, all docs are shown");
-      docidList = null;
-    }
+    List<Integer> docidList = args.getList("docs");
+
+    int numPerPage = args.getInt("num");
 
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();
@@ -224,7 +214,7 @@ public DocValCommand(ClueContext ctx) {
         for (int k = 0; k < maxDoc; ++k) {
           
           showDocId(k + ctx.docBase, ctx.docBase, readDocValues(field, docValType, atomicReader), docValType, bref, out, i);
-          if (getContext().isInteractiveMode() && (k+1) % numPerPage == 0){
+          if (this.ctx.isInteractiveMode() && (k+1) % numPerPage == 0){
               out.println("Ctrl-D to break");
               int ch = System.in.read();
               if (ch == -1) {

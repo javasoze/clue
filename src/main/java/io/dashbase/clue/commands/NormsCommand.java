@@ -1,21 +1,21 @@
 package io.dashbase.clue.commands;
 
+import io.dashbase.clue.LuceneContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.lucene.index.*;
+
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.NumericDocValues;
-
-import io.dashbase.clue.ClueContext;
-
+@Readonly
 public class NormsCommand extends ClueCommand {
 
-  public NormsCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public NormsCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -50,29 +50,23 @@ public class NormsCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    if (args.length < 1) {
-      out.println("usage: field doc1,doc2...");
-      return;
-    }
-    String field = args[0];
-    
-    IndexReader reader = getContext().getIndexReader();
-    
-    
-    List<Integer> docidList = new ArrayList<Integer>();
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field name");
+    parser.addArgument("-d", "--docs").type(Integer.class).nargs("*").help("doc ids, e.g. d1 d2 d3");
+    parser.addArgument("-n", "--num").type(Integer.class).setDefault(20).help("num per page");
+    return parser;
+  }
 
-    int numPerPage = 20;
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    String field = args.getString("field");
     
-    try {
-      String[] docListStrings = args[1].split(",");
-      for (String s : docListStrings) {
-        docidList.add(Integer.parseInt(s));
-      }
-    } catch (Exception e) {
-      out.println("invalid docid, all docs are shown");
-      docidList = null;
-    }
+    IndexReader reader = ctx.getIndexReader();
+    
+    
+    List<Integer> docidList = args.getList("docs");
+
+    int numPerPage = args.getInt("num");
 
     List<LeafReaderContext> leaves = reader.leaves();
     if (docidList != null && !docidList.isEmpty()) {
@@ -110,7 +104,7 @@ public class NormsCommand extends ClueCommand {
         for (int k = 0; k < maxDoc; ++k) {
           
           showDocId(k + ctx.docBase, ctx.docBase, atomicReader.getNormValues(field), out, i);
-          if (getContext().isInteractiveMode() && (k+1) % numPerPage == 0){
+          if (this.ctx.isInteractiveMode() && (k+1) % numPerPage == 0){
               out.println("Ctrl-D to break");
               int ch = System.in.read();
               if (ch == -1) {

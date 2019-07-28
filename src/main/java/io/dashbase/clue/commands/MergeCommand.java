@@ -2,14 +2,20 @@ package io.dashbase.clue.commands;
 
 import java.io.PrintStream;
 
+import io.dashbase.clue.LuceneContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexWriter;
 
 import io.dashbase.clue.ClueContext;
 
 public class MergeCommand extends ClueCommand {
 
-  public MergeCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public MergeCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -23,16 +29,14 @@ public class MergeCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    int count;
-    try{
-      count = Integer.parseInt(args[0]);
-    }
-    catch(Exception e){
-      out.println("default target segment count = 1");
-      count = 1;
-    }
-    
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-n", "--num").type(Integer.class).setDefault(1);
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    int count = args.getInt("num");
     IndexWriter writer = ctx.getIndexWriter();
     if (writer != null) {
       writer.forceMerge(count, true);

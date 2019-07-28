@@ -1,13 +1,19 @@
 package io.dashbase.clue.commands;
 
+import io.dashbase.clue.LuceneContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+
 import java.io.PrintStream;
 
-import io.dashbase.clue.ClueContext;
-
+@Readonly
 public class ReadonlyCommand extends ClueCommand {
 
-  public ReadonlyCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+
+  public ReadonlyCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -21,14 +27,15 @@ public class ReadonlyCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    
-    boolean readonly = true;
-    if (args.length > 0) { 
-      readonly = Boolean.parseBoolean(args[0]);
-    }
-    getContext().setReadOnlyMode(readonly);
-    out.println("readonly mode is now: "+readonly);
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("readonly").type(Boolean.class).nargs("?").help("readonly true/false");
+    return parser;
   }
 
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    boolean readonly = args.getBoolean("readonly");
+    ctx.setReadOnlyMode(readonly);
+    out.println("readonly mode is now: "+readonly);
+  }
 }

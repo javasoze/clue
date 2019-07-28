@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -14,11 +17,15 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BytesRef;
 
+@Readonly
 public class DocSetInfoCommand extends ClueCommand {
 
   private static final int DEFAULT_BUCKET_SIZE = 1000;
-  public DocSetInfoCommand(ClueContext ctx) {
+
+  private final LuceneContext ctx;
+  public DocSetInfoCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -36,36 +43,25 @@ public class DocSetInfoCommand extends ClueCommand {
   };
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    String field = null;
+  protected ArgumentParser buildParser(ArgumentParser parser) {
+    parser.addArgument("-f", "--field").required(true).help("field/term pair, e.g. field:term");
+    parser.addArgument("-s", "--size").type(Integer.class)
+            .setDefault(DEFAULT_BUCKET_SIZE).help("bucket size");
+    return parser;
+  }
+
+  @Override
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    String field = args.getString("field");
     String termVal = null;
-    int bucketSize = DEFAULT_BUCKET_SIZE;
-    
-    try{
-      field = args[0];
-    }
-    catch(Exception e){
-      field = null;
-    }
-    
-    try {
-      bucketSize = Integer.parseInt(args[1]);
-    }
-    catch(Exception e){
-    }
-    
+    int bucketSize = args.getInt("size");
+
     if (field != null){
       String[] parts = field.split(":");
       if (parts.length > 1){
         field = parts[0];
         termVal = parts[1];
       }
-    }
-    
-    if (field == null || termVal == null){
-      out.println("usage: field:term");
-      out.flush();
-      return;
     }
     
     IndexReader reader = ctx.getIndexReader();

@@ -6,7 +6,7 @@
     <artifactId>clue</artifactId>
     <packaging>jar</packaging>
     <name>clue</name>
-    <version>8.0.0-1.0.0</version>
+    <version>8.2.0-1.0.0</version>
     <description>command line client for Apache Lucene</description>
 
     <url>http://github.com/javasoze/clue</url>
@@ -36,7 +36,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>io.dashbase.clue.ClueApplication</mainClass>
-        <lucene.version>8.0.0</lucene.version>
+        <lucene.version>8.2.0</lucene.version>
+        <dropwizard.version>1.3.5</dropwizard.version>
+        <retrofit2.version>2.5.0</retrofit2.version>
     </properties>
 
     <!-- Set the compiler to java6 -->
@@ -46,11 +48,12 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>10</source>
+                    <target>10</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            <!--
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.4.1</version>
@@ -64,7 +67,7 @@
                             <mainClass>${mainClass}</mainClass>
                         </transformer>
                     </transformers>
-                    <!-- exclude signed Manifests -->
+                    
                     <filters>
                         <filter>
                             <artifact>*:*</artifact>
@@ -85,6 +88,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
         <extensions>
                         <!-- Enabling the use of FTP -->
@@ -95,6 +99,18 @@
                         </extension>
         </extensions>
     </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-bom</artifactId>
+                <version>${dropwizard.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -138,20 +154,54 @@
             <version>${lucene.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+            <version>${retrofit2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-scalars</artifactId>
+            <version>${retrofit2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-jackson</artifactId>
+            <version>${retrofit2.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20140107</version>
-        </dependency>
-        <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
             <version>2.12</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 

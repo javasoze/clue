@@ -3,11 +3,16 @@ package io.dashbase.clue.commands;
 import java.io.PrintStream;
 
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.LuceneContext;
+import net.sourceforge.argparse4j.inf.Namespace;
 
+@Readonly
 public class DirectoryCommand extends ClueCommand {
 
-  public DirectoryCommand(ClueContext ctx) {
+  private final LuceneContext ctx;
+  public DirectoryCommand(LuceneContext ctx) {
     super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -21,8 +26,8 @@ public class DirectoryCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(String[] args, PrintStream out) throws Exception {
-    out.println(getContext().getDirectory());
+  public void execute(Namespace args, PrintStream out) throws Exception {
+    out.println(ctx.getDirectory());
   }
 
 }
