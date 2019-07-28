@@ -53,6 +53,7 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            <!--
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.4.1</version>
@@ -66,7 +67,7 @@
                             <mainClass>${mainClass}</mainClass>
                         </transformer>
                     </transformers>
-                    <!-- exclude signed Manifests -->
+                    
                     <filters>
                         <filter>
                             <artifact>*:*</artifact>
@@ -87,6 +88,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
         <extensions>
                         <!-- Enabling the use of FTP -->
