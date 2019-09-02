@@ -20,7 +20,7 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 7.4.0-1.0.0
+latest version: 8.2.0-1.0.0
 
 #### What's new in this release?
 
@@ -30,15 +30,9 @@ See [Release Note](https://github.com/javasoze/clue/releases/tag/release-6.6.2-1
 
 mvn package
 
-This will create 2 artifacts in the target directory:
+This will create the following artifact in the target directory:
 
-1. ```original-clue-${VERSION}.jar```
-
-   jar file containing all clue classes.
-
-2. ```clue-${VERSION}.jar```
-
-   executable jar file containing all clue classes as well as all runtime dependencies, e.g. ```java -jar clue-${VERSION}.jar``` works
+```clue-${VERSION}.jar```
 
 ### Run:
 
