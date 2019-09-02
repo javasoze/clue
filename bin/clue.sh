@@ -3,10 +3,11 @@
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
 
-lib=$bin/../target/lib
+lib=$bin/../target/libs
 dist=$bin/../target
 
 HEAP_OPTS="-Xmx1g -Xms1g -XX:NewSize=256m"
 #JAVA_DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y"
 
-(cd $bin/..; java $JAVA_OPTS $JAVA_DEBUG $HEAP_OPTS -jar $dist/clue-*.jar $@)
+MAIN_CLASS="io.dashbase.clue.ClueApplication"
+(cd $bin/..; java $JAVA_OPTS $JAVA_DEBUG $HEAP_OPTS -classpath $dist/*:$lib/* $MAIN_CLASS $@)
