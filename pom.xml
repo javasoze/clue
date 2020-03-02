@@ -6,7 +6,7 @@
     <artifactId>clue</artifactId>
     <packaging>jar</packaging>
     <name>clue</name>
-    <version>8.2.0-1.0.0</version>
+    <version>8.4.1-1.0.0</version>
     <description>command line client for Apache Lucene</description>
 
     <url>http://github.com/javasoze/clue</url>
@@ -36,7 +36,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>io.dashbase.clue.ClueApplication</mainClass>
-        <lucene.version>8.2.0</lucene.version>
+        <lucene.version>8.4.1</lucene.version>
         <dropwizard.version>1.3.5</dropwizard.version>
         <retrofit2.version>2.5.0</retrofit2.version>
     </properties>
