@@ -244,6 +244,12 @@
     </repositories>
 
     <distributionManagement>
+        <repository>
+          <id>github</id>
+          <name>clue</name>
+          <url>https://maven.pkg.github.com/javasoze/clue</url>
+        </repository>
+        <!--
             <snapshotRepository>
                     <id>repo.dashbase.io</id>
                     <url>s3://repo.dashbase.io/snapshot</url>
@@ -252,6 +258,7 @@
                     <id>repo.dashbase.io</id>
                     <url>s3://repo.dashbase.io/snapshot</url>
             </repository>
+            -->
       </distributionManagement>
 </project>
 
