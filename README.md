@@ -20,11 +20,11 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 8.4.1-1.0.0
+latest version: 8.5.0-1.0.0
 
 #### What's new in this release?
 
-See [Release Note](https://github.com/javasoze/clue/releases/tag/release-8.2.0-1.0.0)
+See [Release Note](https://github.com/javasoze/clue/releases/tag/release-8.5.0-1.0.0)
 
 ### Build:
 
