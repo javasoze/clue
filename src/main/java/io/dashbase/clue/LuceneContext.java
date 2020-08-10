@@ -4,6 +4,7 @@ import io.dashbase.clue.api.*;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.*;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
@@ -41,6 +42,10 @@ public class LuceneContext extends ClueContext {
         return readerFactory.getIndexReader();
     }
 
+    public IndexSearcher getIndexSearcher() {
+        return new IndexSearcher(getIndexReader());
+    }
+
     public IndexWriter getIndexWriter(){
         if (registry.isReadonly()) return null;
         if (writer == null) {
@@ -54,7 +59,7 @@ public class LuceneContext extends ClueContext {
     }
 
     Collection<String> fieldNames() {
-        LinkedList<String> fieldNames = new LinkedList<String>();
+        LinkedList<String> fieldNames = new LinkedList<>();
         for (LeafReaderContext context : getIndexReader().leaves()) {
             LeafReader reader = context.reader();
             for(FieldInfo info : reader.getFieldInfos()) {
