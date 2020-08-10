@@ -53,6 +53,7 @@ Command list:
 	Query Builder: 		class io.dashbase.clue.api.DefaultQueryBuilder
 	Directory Builder: 	class io.dashbase.clue.api.DefaultDirectoryBuilder
 	IndexReader Factory: 	class io.dashbase.clue.api.DefaultIndexReaderFactory
+	count - shows how many documents in index match the given query
 	delete - deletes a list of documents from searching via a query, input: query
 	directory - prints directory information
 	docsetinfo - doc id set info and stats

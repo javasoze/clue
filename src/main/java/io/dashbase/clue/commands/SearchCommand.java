@@ -7,14 +7,10 @@ import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.client.CmdlineHelper;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-
-import io.dashbase.clue.ClueContext;
 
 @Readonly
 public class SearchCommand extends ClueCommand {
@@ -45,12 +41,10 @@ public class SearchCommand extends ClueCommand {
 
   @Override
   public void execute(Namespace args, PrintStream out) throws Exception {
-    IndexReader r = ctx.getIndexReader();
-    IndexSearcher searcher = new IndexSearcher(r);
+    IndexSearcher searcher = ctx.getIndexSearcher();
     List<String> qlist = args.getList("query");
-    String qstring = CmdlineHelper.toString(qlist);
 
-    Query q = null;
+    Query q;
 
     try{
       q = CmdlineHelper.toQuery(qlist, ctx.getQueryBuilder());
@@ -63,7 +57,7 @@ public class SearchCommand extends ClueCommand {
     out.println("parsed query: " + q);
 
     int count = args.getInt("num");
-    
+
     long start = System.currentTimeMillis();
     TopDocs td = searcher.search(q, count);
     long end = System.currentTimeMillis();

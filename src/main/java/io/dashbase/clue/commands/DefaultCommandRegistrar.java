@@ -12,6 +12,7 @@ public class DefaultCommandRegistrar implements CommandRegistrar {
         new InfoCommand(ctx);
         new DocValCommand(ctx);
         new SearchCommand(ctx);
+        new CountCommand(ctx);
         new TermsCommand(ctx);
         new PostingsCommand(ctx);
         new DocSetInfoCommand(ctx);
