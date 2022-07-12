@@ -1,6 +1,5 @@
 package io.dashbase.clue.commands;
 
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -60,7 +59,7 @@ public class DocValCommand extends ClueCommand {
       case SORTED: {
         SortedDocValues sv = (SortedDocValues)docVals;
         if (sv.advanceExact(subid)) {
-          bytesRef = sv.binaryValue();
+          bytesRef = sv.lookupOrd(sv.ordValue());
           StringBuilder sb = new StringBuilder();
           sb.append(NUM_TERMS_IN_FIELD).append(sv.getValueCount()).append(", ");
           sb.append("value: [");

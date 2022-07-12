@@ -43,4 +43,9 @@ public final class MatchSomeDocsQuery extends Query {
       }
     };
   }
+
+  @Override
+  public void visit(QueryVisitor queryVisitor) {
+    queryVisitor.visitLeaf(this);
+  }
 }
