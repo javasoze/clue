@@ -1,32 +1,38 @@
-CLue - Command Line tool for Apache Lucene
+CLue - Command Line Tool for Apache Lucene
 ==========================================
 
-### Overview:
+## Overview
 
 When working with Lucene, it is often useful to inspect an index.
 
-[Luke](http://www.getopt.org/luke/) is awesome, but often times it is not feasible to inspect an index on a remote machine using a GUI. That's where Clue comes in.
+[Luke](http://www.getopt.org/luke/) is awesome, but often times it is not feasible to inspect an index on a remote
+machine using a GUI. That's where Clue comes in.
 You can ssh into your production box and inspect your index using your favorite shell.
 
 Another important feature for Clue is the ability to interact with other Unix commands via piping, e.g. grep, more etc.
 
-#### License:
+## About this fork
 
-Clue is under the [Apache Public License v2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+This is a fork from the upstream version: [javasoze/clue](https://github.com/javasoze/clue/). It's built for Lucene 8
+and requires Java 8 (instead of Java 11, which is needed for newer versions of Lucene).
 
-#### Bugs:
+### License
+
+Clue is under the [Apache Public License v2.0](http//www.apache.org/licenses/LICENSE-2.0.html).
+
+### Bugs
 
 Please file bugs and feature requests [here](https://github.com/javasoze/clue/issues).
 
-### Downloads:
+## Downloads
 
-latest version: 8.5.0-1.0.0
+latest version: java8-8.11.2-1.0.0
 
-#### What's new in this release?
+### What's new in this release?
 
-See [Release Note](https://github.com/javasoze/clue/releases/tag/release-8.5.0-1.0.0)
+See [Release Note](https://github.com/cavorite/clue/releases/tag/release-java8-8.11.2-1.0.0)
 
-### Build:
+## Build
 
 mvn package
 
@@ -34,7 +40,7 @@ This will create the following artifact in the target directory:
 
 ```clue-${VERSION}.jar```
 
-### Run:
+## Run
 
 Interactive Mode:
 
@@ -73,54 +79,53 @@ Command list:
 	terms - gets terms from the index, <field:term>, term can be a prefix
 	trim - trims the index, <TRIM PERCENTAGE> <OPTIONS>, options are: head, tail, random
 	tv - shows term vector of a field for a doc
-	
-### Build a sample index to play with:
+
+## Build a sample index to play with
 
 Clue bundles with some test data (15000 car data) for you to build a sample index to play with, do:
 
     ./bin/build_sample_index.sh my-idx
-	
 
-### Examples:
+## Examples
 
 1. Getting all the terms in the field 'color_indexed':
 
-    **./bin/clue.sh my-idx terms color_indexed**
+   ``./bin/clue.sh my-idx terms color_indexed``
 
 2. Getting all the terms in the field 'color_indexed' starting with the term staring with 'r':
 
-    **./bin/clue.sh my-idx terms color_indexed:r**
+   ``./bin/clue.sh my-idx terms color_indexed:r``
 
-    **./bin/clue.sh my-idx terms color_indexed | grep r**
+   ``./bin/clue.sh my-idx terms color_indexed | grep r``
 
-3. Do a search:
+4. Do a search:
 
-    **./bin/clue.sh my-idx search myquery**
+   ``./bin/clue.sh my-idx search myquery``
 
-4. Get the index info:
+5. Get the index info:
 
-    **./bin/clue.sh my-idx info**
+   ``./bin/clue.sh my-idx info``
 
-5. Iterate a posting for the term color_indexed:red
+6. Iterate a posting for the term color_indexed:red
 
-    **./bin/clue.sh my-idx postings color_indexed:red**
+   ``./bin/clue.sh my-idx postings color_indexed:red``
 
-6. List docvalues for the column-stride-field color:
+7. List docvalues for the column-stride-field color:
 
-    **./bin/clue.sh my-idx docval color**
+   ``./bin/clue.sh my-idx docval color``
 
-7. Get docvalue for the column-stride-field *category* for document 4:
+8. Get docvalue for the column-stride-field *category* for document 4:
 
-    **./bin/clue.sh my-idx docval *category* 5**
+   ``./bin/clue.sh my-idx docval *category* 5``
 
-8. Get docvalue for the column-stride-field *year* of type numeric for document 3:
+9. Get docvalue for the column-stride-field *year* of type numeric for document 3:
 
-	**./bin/clue.sh my-idx docval year 3**
-	
-9. Get docvalue for the column-stride-field *json* of type binary for document 3:
+   ``./bin/clue.sh my-idx docval year 3``
 
-	**./bin/clue.sh my-idx docval json 3**
-	
-9. Get docvalue for the column-stride-field *tags* of type sorted-set for document 3:
+10. Get docvalue for the column-stride-field *json* of type binary for document 3:
 
-	**./bin/clue.sh my-idx docval tags 3**
+    ``./bin/clue.sh my-idx docval json 3``
+
+11. Get docvalue for the column-stride-field *tags* of type sorted-set for document 3:
+
+    ``./bin/clue.sh my-idx docval tags 3``

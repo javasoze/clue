@@ -2,6 +2,7 @@ package io.dashbase.clue.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.ByteStreams;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
@@ -121,8 +122,7 @@ public class ClueCommandClient {
 
             Response<ResponseBody> response = call.execute();
             try (ResponseBody responseBody = response.body()) {
-                InputStream is = responseBody.byteStream();
-                is.transferTo(System.out);
+                ByteStreams.copy(responseBody.byteStream(), System.out);
             }
         } catch (Exception e) {
             e.printStackTrace(out);

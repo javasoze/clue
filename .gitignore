@@ -1,8 +1,11 @@
 /target
 my-idx
-.settings/
-.project
+*.iml
+*.swp
+.DS_Store
 .classpath
 .idea/
-*.iml
+.project
+.sdkmanrc
+.settings
 dependency-reduced-pom.xml
