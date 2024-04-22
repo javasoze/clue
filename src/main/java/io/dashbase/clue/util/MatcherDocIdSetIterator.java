@@ -1,8 +1,7 @@
 package io.dashbase.clue.util;
 
-import org.apache.lucene.search.DocIdSetIterator;
-
 import java.io.IOException;
+import org.apache.lucene.search.DocIdSetIterator;
 
 public class MatcherDocIdSetIterator extends DocIdSetIterator {
 

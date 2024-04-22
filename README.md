@@ -13,12 +13,15 @@ Another important feature for Clue is the ability to interact with other Unix co
 
 ## About this fork
 
-This is a fork from the upstream version: [javasoze/clue](https://github.com/javasoze/clue/). It's built for Lucene 8
-and requires Java 8 (instead of Java 11, which is needed for newer versions of Lucene).
+This is a fork from the upstream version: [javasoze/clue](https://github.com/javasoze/clue/). It tracks the two main releases of Lucene in different
+branches:
+
+- `main`: For the latest version (9.X). It requires JDK 11 or newer.
+- `branch_8X`: For the 8.X release. It requires JDK 8.
 
 ### License
 
-Clue is under the [Apache Public License v2.0](http//www.apache.org/licenses/LICENSE-2.0.html).
+Clue is under the [Apache Public License v2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
 ### Bugs
 
@@ -26,15 +29,11 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ## Downloads
 
-latest version: java8-8.11.2-1.0.0
-
-### What's new in this release?
-
-See [Release Note](https://github.com/cavorite/clue/releases/tag/release-java8-8.11.2-1.0.0)
+latest version: 9.10.0-1.0.0
 
 ## Build
 
-mvn package
+./mvnw package
 
 This will create the following artifact in the target directory:
 
@@ -69,15 +68,14 @@ Command list:
 	export - export index to readable text files
 	help - displays help
 	info - displays information about the index, <segment number> to get information on the segment
-	merge - force merges segments into given N segments, input: number of max segments
 	norm - displays norm values for a field for a list of documents
 	postings - iterating postings given a term, e.g. <fieldname:fieldvalue>
 	readonly - puts clue in readonly mode
 	reconstruct - reconstructs an indexed field for a document
 	search - executes a query against the index, input: <query string>
 	stored - displays stored data for a given field
+    showcommitdata - Shows user commit data
 	terms - gets terms from the index, <field:term>, term can be a prefix
-	trim - trims the index, <TRIM PERCENTAGE> <OPTIONS>, options are: head, tail, random
 	tv - shows term vector of a field for a doc
 
 ## Build a sample index to play with
@@ -98,34 +96,34 @@ Clue bundles with some test data (15000 car data) for you to build a sample inde
 
    ``./bin/clue.sh my-idx terms color_indexed | grep r``
 
-4. Do a search:
+3. Do a search:
 
    ``./bin/clue.sh my-idx search myquery``
 
-5. Get the index info:
+4. Get the index info:
 
    ``./bin/clue.sh my-idx info``
 
-6. Iterate a posting for the term color_indexed:red
+5. Iterate a posting for the term color_indexed:red
 
    ``./bin/clue.sh my-idx postings color_indexed:red``
 
-7. List docvalues for the column-stride-field color:
+6. List docvalues for the column-stride-field color:
 
    ``./bin/clue.sh my-idx docval color``
 
-8. Get docvalue for the column-stride-field *category* for document 4:
+7. Get docvalue for the column-stride-field *category* for document 4:
 
    ``./bin/clue.sh my-idx docval *category* 5``
 
-9. Get docvalue for the column-stride-field *year* of type numeric for document 3:
+8. Get docvalue for the column-stride-field *year* of type numeric for document 3:
 
    ``./bin/clue.sh my-idx docval year 3``
 
-10. Get docvalue for the column-stride-field *json* of type binary for document 3:
+9. Get docvalue for the column-stride-field *json* of type binary for document 3:
 
-    ``./bin/clue.sh my-idx docval json 3``
+   ``./bin/clue.sh my-idx docval json 3``
 
-11. Get docvalue for the column-stride-field *tags* of type sorted-set for document 3:
+10. Get docvalue for the column-stride-field *tags* of type sorted-set for document 3:
 
     ``./bin/clue.sh my-idx docval tags 3``

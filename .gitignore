@@ -8,4 +8,8 @@ my-idx
 .project
 .sdkmanrc
 .settings
+.mvn/wrapper
+mvnw
+mvnw.cmd
+tmp
 dependency-reduced-pom.xml

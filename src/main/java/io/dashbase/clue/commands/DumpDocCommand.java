@@ -1,19 +1,16 @@
 package io.dashbase.clue.commands;
 
-
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
+import java.io.PrintStream;
+import java.util.List;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.BytesRef;
-
-import java.io.PrintStream;
-import java.util.List;
 
 @Readonly
 public class DumpDocCommand extends ClueCommand {

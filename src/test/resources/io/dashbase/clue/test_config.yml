@@ -1,0 +1,11 @@
+---
+# Example configuration file. Defines the fields in ClueAppConfiguration.
+
+# Not all fields need to be set. Missing values will be set with the defaults
+analyzerFactory: !<DefaultAnalyzerFactory>
+  forQuery:
+    defaultAnalyzer:
+      className: org.apache.lucene.analysis.standard.StandardAnalyzer
+    fieldAnalyzers:
+      id_indexed:
+        className: org.apache.lucene.analysis.core.KeywordAnalyzer

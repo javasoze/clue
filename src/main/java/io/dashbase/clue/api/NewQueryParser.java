@@ -5,8 +5,8 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 
 public class NewQueryParser extends QueryParser {
 
-        public NewQueryParser(String defaultField, Analyzer analyzer) {
-	    super(defaultField, analyzer);
-	    setAllowLeadingWildcard(true);
-	}
+    public NewQueryParser(String defaultField, Analyzer analyzer) {
+        super(defaultField, analyzer);
+        setAllowLeadingWildcard(true);
+    }
 }

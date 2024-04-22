@@ -1,6 +1,12 @@
 package io.dashbase.clue.client;
 
 import io.dashbase.clue.api.QueryBuilder;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Supplier;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
@@ -9,26 +15,21 @@ import jline.console.completer.StringsCompleter;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Supplier;
-
 public class CmdlineHelper {
     private final ConsoleReader consoleReader;
 
-    public CmdlineHelper(Supplier<Collection<String>> commandNameSupplier,
-                         Supplier<Collection<String>> fieldNameSupplier) throws IOException {
+    public CmdlineHelper(
+            Supplier<Collection<String>> commandNameSupplier,
+            Supplier<Collection<String>> fieldNameSupplier)
+            throws IOException {
         consoleReader = new ConsoleReader();
         consoleReader.setBellEnabled(false);
 
-        Collection<String> commands = commandNameSupplier != null
-                ? commandNameSupplier.get() : Collections.emptyList();
+        Collection<String> commands =
+                commandNameSupplier != null ? commandNameSupplier.get() : Collections.emptyList();
 
-        Collection<String> fields = fieldNameSupplier != null
-                ? fieldNameSupplier.get() : Collections.emptyList();
+        Collection<String> fields =
+                fieldNameSupplier != null ? fieldNameSupplier.get() : Collections.emptyList();
 
         LinkedList<Completer> completors = new LinkedList<Completer>();
         completors.add(new StringsCompleter(commands));
@@ -57,10 +58,9 @@ public class CmdlineHelper {
     public static Query toQuery(List<String> list, QueryBuilder queryBuilder) throws Exception {
         String qstring = toString(list);
         Query q = null;
-        if (qstring == null || qstring.isEmpty() || qstring.equals("*")){
+        if (qstring == null || qstring.isEmpty() || qstring.equals("*")) {
             q = new MatchAllDocsQuery();
-        }
-        else{
+        } else {
             q = queryBuilder.build(qstring);
         }
         return q;

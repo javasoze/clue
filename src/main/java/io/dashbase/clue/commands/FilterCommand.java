@@ -1,12 +1,12 @@
 package io.dashbase.clue.commands;
 
-import net.sourceforge.argparse4j.inf.Namespace;
-
-import javax.validation.constraints.NotNull;
 import java.io.PrintStream;
+import javax.validation.constraints.NotNull;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 public class FilterCommand extends ClueCommand {
     protected final ClueCommand delegate;
+
     public FilterCommand(@NotNull ClueCommand cmd) {
         super(cmd.ctx, true);
         this.delegate = cmd;

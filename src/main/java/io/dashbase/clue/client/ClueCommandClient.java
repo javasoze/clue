@@ -3,6 +3,16 @@ package io.dashbase.clue.client;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
+import java.io.PrintStream;
+import java.net.URL;
+import java.security.cert.CertificateException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+import javax.net.ssl.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
@@ -17,18 +27,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-import javax.net.ssl.*;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.net.URL;
-import java.security.cert.CertificateException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
 public class ClueCommandClient {
 
     private final ClueCommandService svc;
@@ -42,33 +40,41 @@ public class ClueCommandClient {
         if ("https".equals(url.getProtocol())) {
             try {
                 setSslSocketFactory(okHttpClientBuilder);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new IllegalStateException("cannot create ssl connection: " + e);
             }
         }
 
-        final OkHttpClient okHttpClient = okHttpClientBuilder.readTimeout(10, TimeUnit.SECONDS)
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .build();
+        final OkHttpClient okHttpClient =
+                okHttpClientBuilder
+                        .readTimeout(10, TimeUnit.SECONDS)
+                        .connectTimeout(10, TimeUnit.SECONDS)
+                        .build();
 
-        Retrofit restAdator = new Retrofit.Builder().baseUrl(HttpUrl.get(url))
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(JacksonConverterFactory.create(mapper))
-                .client(okHttpClient).build();
+        Retrofit restAdator =
+                new Retrofit.Builder()
+                        .baseUrl(HttpUrl.get(url))
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .addConverterFactory(JacksonConverterFactory.create(mapper))
+                        .client(okHttpClient)
+                        .build();
 
         svc = restAdator.create(ClueCommandService.class);
 
-        cmdlineHelper = new CmdlineHelper(new Supplier<Collection<String>>() {
-            @Override
-            public Collection<String> get() {
-                try {
-                    return getCommands();
-                } catch (Exception e) {
-                    System.out.println("unable obtaining command list");
-                    return Collections.emptyList();
-                }
-            }
-        }, null);
+        cmdlineHelper =
+                new CmdlineHelper(
+                        new Supplier<Collection<String>>() {
+                            @Override
+                            public Collection<String> get() {
+                                try {
+                                    return getCommands();
+                                } catch (Exception e) {
+                                    System.out.println("unable obtaining command list");
+                                    return Collections.emptyList();
+                                }
+                            }
+                        },
+                        null);
     }
 
     public final ClueCommandService service() {
@@ -76,44 +82,47 @@ public class ClueCommandClient {
     }
 
     // Create a trust manager that does not validate certificate chains
-    private static final TrustManager[] trustAllCerts = new TrustManager[] {
-            new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                }
+    private static final TrustManager[] trustAllCerts =
+            new TrustManager[] {
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] chain, String authType)
+                            throws CertificateException {}
 
-                @Override
-                public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                }
+                    @Override
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] chain, String authType)
+                            throws CertificateException {}
 
-                @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return new java.security.cert.X509Certificate[]{};
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[] {};
+                    }
                 }
-            }
-    };
+            };
 
-    private static void setSslSocketFactory(OkHttpClient.Builder builder)  throws Exception {
+    private static void setSslSocketFactory(OkHttpClient.Builder builder) throws Exception {
         // Install the all-trusting trust manager
         final SSLContext sslContext = SSLContext.getInstance("SSL");
         sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
         // Create an ssl socket factory with our all-trusting manager
         final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-        builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
-        builder.hostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        });
+        builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+        builder.hostnameVerifier(
+                new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                });
     }
 
     public Collection<String> getCommands() throws Exception {
         Call<Collection<String>> call = svc.commands();
         return call.execute().body();
     }
-
 
     public void handleCommand(String cmdName, String[] args, PrintStream out) {
         try {
@@ -151,9 +160,7 @@ public class ClueCommandClient {
 
         consoleReader.addCompleter(new ArgumentCompleter(completors));
 
-
-
-        while(true){
+        while (true) {
             String line = readCommand();
             if (line == null || line.isEmpty()) continue;
             line = line.trim();
@@ -161,7 +168,7 @@ public class ClueCommandClient {
                 System.exit(0);
             }
             String[] parts = line.split("\\s");
-            if (parts.length > 0){
+            if (parts.length > 0) {
                 String cmd = parts[0];
                 String[] cmdArgs = new String[parts.length - 1];
                 System.arraycopy(parts, 1, cmdArgs, 0, cmdArgs.length);
@@ -170,9 +177,8 @@ public class ClueCommandClient {
         }
     }
 
-
     public static void main(String[] args) throws Exception {
-        if (args.length != 1){
+        if (args.length != 1) {
             System.out.println("usage: <url>");
             System.exit(1);
         }

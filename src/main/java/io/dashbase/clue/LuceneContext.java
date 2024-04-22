@@ -1,15 +1,14 @@
 package io.dashbase.clue;
 
 import io.dashbase.clue.api.*;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.*;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
 
 public class LuceneContext extends ClueContext {
     private final IndexReaderFactory readerFactory;
@@ -37,8 +36,7 @@ public class LuceneContext extends ClueContext {
         this.writer = null;
     }
 
-
-    public IndexReader getIndexReader(){
+    public IndexReader getIndexReader() {
         return readerFactory.getIndexReader();
     }
 
@@ -46,7 +44,7 @@ public class LuceneContext extends ClueContext {
         return new IndexSearcher(getIndexReader());
     }
 
-    public IndexWriter getIndexWriter(){
+    public IndexWriter getIndexWriter() {
         if (registry.isReadonly()) return null;
         if (writer == null) {
             try {
@@ -62,7 +60,7 @@ public class LuceneContext extends ClueContext {
         LinkedList<String> fieldNames = new LinkedList<>();
         for (LeafReaderContext context : getIndexReader().leaves()) {
             LeafReader reader = context.reader();
-            for(FieldInfo info : reader.getFieldInfos()) {
+            for (FieldInfo info : reader.getFieldInfos()) {
                 fieldNames.add(info.name);
             }
         }
@@ -73,7 +71,7 @@ public class LuceneContext extends ClueContext {
         return queryBuilder;
     }
 
-    public Analyzer getAnalyzerQuery() {
+    public Analyzer getAnalyzerQuery() throws Exception {
         return analyzerFactory.forQuery();
     }
 
@@ -106,11 +104,10 @@ public class LuceneContext extends ClueContext {
     }
 
     @Override
-    public void shutdown() throws Exception{
+    public void shutdown() throws Exception {
         try {
             readerFactory.shutdown();
-        }
-        finally{
+        } finally {
             directory.close();
             if (writer != null) {
                 writer.close();

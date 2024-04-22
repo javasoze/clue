@@ -16,15 +16,17 @@ public class ClueWebApplication extends Application<ClueWebConfiguration> {
         final LuceneContext ctx = new LuceneContext(conf.dir, conf.clue, true);
         ctx.setReadOnlyMode(true);
         environment.jersey().register(new ClueCommandResource(ctx));
-        environment.lifecycle().manage(new Managed() {
-            @Override
-            public void start() throws Exception {
-            }
+        environment
+                .lifecycle()
+                .manage(
+                        new Managed() {
+                            @Override
+                            public void start() throws Exception {}
 
-            @Override
-            public void stop() throws Exception {
-                ctx.shutdown();
-            }
-        });
+                            @Override
+                            public void stop() throws Exception {
+                                ctx.shutdown();
+                            }
+                        });
     }
 }

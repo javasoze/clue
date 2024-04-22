@@ -6,7 +6,7 @@ import io.dashbase.clue.LuceneContext;
 public class DefaultCommandRegistrar implements CommandRegistrar {
     @Override
     public void registerCommands(ClueContext clueCtx) {
-        LuceneContext ctx = (LuceneContext)clueCtx;
+        LuceneContext ctx = (LuceneContext) clueCtx;
         // registers all the commands we currently support
         new HelpCommand(ctx);
         new InfoCommand(ctx);
