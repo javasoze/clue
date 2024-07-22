@@ -29,7 +29,7 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ## Downloads
 
-latest version: 9.10.0-1.0.0
+latest version: 9.11.1-1.0.0
 
 ## Build
 
