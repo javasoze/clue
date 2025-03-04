@@ -32,9 +32,19 @@ public final class MatchSomeDocsQuery extends Query {
   public Weight createWeight(IndexSearcher searcher, ScoreMode scoreMode, float boost) throws IOException {
     return new ConstantScoreWeight(this, 1.0f) {
       @Override
-      public Scorer scorer(LeafReaderContext leafReaderContext) throws IOException {
+      public ScorerSupplier scorerSupplier(LeafReaderContext leafReaderContext) throws IOException {
+        Scorer scorer = new ConstantScoreScorer(1.0f, scoreMode, docIdSetIterator);
 
-        return new ConstantScoreScorer(this, score(), scoreMode, docIdSetIterator);
+        return new ScorerSupplier() {
+          @Override
+          public Scorer get(long l) throws IOException {
+            return scorer;
+          }
+          @Override
+          public long cost() {
+            return scorer.iterator().cost();
+          }
+        };
       }
 
       @Override
@@ -42,5 +52,9 @@ public final class MatchSomeDocsQuery extends Query {
         return false;
       }
     };
+  }
+  @Override
+  public void visit(QueryVisitor visitor) {
+    visitor.visitLeaf(this);
   }
 }

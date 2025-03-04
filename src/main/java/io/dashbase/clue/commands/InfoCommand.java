@@ -1,6 +1,5 @@
 package io.dashbase.clue.commands;
 
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -43,7 +42,8 @@ public class InfoCommand extends ClueCommand {
       out.println("index_options:\t" + finfo.getIndexOptions().name());
     }
     out.println("payloads:\t" + finfo.hasPayloads());
-    out.println("vectors:\t" + finfo.hasVectors());
+    out.println("term vectors:\t" + finfo.hasTermVectors());
+    out.println("vectors:\t" + finfo.hasVectorValues());
     out.println("attributes:\t" + finfo.attributes().toString());
     if (termList != null) {
 
@@ -113,24 +113,23 @@ public class InfoCommand extends ClueCommand {
       out.println("segment count: " + leaves.size());
       SortedMap<String, Object[]> fields = new TreeMap<String, Object[]>();
       for (LeafReaderContext leaf : leaves) {        
-        LeafReader ar = leaf.reader();        
-        FieldInfos fldInfos = ar.getFieldInfos();
-        Iterator<FieldInfo> finfoIter = fldInfos.iterator();
+        try (LeafReader ar = leaf.reader()) {
+          FieldInfos fldInfos = ar.getFieldInfos();
 
-        while (finfoIter.hasNext()) {
-          FieldInfo finfo = finfoIter.next();          
-          Object[] data = fields.get(finfo.name);
-          Terms t = ar.terms(finfo.name);
-          if (data == null) {
-            data = new Object[2];
-            LinkedList<Terms> termsList = new LinkedList<Terms>();
-            termsList.add(t);
-            data[0] = finfo;
-            data[1] = termsList;
-            fields.put(finfo.name, data);
-          } else {
-            List<Terms> termsList = (List<Terms>) data[1];
-            termsList.add(t);
+          for (var finfo : fldInfos) {
+            Object[] data = fields.get(finfo.name);
+            Terms t = ar.terms(finfo.name);
+            if (data == null) {
+              data = new Object[2];
+              LinkedList<Terms> termsList = new LinkedList<Terms>();
+              termsList.add(t);
+              data[0] = finfo;
+              data[1] = termsList;
+              fields.put(finfo.name, data);
+            } else {
+              List<Terms> termsList = (List<Terms>) data[1];
+              termsList.add(t);
+            }
           }
         }
       }
@@ -143,26 +142,26 @@ public class InfoCommand extends ClueCommand {
       }
     } else {
       LeafReaderContext leaf = leaves.get(segid);
-      LeafReader atomicReader = leaf.reader();
+      try (LeafReader atomicReader = leaf.reader()) {
 
-      out.println("segment " + segid + ": ");
-      out.println("doc base:\t" + leaf.docBase);
-      out.println("numdocs:\t" + atomicReader.numDocs());
-      out.println("maxdoc:\t" + atomicReader.maxDoc());
-      out.println("num deleted docs:\t" + atomicReader.numDeletedDocs());
+        out.println("segment " + segid + ": ");
+        out.println("doc base:\t" + leaf.docBase);
+        out.println("numdocs:\t" + atomicReader.numDocs());
+        out.println("maxdoc:\t" + atomicReader.maxDoc());
+        out.println("num deleted docs:\t" + atomicReader.numDeletedDocs());
 
-      FieldInfos fields = atomicReader.getFieldInfos();
+        FieldInfos fields = atomicReader.getFieldInfos();
 
-      out.println("number of fields: " + fields.size());
+        out.println("number of fields: " + fields.size());
 
-      for (int i = 0; i < fields.size(); ++i) {
-        FieldInfo finfo = fields.fieldInfo(i);
-        Terms te = atomicReader.terms(finfo.name);
-        out.println("=================================== Field "+finfo.name+" ===================================");
-        toString(new Object[] { finfo, Arrays.asList(te) }, out);
+        for (int i = 0; i < fields.size(); ++i) {
+          FieldInfo finfo = fields.fieldInfo(i);
+          Terms te = atomicReader.terms(finfo.name);
+          out.println("=================================== Field " + finfo.name + " ===================================");
+          toString(new Object[]{finfo, Collections.singletonList(te)}, out);
+        }
       }
     }
-
     out.flush();
   }
 

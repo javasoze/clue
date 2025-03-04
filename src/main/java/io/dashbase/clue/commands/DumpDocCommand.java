@@ -1,15 +1,14 @@
 package io.dashbase.clue.commands;
 
 
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.BytesRef;
 
 import java.io.PrintStream;
@@ -48,40 +47,42 @@ public class DumpDocCommand extends ClueCommand {
         List<LeafReaderContext> leaves = reader.leaves();
 
         for (LeafReaderContext ctx : leaves) {
-            LeafReader atomicReader = ctx.reader();
+            try (LeafReader atomicReader = ctx.reader()) {
 
-            int docID = doc - ctx.docBase;
+                int docID = doc - ctx.docBase;
 
-            if (docID >= atomicReader.maxDoc()) {
-                continue;
-            }
+                if (docID >= atomicReader.maxDoc()) {
+                    continue;
+                }
 
-            if (docID >= 0) {
-                Document storedData = atomicReader.document(docID);
+                if (docID >= 0) {
+                    var storedField = atomicReader.storedFields();
+                    Document storedData = storedField.document(docID);
 
-                if (storedData == null) continue;
+                    if (storedData == null) continue;
 
-                for (IndexableField indexableField : storedData.getFields()) {
-                    out.print(indexableField.name() + ":");
-                    final Number number = indexableField.numericValue();
-                    if (number != null) {
-                        out.println(number);
-                        continue;
+                    for (IndexableField indexableField : storedData.getFields()) {
+                        out.print(indexableField.name() + ":");
+                        final Number number = indexableField.numericValue();
+                        if (number != null) {
+                            out.println(number);
+                            continue;
+                        }
+
+                        final String strData = indexableField.stringValue();
+
+                        if (strData != null) {
+                            out.println(strData);
+                            continue;
+                        }
+
+                        final BytesRef bytesRef = indexableField.binaryValue();
+                        if (bytesRef != null) {
+                            out.println(bytesRef);
+                        }
+
+                        out.println("<unsupported value type>");
                     }
-
-                    final String strData = indexableField.stringValue();
-
-                    if (strData != null) {
-                        out.println(strData);
-                        continue;
-                    }
-
-                    final BytesRef bytesRef = indexableField.binaryValue();
-                    if (bytesRef != null) {
-                        out.println(bytesRef);
-                    }
-
-                    out.println("<unsupported value type>");
                 }
             }
         }

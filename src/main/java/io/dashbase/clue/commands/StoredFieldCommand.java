@@ -1,20 +1,19 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.util.BytesRef;
+
+import java.io.PrintStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 @Readonly
 public class StoredFieldCommand extends ClueCommand {
@@ -58,50 +57,52 @@ public class StoredFieldCommand extends ClueCommand {
     
     
     for (LeafReaderContext ctx : leaves) {
-      LeafReader atomicReader = ctx.reader();
-      FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
-      if (finfo == null) continue;
-      
-      stored = true;
-      
-      int docID = doc - ctx.docBase;
-      
-      if (docID >= atomicReader.maxDoc()) {
+      try (LeafReader atomicReader = ctx.reader()) {
+        FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
+        if (finfo == null) continue;
+
+        stored = true;
+
+        int docID = doc - ctx.docBase;
+
+        if (docID >= atomicReader.maxDoc()) {
           continue;
-      }
-      
-      if (docID >= 0) {
-      
-        Document storedData = atomicReader.document(docID, new HashSet<String>(Arrays.asList(field)));
-        
-        if (storedData == null) continue;
-        
-        String strData = storedData.get(field);
-        
-        if (strData != null) {
-          out.println(strData);
+        }
+
+        if (docID >= 0) {
+          var storedFields = atomicReader.storedFields();
+
+          Document storedData = storedFields.document(docID, new HashSet<String>(Collections.singletonList(field)));
+
+          if (storedData == null) continue;
+
+          String strData = storedData.get(field);
+
+          if (strData != null) {
+            out.println(strData);
+            found = true;
+            break;
+          }
+
+          BytesRef bytesRef = storedData.getBinaryValue(field);
+          if (bytesRef != null) {
+            out.println(bytesRef);
+            found = true;
+            break;
+          }
+
+          BytesRef[] dataArray = storedData.getBinaryValues(field);
+
+          if (dataArray == null || dataArray.length == 0) {
+            continue;
+          }
+
+          for (BytesRef data : dataArray) {
+            out.println(data);
+          }
           found = true;
           break;
         }
-        
-        BytesRef bytesRef = storedData.getBinaryValue(field);
-        if (bytesRef != null) {
-          out.println(bytesRef);
-          found = true;
-          break;
-        }
-        
-        BytesRef[] dataArray = storedData.getBinaryValues(field);
-        
-        if (dataArray == null || dataArray.length == 0) {
-          continue;
-        }
-      
-        for (BytesRef data : dataArray){
-          out.println(data);
-        }
-        found = true;
-        break;
       }
     }
     
