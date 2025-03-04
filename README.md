@@ -3,12 +3,14 @@ CLue - Command Line tool for Apache Lucene
 
 ### Overview:
 
-When working with Lucene, it is often useful to inspect an index.
+When working with Lucene, it is often necessary to inspect an index for debugging, analysis, or optimization purposes.
 
-[Luke](http://www.getopt.org/luke/) is awesome, but often times it is not feasible to inspect an index on a remote machine using a GUI. That's where Clue comes in.
-You can ssh into your production box and inspect your index using your favorite shell.
+[Luke](https://github.com/apache/lucene/tree/main/lucene/luke) provides a powerful graphical interface for examining Lucene indexes. However, in many scenarios, particularly when working on a remote machine, using a GUI-based tool may not be practical. This is where Clue proves to be a valuable alternative.
 
-Another important feature for Clue is the ability to interact with other Unix commands via piping, e.g. grep, more etc.
+Clue allows users to inspect Lucene indexes directly from the command line, making it ideal for remote environments. By connecting via SSH to a production server, users can analyze their indexes without the need for a graphical interface.
+
+Additionally, Clue is designed to seamlessly integrate with Unix command-line utilities through piping. This enables users to leverage tools such as grep, more, and other shell commands to filter and process index data efficiently.
+
 
 #### License:
 
@@ -20,11 +22,11 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 8.5.0-1.0.0
+latest version: 1.0.0-10.1.0
 
 #### What's new in this release?
 
-See [Release Note](https://github.com/javasoze/clue/releases/tag/release-8.5.0-1.0.0)
+See [Release Note](https://github.com/javasoze/clue/releases/tag/release-1.0.0-10.1.0)
 
 ### Build:
 
@@ -45,7 +47,7 @@ Non-interactive Mode:
     ./bin/clue.sh my-idx command args
 
 Command list:
-
+```bash
     ./bin/clue.sh my-idx help
 
     using configuration file found at: /Users/johnwang/github/clue/config/clue.conf
@@ -73,6 +75,7 @@ Command list:
 	terms - gets terms from the index, <field:term>, term can be a prefix
 	trim - trims the index, <TRIM PERCENTAGE> <OPTIONS>, options are: head, tail, random
 	tv - shows term vector of a field for a doc
+```
 	
 ### Build a sample index to play with:
 
