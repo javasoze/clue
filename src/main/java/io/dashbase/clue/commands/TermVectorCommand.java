@@ -52,14 +52,14 @@ public class TermVectorCommand extends ClueCommand {
     for (LeafReaderContext ctx : leaves) {
       LeafReader atomicReader = ctx.reader();
       FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
-      if (finfo == null || !finfo.hasVectors()) continue;
+      if (finfo == null || !finfo.hasTermVectors()) continue;
       
       tvFound = true;
       
       int docID = doc - ctx.docBase;
       if (docID >= 0) {
-      
-        Terms terms = atomicReader.getTermVector(docID, field);
+        var termVectors = atomicReader.termVectors();
+        Terms terms = termVectors.get(docID, field);
         if (terms == null) continue;
         
         TermsEnum te = terms.iterator();      

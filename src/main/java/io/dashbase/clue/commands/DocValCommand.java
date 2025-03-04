@@ -1,6 +1,5 @@
 package io.dashbase.clue.commands;
 
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -60,11 +59,14 @@ public class DocValCommand extends ClueCommand {
       case SORTED: {
         SortedDocValues sv = (SortedDocValues)docVals;
         if (sv.advanceExact(subid)) {
-          bytesRef = sv.binaryValue();
+          int val_count = sv.getValueCount();
           StringBuilder sb = new StringBuilder();
-          sb.append(NUM_TERMS_IN_FIELD).append(sv.getValueCount()).append(", ");
+          sb.append(NUM_TERMS_IN_FIELD).append(val_count).append(", ");
           sb.append("value: [");
-          sb.append(bytesRef.utf8ToString());
+          if (val_count > 0) {
+            bytesRef = sv.lookupOrd(0);
+            sb.append(bytesRef.utf8ToString());
+          }
           sb.append("]");
           val = sb.toString();
         }
@@ -79,7 +81,8 @@ public class DocValCommand extends ClueCommand {
           sb.append(NUM_TERMS_IN_FIELD).append(count).append(", ");
           sb.append("values: [");
           boolean firstPass = true;
-          while ((nextOrd = sv.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS) {
+          for (int i = 0; i < sv.docValueCount(); i++) {
+            nextOrd = sv.nextOrd();
             bytesRef = sv.lookupOrd(nextOrd);
             if (!firstPass) {
               sb.append(", ");
@@ -105,7 +108,7 @@ public class DocValCommand extends ClueCommand {
             if (!firstPass) {
               sb.append(", ");
             }
-            sb.append(String.valueOf(nextVal));
+            sb.append(nextVal);
             firstPass = false;
           }
           sb.append("]");
