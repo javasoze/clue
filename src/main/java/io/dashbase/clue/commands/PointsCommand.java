@@ -1,7 +1,6 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
-import io.dashbase.clue.api.BytesRefPrinter;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.document.LongPoint;
@@ -15,6 +14,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Readonly
 public class PointsCommand extends ClueCommand {
@@ -32,7 +32,7 @@ public class PointsCommand extends ClueCommand {
 
     @Override
     public String help() {
-        return "gets points values from the index, <field>";
+        return "gets points values from the index, e.g. <field:value>";
     }
 
     @Override
@@ -51,14 +51,25 @@ public class PointsCommand extends ClueCommand {
     @Override
     public void execute(Namespace args, PrintStream out) throws Exception {
         String field = args.getString("field");
+
+        final AtomicLong pointsVal = new AtomicLong(Long.MIN_VALUE);
+
+        if (field != null){
+            String[] parts = field.split(":");
+            if (parts.length > 1){
+                field = parts[0];
+                pointsVal.set(Long.parseLong(parts[1]));
+            }
+        }
+        else{
+            out.println("Usage: field:value");
+            return;
+        }
+
         if (field == null){
             out.println("Usage: field");
             return;
         }
-
-        BytesRefPrinter bytesRefPrinter = ctx.getTermBytesRefDisplay().getBytesRefPrinter(field);
-
-
         IndexReader reader = ctx.getIndexReader();
         List<LeafReaderContext> leaves = reader.leaves();
 
@@ -81,7 +92,9 @@ public class PointsCommand extends ClueCommand {
                     public void visit(int docID, byte[] packedValue) throws IOException {
                         Long value = toLong(packedValue);
                         if (value != null) {
-                            valueToDocCount.put(value, valueToDocCount.getOrDefault(value, 0) + 1);
+                            if (value.equals(pointsVal.get())) {
+                                valueToDocCount.put(value, valueToDocCount.getOrDefault(value, 0) + 1);
+                            }
                         }
                     }
 

@@ -67,6 +67,7 @@ Command list:
 	info - displays information about the index, <segment number> to get information on the segment
 	merge - force merges segments into given N segments, input: number of max segments
 	norm - displays norm values for a field for a list of documents
+	points - gets points values from the index, e.g. <field:value>
 	postings - iterating postings given a term, e.g. <fieldname:fieldvalue>
 	readonly - puts clue in readonly mode
 	reconstruct - reconstructs an indexed field for a document
