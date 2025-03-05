@@ -113,23 +113,22 @@ public class InfoCommand extends ClueCommand {
       out.println("segment count: " + leaves.size());
       SortedMap<String, Object[]> fields = new TreeMap<String, Object[]>();
       for (LeafReaderContext leaf : leaves) {        
-        try (LeafReader ar = leaf.reader()) {
-          FieldInfos fldInfos = ar.getFieldInfos();
+        LeafReader ar = leaf.reader();
+        FieldInfos fldInfos = ar.getFieldInfos();
 
-          for (var finfo : fldInfos) {
-            Object[] data = fields.get(finfo.name);
-            Terms t = ar.terms(finfo.name);
-            if (data == null) {
-              data = new Object[2];
-              LinkedList<Terms> termsList = new LinkedList<Terms>();
-              termsList.add(t);
-              data[0] = finfo;
-              data[1] = termsList;
-              fields.put(finfo.name, data);
-            } else {
-              List<Terms> termsList = (List<Terms>) data[1];
-              termsList.add(t);
-            }
+        for (var finfo : fldInfos) {
+          Object[] data = fields.get(finfo.name);
+          Terms t = ar.terms(finfo.name);
+          if (data == null) {
+            data = new Object[2];
+            LinkedList<Terms> termsList = new LinkedList<Terms>();
+            termsList.add(t);
+            data[0] = finfo;
+            data[1] = termsList;
+            fields.put(finfo.name, data);
+          } else {
+            List<Terms> termsList = (List<Terms>) data[1];
+            termsList.add(t);
           }
         }
       }
@@ -142,7 +141,8 @@ public class InfoCommand extends ClueCommand {
       }
     } else {
       LeafReaderContext leaf = leaves.get(segid);
-      try (LeafReader atomicReader = leaf.reader()) {
+      LeafReader atomicReader = leaf.reader();
+
 
         out.println("segment " + segid + ": ");
         out.println("doc base:\t" + leaf.docBase);
@@ -160,9 +160,7 @@ public class InfoCommand extends ClueCommand {
           out.println("=================================== Field " + finfo.name + " ===================================");
           toString(new Object[]{finfo, Collections.singletonList(te)}, out);
         }
-      }
     }
     out.flush();
   }
-
 }

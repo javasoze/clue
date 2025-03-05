@@ -4,15 +4,12 @@ import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.api.BytesRefPrinter;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.*;
 import org.apache.lucene.util.BytesRef;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,13 +38,6 @@ public class TermsCommand extends ClueCommand {
   protected ArgumentParser buildParser(ArgumentParser parser) {
     parser.addArgument("-f", "--field").required(true).help("field and term, e.g. field:term");
     return parser;
-  }
-
-  static Long toLong(byte[] original) {
-    if (original == null || original.length < 8) {
-      return null; // Skip if invalid
-    }
-    return LongPoint.decodeDimension(original, 0);
   }
 
   @Override
@@ -98,7 +88,6 @@ public class TermsCommand extends ClueCommand {
           termMap = new TreeMap<BytesRef, TermsEnum>();
         }
 
-
         TermsEnum te = terms.iterator();
         BytesRef termBytes;
         if (termVal != null) {
@@ -127,38 +116,6 @@ public class TermsCommand extends ClueCommand {
             termBytes = null;
           } else {
             termBytes = te.next();
-          }
-        }
-      }
-      else {
-        PointValues pointValues = atomicReader.getPointValues(field);
-        Map<Long, Integer> valueToDocCount = new HashMap<>();
-        if (pointValues != null) {
-
-          pointValues.intersect(new PointValues.IntersectVisitor() {
-            @Override
-            public void visit(int docID) throws IOException {
-            }
-
-            @Override
-            public void visit(int docID, byte[] packedValue) throws IOException {
-              Long value = toLong(packedValue);
-              if (value != null) {
-                valueToDocCount.put(value, valueToDocCount.getOrDefault(value, 0) + 1);
-              }
-            }
-
-            @Override
-            public PointValues.Relation compare(byte[] minPackedValue, byte[] maxPackedValue) {
-              return PointValues.Relation.CELL_CROSSES_QUERY;
-            }
-          });
-
-          // Print out the values and their counts
-          for (Map.Entry<Long, Integer> entry : valueToDocCount.entrySet()) {
-            long value = entry.getKey();
-            int count = entry.getValue();
-            System.out.println(value + " (" + count + ")");
           }
         }
       }
@@ -198,6 +155,5 @@ public class TermsCommand extends ClueCommand {
     }
     out.flush();
   }
-
 }
 

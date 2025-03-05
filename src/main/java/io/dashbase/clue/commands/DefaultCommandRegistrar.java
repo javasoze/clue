@@ -31,5 +31,6 @@ public class DefaultCommandRegistrar implements CommandRegistrar {
         new SaveUserCommitData(ctx);
         new DeleteUserCommitData(ctx);
         new DumpDocCommand(ctx);
+        new PointsCommand(ctx);
     }
 }
