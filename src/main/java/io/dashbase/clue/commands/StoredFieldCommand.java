@@ -57,52 +57,51 @@ public class StoredFieldCommand extends ClueCommand {
     
     
     for (LeafReaderContext ctx : leaves) {
-      try (LeafReader atomicReader = ctx.reader()) {
-        FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
-        if (finfo == null) continue;
+      LeafReader atomicReader = ctx.reader();
+      FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
+      if (finfo == null) continue;
 
-        stored = true;
+      stored = true;
 
-        int docID = doc - ctx.docBase;
+      int docID = doc - ctx.docBase;
 
-        if (docID >= atomicReader.maxDoc()) {
-          continue;
-        }
+      if (docID >= atomicReader.maxDoc()) {
+        continue;
+      }
 
-        if (docID >= 0) {
-          var storedFields = atomicReader.storedFields();
+      if (docID >= 0) {
+        var storedFields = atomicReader.storedFields();
 
-          Document storedData = storedFields.document(docID, new HashSet<String>(Collections.singletonList(field)));
+        Document storedData = storedFields.document(docID, new HashSet<String>(Collections.singletonList(field)));
 
-          if (storedData == null) continue;
+        if (storedData == null) continue;
 
-          String strData = storedData.get(field);
+        String strData = storedData.get(field);
 
-          if (strData != null) {
-            out.println(strData);
-            found = true;
-            break;
-          }
-
-          BytesRef bytesRef = storedData.getBinaryValue(field);
-          if (bytesRef != null) {
-            out.println(bytesRef);
-            found = true;
-            break;
-          }
-
-          BytesRef[] dataArray = storedData.getBinaryValues(field);
-
-          if (dataArray == null || dataArray.length == 0) {
-            continue;
-          }
-
-          for (BytesRef data : dataArray) {
-            out.println(data);
-          }
+        if (strData != null) {
+          out.println(strData);
           found = true;
           break;
         }
+
+        BytesRef bytesRef = storedData.getBinaryValue(field);
+        if (bytesRef != null) {
+          out.println(bytesRef);
+          found = true;
+          break;
+        }
+
+        BytesRef[] dataArray = storedData.getBinaryValues(field);
+
+        if (dataArray == null || dataArray.length == 0) {
+          continue;
+        }
+
+        for (BytesRef data : dataArray) {
+          out.println(data);
+        }
+        found = true;
+        break;
       }
     }
     

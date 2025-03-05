@@ -1,23 +1,18 @@
 package io.dashbase.clue.commands;
 
+import io.dashbase.clue.LuceneContext;
+import io.dashbase.clue.api.BytesRefPrinter;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.lucene.index.*;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import io.dashbase.clue.ClueContext;
-import io.dashbase.clue.LuceneContext;
-import io.dashbase.clue.api.BytesRefPrinter;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.util.BytesRef;
 
 @Readonly
 public class TermsCommand extends ClueCommand {
@@ -88,46 +83,40 @@ public class TermsCommand extends ClueCommand {
       
       Terms terms = atomicReader.terms(field);
       
-      if (terms == null) {
-        continue;
-      }
-      
-      if (termMap == null){
-        termMap = new TreeMap<BytesRef,TermsEnum>();
-      }
-      
-      
-      TermsEnum te = terms.iterator();
-      BytesRef termBytes;
-      if (termVal != null){
-        if (isExact){
-          if (!te.seekExact(new BytesRef(termVal))){
-            continue;
+      if (terms != null) {
+        if (termMap == null) {
+          termMap = new TreeMap<BytesRef, TermsEnum>();
+        }
+
+        TermsEnum te = terms.iterator();
+        BytesRef termBytes;
+        if (termVal != null) {
+          if (isExact) {
+            if (!te.seekExact(new BytesRef(termVal))) {
+              continue;
+            }
+          } else {
+            te.seekCeil(new BytesRef(termVal));
           }
-        }
-        else{
-          te.seekCeil(new BytesRef(termVal));
-        }
-        termBytes = te.term();
-      }
-      else{
-        termBytes = te.next();
-      }
-      
-      while(true){
-        if (termBytes == null) break;        
-        AtomicInteger count = termCountMap.get(termBytes);
-        if (count == null){
-          termCountMap.put(termBytes, new AtomicInteger(te.docFreq()));
-          termMap.put(termBytes, te);
-          break;
-        }
-        count.getAndAdd(te.docFreq());
-        if (isExact){
-          termBytes = null; 
-        }
-        else{
+          termBytes = te.term();
+        } else {
           termBytes = te.next();
+        }
+
+        while (true) {
+          if (termBytes == null) break;
+          AtomicInteger count = termCountMap.get(termBytes);
+          if (count == null) {
+            termCountMap.put(termBytes, new AtomicInteger(te.docFreq()));
+            termMap.put(termBytes, te);
+            break;
+          }
+          count.getAndAdd(te.docFreq());
+          if (isExact) {
+            termBytes = null;
+          } else {
+            termBytes = te.next();
+          }
         }
       }
     }
@@ -166,6 +155,5 @@ public class TermsCommand extends ClueCommand {
     }
     out.flush();
   }
-
 }
 
