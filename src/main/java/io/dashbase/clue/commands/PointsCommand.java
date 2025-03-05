@@ -97,8 +97,9 @@ public class PointsCommand extends ClueCommand {
                     Map.Entry<Long, Integer> entry = valueToDocCount.pollFirstEntry();
                     if (entry == null) break;
                     Long key = entry.getKey();
-                    Integer count = valueToDocCount.remove(key);
+                    Integer count = entry.getValue();
                     out.println(key+" ("+count+") ");
+                    valueToDocCount.remove(key);
                     if (ctx.isInteractiveMode() && numCount % numPerPage == 0){
                         out.println("Press q to break");
                         int ch = System.in.read();
@@ -108,13 +109,12 @@ public class PointsCommand extends ClueCommand {
                         }
                     }
 
-                    valueToDocCount.entrySet().stream().forEach(
-                            e -> {
-                                long value = e.getKey();
-                                int countVal = e.getValue();
-                                System.out.println(value + " (" + countVal + ")");
-                            }
-                    );
+                    entry = valueToDocCount.pollFirstEntry();
+                    if (entry == null) break;
+                    key = entry.getKey();
+                    count = entry.getValue();
+                    valueToDocCount.remove(key);
+                    out.println(key+" ("+count+") ");
                 }
             }
         }
