@@ -4,10 +4,12 @@ import io.dashbase.clue.LuceneContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.*;
+import org.apache.lucene.util.BytesRef;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Readonly
 public class InfoCommand extends ClueCommand {
@@ -46,32 +48,45 @@ public class InfoCommand extends ClueCommand {
     out.println("vectors:\t" + finfo.hasVectorValues());
     out.println("attributes:\t" + finfo.attributes().toString());
     if (termList != null) {
+      Map<String, AtomicLong> docFreqStats = new TreeMap<>();
+      Map<String, AtomicLong> sumTotalTermsFreq = new TreeMap<>();
 
-      long numTerms = 0L;
       long docCount = 0L;
-      long sumDocFreq = 0L;
-      long sumTotalTermFreq = 0L;
 
       for (Terms t : termList) {
         if (t != null) {
-          numTerms += t.size();
-          docCount += t.getDocCount();
-          sumDocFreq += t.getSumDocFreq();
-          sumTotalTermFreq += t.getSumTotalTermFreq();
+            docCount += t.getDocCount();
+            TermsEnum termsEnum = t.iterator();
+            if (termsEnum != null) {
+              BytesRef term;
+              while ((term = termsEnum.next()) != null) {
+                  String termStr = term.utf8ToString();
+                  AtomicLong count = docFreqStats.get(termStr);
+                  if (count == null) {
+                    count = new AtomicLong(0);
+                    docFreqStats.put(termStr, count);
+                  }
+                  count.addAndGet(termsEnum.docFreq());
+
+                count = sumTotalTermsFreq.get(termStr);
+                if (count == null) {
+                  count = new AtomicLong(0);
+                  sumTotalTermsFreq.put(termStr, count);
+                }
+                count.addAndGet(termsEnum.totalTermFreq());
+              }
+          }
         }
       }
-      if (numTerms < 0) {
-        numTerms = -1;
-      }
-      if (docCount < 0) {
-        docCount = -1;
-      }
-      if (sumDocFreq < 0) {
-        sumDocFreq = -1;
-      }
-      if (sumTotalTermFreq < 0) {
-        sumTotalTermFreq = -1;
-      }
+
+
+      long numTerms = docFreqStats.size();
+      final AtomicLong sumDocFreq = new AtomicLong(0L);
+      docFreqStats.values().forEach(num -> sumDocFreq.addAndGet(num.get()));
+
+      final AtomicLong sumTotalTermFreq = new AtomicLong(0L);
+      sumTotalTermsFreq.values().forEach(num -> sumTotalTermFreq.addAndGet(num.get()));
+
       out.println("num_terms:\t" + numTerms);
       out.println("doc_count:\t" + docCount);
       out.println("sum_doc_freq:\t" + sumDocFreq);
@@ -96,6 +111,8 @@ public class InfoCommand extends ClueCommand {
     if (r instanceof DirectoryReader) {
       DirectoryReader dr = (DirectoryReader)r;
       SegmentInfos sis = SegmentInfos.readLatestCommit(dr.directory()); // read infos from dir
+
+      // assuming codecs are the same for all segments
       for (SegmentCommitInfo commitInfo : sis) {
         if (commitInfo != null) {          
           out.println("Codec found: " + commitInfo.info.getCodec().getName());

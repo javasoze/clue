@@ -22,11 +22,11 @@ Please file bugs and feature requests [here](https://github.com/javasoze/clue/is
 
 ### Downloads:
 
-latest version: 1.0.0-10.1.0
+latest version: 1.0.0-10.2.2
 
 #### What's new in this release?
 
-See [Release Note](https://github.com/javasoze/clue/releases/tag/release-1.0.0-10.1.0)
+See [Release Note](https://github.com/javasoze/clue/releases/tag/release-1.0.0-10.2.2)
 
 ### Build:
 

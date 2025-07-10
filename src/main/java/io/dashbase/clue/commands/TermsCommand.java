@@ -127,7 +127,7 @@ public class TermsCommand extends ClueCommand {
       if (entry == null) break;
       BytesRef key = entry.getKey();
       AtomicInteger count = termCountMap.remove(key);
-      out.println(bytesRefPrinter.print(key)+" ("+count+") ");
+      out.println(bytesRefPrinter.print(key)+" (" + count + ") ");
       if (ctx.isInteractiveMode() && numCount % numPerPage == 0){
           out.println("Press q to break");
           int ch = System.in.read();
