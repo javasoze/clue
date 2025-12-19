@@ -1,7 +1,7 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java#apache-maven-with-a-settings-path
+# This workflow will build a package using Gradle and then publish it to GitHub Packages when a release is created.
+# For more information see: https://github.com/actions/setup-java#gradle-builds
 
-name: Maven Package
+name: Gradle Package
 
 on:
   release:
@@ -19,13 +19,13 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '21'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        cache: 'gradle'
 
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - name: Build with Gradle
+      run: gradle build
 
-    - name: Publish to GitHub Packages Apache Maven
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+    - name: Publish to GitHub Packages
+      run: gradle publish
       env:
+        GITHUB_ACTOR: ${{ github.actor }}
         GITHUB_TOKEN: ${{ github.token }}
