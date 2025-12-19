@@ -30,9 +30,9 @@ See [Release Note](https://github.com/javasoze/clue/releases/tag/release-1.0.0-1
 
 ### Build:
 
-mvn package
+gradle build
 
-This will create the following artifact in the target directory:
+This will create the following artifact in the build/libs directory:
 
 ```clue-${VERSION}.jar```
 

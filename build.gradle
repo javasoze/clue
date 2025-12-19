@@ -1,0 +1,73 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'io.dashbase.clue'
+version = '1.0.0-10.2.2'
+description = 'command line client for Apache Lucene'
+
+ext {
+    luceneVersion = '10.2.2'
+    dropwizardVersion = '1.3.5'
+    retrofit2Version = '2.5.0'
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/releases' }
+    maven { url 'https://repository.apache.org/snapshots/' }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainClass = 'io.dashbase.clue.ClueApplication'
+}
+
+dependencies {
+    implementation platform("io.dropwizard:dropwizard-bom:${dropwizardVersion}")
+
+    implementation "org.apache.lucene:lucene-core:${luceneVersion}"
+    implementation "org.apache.lucene:lucene-codecs:${luceneVersion}"
+    implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"
+    implementation "org.apache.lucene:lucene-backward-codecs:${luceneVersion}"
+    implementation "org.apache.lucene:lucene-queries:${luceneVersion}"
+    implementation "org.apache.lucene:lucene-queryparser:${luceneVersion}"
+    implementation "org.apache.lucene:lucene-facet:${luceneVersion}"
+
+    implementation 'io.dropwizard:dropwizard-core'
+
+    implementation "com.squareup.retrofit2:retrofit:${retrofit2Version}"
+    implementation "com.squareup.retrofit2:converter-scalars:${retrofit2Version}"
+    implementation "com.squareup.retrofit2:converter-jackson:${retrofit2Version}"
+
+    implementation 'jline:jline:2.12'
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation 'com.sun.xml.bind:jaxb-core:2.3.0'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.3.0'
+    implementation 'javax.activation:activation:1.1.1'
+
+    testImplementation 'junit:junit:4.13.1'
+}
+
+tasks.register('copyRuntimeLibs', Copy) {
+    from configurations.runtimeClasspath
+    into layout.buildDirectory.dir('libs')
+}
+
+tasks.named('startScripts') {
+    dependsOn tasks.named('copyRuntimeLibs')
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('copyRuntimeLibs')
+}
