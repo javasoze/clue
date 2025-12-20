@@ -1,8 +1,8 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Readonly
+@Command(name = "stored", mixinStandardHelpOptions = true)
 public class StoredFieldCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -24,6 +25,12 @@ public class StoredFieldCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-f", "--field"}, required = true, description = "field name")
+  private String field;
+
+  @Option(names = {"-d", "--doc"}, required = true, description = "docid")
+  private int doc;
 
   @Override
   public String getName() {
@@ -36,19 +43,8 @@ public class StoredFieldCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-f", "--field").required(true).help("field name");
-    parser.addArgument("-d", "--doc").type(Integer.class).required(true).help("docid");
-    return parser;
-  }
+  protected void run(PrintStream out) throws Exception {
 
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-
-    String field = args.getString("field");
-    
-    int doc = args.getInt("doc");
-    
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();
     

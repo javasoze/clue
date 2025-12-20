@@ -1,15 +1,15 @@
 package io.dashbase.clue.commands;
 
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.IndexWriter;
 
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+@Command(name = "savecommitdata", mixinStandardHelpOptions = true)
 public class SaveUserCommitData extends ClueCommand {
 
 	private final LuceneContext ctx;
@@ -18,6 +18,12 @@ public class SaveUserCommitData extends ClueCommand {
 		super(ctx);
 		this.ctx = ctx;
 	}
+
+	@Option(names = {"-k", "--key"}, required = true)
+	private String key;
+
+	@Option(names = {"-v", "--value"}, required = true)
+	private String value;
 
 	@Override
 	public String getName() {
@@ -30,17 +36,9 @@ public class SaveUserCommitData extends ClueCommand {
 	}
 
 	@Override
-	protected ArgumentParser buildParser(ArgumentParser parser) {
-		parser.addArgument("-k", "--key").required(true);
-		parser.addArgument("-v", "--value").required(true);
-		return parser;
-	}
-
-	@Override
-	public void execute(Namespace args, PrintStream out) throws Exception {
+	protected void run(PrintStream out) throws Exception {
 		IndexWriter writer = ctx.getIndexWriter();
-		String key = args.getString("key");
-		String val = args.getString("value");
+		String val = value;
 		if (writer != null) {
 			Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
 			HashMap<String, String> commitMap = new HashMap<>();

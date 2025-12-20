@@ -1,16 +1,19 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.List;
-
 import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.client.CmdlineHelper;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Readonly
+@Command(name = "count", mixinStandardHelpOptions = true)
 public class CountCommand extends ClueCommand {
 
 	private final LuceneContext ctx;
@@ -19,6 +22,9 @@ public class CountCommand extends ClueCommand {
 		super(ctx);
 		this.ctx = ctx;
 	}
+
+	@Option(names = {"-q", "--query"}, arity = "0..*", description = "query")
+	private String[] query;
 
 	@Override
 	public String getName() {
@@ -31,16 +37,15 @@ public class CountCommand extends ClueCommand {
 	}
 
 	@Override
-	protected ArgumentParser buildParser(ArgumentParser parser) {
-		parser.addArgument("-q", "--query").nargs("*").setDefault(new String[]{"*"});
-		return parser;
-	}
-
-	@Override
-	public void execute(Namespace args, PrintStream out) throws Exception {
+	protected void run(PrintStream out) throws Exception {
 		IndexSearcher searcher = ctx.getIndexSearcher();
 
-		List<String> qlist = args.getList("query");
+		List<String> qlist;
+		if (query == null || query.length == 0) {
+			qlist = Collections.singletonList("*");
+		} else {
+			qlist = Arrays.asList(query);
+		}
 		Query q;
 		try{
 			q = CmdlineHelper.toQuery(qlist, ctx.getQueryBuilder());

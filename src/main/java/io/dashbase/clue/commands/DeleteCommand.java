@@ -1,13 +1,14 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Query;
 
 import java.io.PrintStream;
 
+@Command(name = "delete", mixinStandardHelpOptions = true)
 public class DeleteCommand extends ClueCommand {
 
   private final LuceneContext luceneContext;
@@ -15,6 +16,9 @@ public class DeleteCommand extends ClueCommand {
     super(ctx);
     this.luceneContext = ctx;
   }
+
+  @Option(names = {"-q", "--query"}, required = true)
+  private String query;
 
   @Override
   public String getName() {
@@ -27,15 +31,9 @@ public class DeleteCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-q", "--query").required(true);
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
+  protected void run(PrintStream out) throws Exception {
     Query q = null;
-    String qstring = args.getString("query");
+    String qstring = query;
     try{
       q = luceneContext.getQueryBuilder().build(qstring);
     }

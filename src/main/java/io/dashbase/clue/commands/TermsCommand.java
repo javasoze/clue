@@ -2,8 +2,8 @@ package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.api.BytesRefPrinter;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.*;
 import org.apache.lucene.util.BytesRef;
 
@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Readonly
+@Command(name = "terms", mixinStandardHelpOptions = true)
 public class TermsCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -23,6 +24,9 @@ public class TermsCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-f", "--field"}, required = true, description = "field and term, e.g. field:term")
+  private String field;
 
   @Override
   public String getName() {
@@ -35,14 +39,8 @@ public class TermsCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-f", "--field").required(true).help("field and term, e.g. field:term");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    String field = args.getString("field");
+  protected void run(PrintStream out) throws Exception {
+    String field = this.field;
     String termVal = null;
 
     if (field != null){
@@ -156,4 +154,3 @@ public class TermsCommand extends ClueCommand {
     out.flush();
   }
 }
-

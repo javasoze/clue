@@ -1,12 +1,12 @@
 package io.dashbase.clue.commands;
 
+import io.dashbase.clue.LuceneContext;
+import picocli.CommandLine.Command;
+
 import java.io.PrintStream;
 
-import io.dashbase.clue.ClueContext;
-import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.Namespace;
-
 @Readonly
+@Command(name = "directory", mixinStandardHelpOptions = true)
 public class DirectoryCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -26,7 +26,7 @@ public class DirectoryCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
+  protected void run(PrintStream out) throws Exception {
     out.println(ctx.getDirectory());
   }
 

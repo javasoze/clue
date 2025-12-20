@@ -1,8 +1,8 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Readonly
+@Command(name = "points", mixinStandardHelpOptions = true)
 public class PointsCommand extends ClueCommand {
     private final LuceneContext ctx;
 
@@ -24,6 +25,9 @@ public class PointsCommand extends ClueCommand {
         super(ctx);
         this.ctx = ctx;
     }
+
+    @Option(names = {"-f", "--field"}, required = true, description = "field")
+    private String field;
 
     @Override
     public String getName() {
@@ -35,12 +39,6 @@ public class PointsCommand extends ClueCommand {
         return "gets points values from the index, e.g. <field:value>";
     }
 
-    @Override
-    protected ArgumentParser buildParser(ArgumentParser parser) {
-        parser.addArgument("-f", "--field").required(true).help("field");
-        return parser;
-    }
-
     static Long toLong(byte[] original) {
         if (original == null || original.length < 8) {
             return null; // Skip if invalid
@@ -49,8 +47,8 @@ public class PointsCommand extends ClueCommand {
     }
 
     @Override
-    public void execute(Namespace args, PrintStream out) throws Exception {
-        String field = args.getString("field");
+    protected void run(PrintStream out) throws Exception {
+        String field = this.field;
 
         final AtomicLong pointsVal = new AtomicLong(Long.MIN_VALUE);
 

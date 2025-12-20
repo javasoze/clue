@@ -1,12 +1,9 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.List;
-
 import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.api.BytesRefPrinter;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -16,9 +13,11 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BytesRef;
 
-import io.dashbase.clue.ClueContext;
+import java.io.PrintStream;
+import java.util.List;
 
 @Readonly
+@Command(name = "postings", mixinStandardHelpOptions = true)
 public class PostingsCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -27,6 +26,12 @@ public class PostingsCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-f", "--field"}, required = true, description = "field and term, e.g. field:term")
+  private String field;
+
+  @Option(names = {"-n", "--num"}, defaultValue = "20", description = "num per page, default 20")
+  private int num;
 
   @Override
   public String getName() {
@@ -39,15 +44,8 @@ public class PostingsCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-f", "--field").required(true).help("field and term, e.g. field:term");
-    parser.addArgument("-n", "--num").type(Integer.class).setDefault(20).help("num per page, default 20");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    String field = args.getString("field");
+  protected void run(PrintStream out) throws Exception {
+    String field = this.field;
     String termVal = null;
 
     if (field != null){
@@ -69,7 +67,7 @@ public class PostingsCommand extends ClueCommand {
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();
     int docBase = 0;
-    int numPerPage = args.getInt("num");
+    int numPerPage = num;
     PostingsEnum postings = null;
     for (LeafReaderContext leaf : leaves){
       LeafReader atomicReader = leaf.reader();

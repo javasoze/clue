@@ -2,16 +2,18 @@ package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.client.CmdlineHelper;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 
 @Readonly
+@Command(name = "explain", mixinStandardHelpOptions = true)
 public class ExplainCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -20,6 +22,12 @@ public class ExplainCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-q", "--query"}, arity = "1..*", required = true, description = "query")
+  private String[] query;
+
+  @Option(names = {"-d", "--docs"}, arity = "1..*", required = true, description = "doc ids, e.g. d1 d2 d3")
+  private int[] docs;
 
   @Override
   public String getName() {
@@ -32,17 +40,8 @@ public class ExplainCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-q", "--query").nargs("*").required(true).help("query");
-    parser.addArgument("-d", "--docs").type(Integer.class).nargs("*").help("doc ids, e.g. d1 d2 d3");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    List<String> qlist = args.getList("query");
-
-    List<Integer> docidList = args.getList("docs");
+  protected void run(PrintStream out) throws Exception {
+    List<String> qlist = Arrays.asList(query);
 
     IndexSearcher searcher = ctx.getIndexSearcher();
     Query q;
@@ -57,7 +56,7 @@ public class ExplainCommand extends ClueCommand {
 
     out.println("parsed query: "+q);
     
-    for (Integer docid : docidList) {
+    for (int docid : docs) {
       Explanation expl = searcher.explain(q, docid);
       out.println(expl);
     }

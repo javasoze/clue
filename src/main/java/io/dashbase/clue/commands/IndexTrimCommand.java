@@ -1,18 +1,18 @@
 package io.dashbase.clue.commands;
 
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.util.DocIdMatcher;
 import io.dashbase.clue.util.MatchSomeDocsQuery;
 import io.dashbase.clue.util.MatcherDocIdSetIterator;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Query;
 
 import java.io.PrintStream;
 
+@Command(name = "trim", mixinStandardHelpOptions = true)
 public class IndexTrimCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -21,6 +21,9 @@ public class IndexTrimCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-p", "--percent"}, required = true, description = "percent to trim")
+  private int percent;
 
   @Override
   public String getName() {
@@ -38,15 +41,8 @@ public class IndexTrimCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-p", "--percent").type(Integer.class)
-            .required(true).help("percent to trim");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    int trimPercent = args.getInt("percent");
+  protected void run(PrintStream out) throws Exception {
+    int trimPercent = percent;
     
     if (trimPercent < 0 || trimPercent > 100) {
       throw new IllegalArgumentException("invalid percent: " + trimPercent);

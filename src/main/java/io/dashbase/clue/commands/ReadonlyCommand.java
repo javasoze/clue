@@ -1,12 +1,13 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 
 import java.io.PrintStream;
 
 @Readonly
+@Command(name = "readonly", mixinStandardHelpOptions = true)
 public class ReadonlyCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -15,6 +16,9 @@ public class ReadonlyCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Parameters(paramLabel = "readonly", description = "readonly true/false")
+  private boolean readonly;
 
   @Override
   public String getName() {
@@ -27,14 +31,7 @@ public class ReadonlyCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("readonly").type(Boolean.class).nargs("?").help("readonly true/false");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    boolean readonly = args.getBoolean("readonly");
+  protected void run(PrintStream out) throws Exception {
     ctx.setReadOnlyMode(readonly);
     out.println("readonly mode is now: "+readonly);
   }
