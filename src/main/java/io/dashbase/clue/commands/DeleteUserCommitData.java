@@ -38,19 +38,22 @@ public class DeleteUserCommitData extends ClueCommand {
 		if (writer != null) {
 			Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
 			List<Map.Entry<String, String>> commitList = new LinkedList<>();
+			boolean removed = false;
 			for (Map.Entry<String, String> dataEntry : commitData) {
-				if (!dataEntry.equals(key)) {
-					commitList.add(dataEntry);
+				if (dataEntry.getKey().equals(key)) {
+					removed = true;
+					continue;
 				}
+				commitList.add(dataEntry);
 			}
-		    if (commitList.size() > 0) {
-			  writer.setLiveCommitData(commitList);
-			  writer.commit();
+			if (removed) {
+				writer.setLiveCommitData(commitList);
+				writer.commit();
 				luceneContext.refreshReader();
-			  out.println("commit data: " + key +" removed.");
-		    } else {
-			  out.println("no commit data found, no action taken");
-		    }
+				out.println("commit data: " + key +" removed.");
+			} else {
+				out.println("no commit data found, no action taken");
+			}
 		} else {
 			out.println("unable to open writer, index is in readonly mode");
 		}
