@@ -5,13 +5,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 
-import io.dashbase.clue.ClueContext;
-
 @Readonly
+@Command(name = "showcommitdata", mixinStandardHelpOptions = true)
 public class GetUserCommitDataCommand extends ClueCommand {
 
 	private final LuceneContext ctx;
@@ -32,7 +31,7 @@ public class GetUserCommitDataCommand extends ClueCommand {
 	}
 
 	@Override
-	public void execute(Namespace args, PrintStream out) throws Exception {
+	protected void run(PrintStream out) throws Exception {
 		IndexReader reader = ctx.getIndexReader();
 		if (reader instanceof DirectoryReader) {
 			DirectoryReader dirReader = (DirectoryReader) reader;

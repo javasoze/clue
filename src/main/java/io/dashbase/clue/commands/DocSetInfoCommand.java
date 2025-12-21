@@ -1,13 +1,8 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.List;
-
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -17,7 +12,12 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BytesRef;
 
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.List;
+
 @Readonly
+@Command(name = "docsetinfo", mixinStandardHelpOptions = true)
 public class DocSetInfoCommand extends ClueCommand {
 
   private static final int DEFAULT_BUCKET_SIZE = 1000;
@@ -27,6 +27,12 @@ public class DocSetInfoCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-f", "--field"}, required = true, description = "field/term pair, e.g. field:term")
+  private String field;
+
+  @Option(names = {"-s", "--size"}, defaultValue = "" + DEFAULT_BUCKET_SIZE, description = "bucket size")
+  private int size;
 
   @Override
   public String getName() {
@@ -43,18 +49,10 @@ public class DocSetInfoCommand extends ClueCommand {
   };
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-f", "--field").required(true).help("field/term pair, e.g. field:term");
-    parser.addArgument("-s", "--size").type(Integer.class)
-            .setDefault(DEFAULT_BUCKET_SIZE).help("bucket size");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    String field = args.getString("field");
+  protected void run(PrintStream out) throws Exception {
+    String field = this.field;
     String termVal = null;
-    int bucketSize = args.getInt("size");
+    int bucketSize = size;
 
     if (field != null){
       String[] parts = field.split(":");

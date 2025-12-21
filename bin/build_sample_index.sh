@@ -10,4 +10,4 @@ JAVA_OPTS=""
 
 MAIN_CLASS="io.dashbase.clue.test.BuildSampleIndex"
 
-java $JAVA_OPTS $JMX_OPTS $HEAP_OPTS -cp $lib/* $MAIN_CLASS $bin/../src/main/resources/cars.json $@
+java $JAVA_OPTS $JMX_OPTS $HEAP_OPTS -cp "$lib/*" $MAIN_CLASS $bin/../src/main/resources/cars.json $@

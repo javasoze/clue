@@ -2,8 +2,8 @@ package io.dashbase.clue.commands;
 
 
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 @Readonly
+@Command(name = "dumpdoc", mixinStandardHelpOptions = true)
 public class DumpDocCommand extends ClueCommand {
 
     private final LuceneContext ctx;
@@ -23,6 +24,9 @@ public class DumpDocCommand extends ClueCommand {
         super(ctx);
         this.ctx = ctx;
     }
+
+    @Option(names = {"-d", "--doc"}, required = true, description = "doc id")
+    private int doc;
 
     @Override
     public String getName() {
@@ -35,14 +39,7 @@ public class DumpDocCommand extends ClueCommand {
     }
 
     @Override
-    protected ArgumentParser buildParser(ArgumentParser parser) {
-        parser.addArgument("-d", "--doc").type(Integer.class).required(true).help("doc id");
-        return parser;
-    }
-
-    @Override
-    public void execute(Namespace args, PrintStream out) throws Exception {
-        int doc = args.getInt("doc");
+    protected void run(PrintStream out) throws Exception {
         IndexReader reader = ctx.getIndexReader();
         List<LeafReaderContext> leaves = reader.leaves();
 

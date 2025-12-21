@@ -2,18 +2,12 @@ package io.dashbase.clue;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import io.dashbase.clue.client.CmdlineHelper;
-import net.sourceforge.argparse4j.helper.HelpScreenException;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.store.Directory;
 
 import io.dashbase.clue.commands.ClueCommand;
 import io.dashbase.clue.commands.HelpCommand;
@@ -64,19 +58,8 @@ public class ClueApplication {
     }
 
     ClueCommand clueCommand = cmd.get();
-    Namespace ns = null;
-
-    try {
-      ns = clueCommand.parseArgs(args);
-    } catch (ArgumentParserException ape) {
-        PrintWriter writer = new PrintWriter(out);
-        ape.getParser().printHelp(writer);
-        writer.flush();
-        return;
-    }
-
     try{
-      cmd.get().execute(ns, out);
+      clueCommand.execute(args, out);
     }
     catch(Exception e){
       e.printStackTrace(out);

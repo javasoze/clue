@@ -1,8 +1,8 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.*;
 import org.apache.lucene.util.BytesRef;
 
@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Readonly
+@Command(name = "info", mixinStandardHelpOptions = true)
 public class InfoCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -20,6 +21,9 @@ public class InfoCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-s", "--seg"}, defaultValue = "-1", description = "segment id")
+  private int seg;
 
   @Override
   public String getName() {
@@ -60,7 +64,7 @@ public class InfoCommand extends ClueCommand {
             if (termsEnum != null) {
               BytesRef term;
               while ((term = termsEnum.next()) != null) {
-                  String termStr = term.utf8ToString();
+                  String termStr = safeTermToString(term);
                   AtomicLong count = docFreqStats.get(termStr);
                   if (count == null) {
                     count = new AtomicLong(0);
@@ -94,16 +98,17 @@ public class InfoCommand extends ClueCommand {
     }
   }
 
-  @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-s", "--seg").type(Integer.class)
-            .setDefault(-1).help("segment id");
-    return parser;
+  private static String safeTermToString(BytesRef term) {
+    try {
+      return term.utf8ToString();
+    } catch (IndexOutOfBoundsException e) {
+      return term.toString();
+    }
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public void execute(Namespace args, PrintStream out) throws Exception {
+  protected void run(PrintStream out) throws Exception {
     IndexReader r = ctx.getIndexReader();
     
     out.println("readonly mode: " + getContext().isReadOnlyMode());
@@ -122,7 +127,7 @@ public class InfoCommand extends ClueCommand {
     }
     
     List<LeafReaderContext> leaves = r.leaves();
-    int segid = args.getInt("seg");
+    int segid = seg;
     if (segid < 0) {
       out.println("numdocs: " + r.numDocs());
       out.println("maxdoc: " + r.maxDoc());

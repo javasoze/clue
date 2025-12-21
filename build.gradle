@@ -70,12 +70,14 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-jackson:${retrofit2Version}"
 
     implementation 'jline:jline:2.12'
+    implementation 'info.picocli:picocli:4.7.5'
     implementation 'javax.xml.bind:jaxb-api:2.3.0'
     implementation 'com.sun.xml.bind:jaxb-core:2.3.0'
     implementation 'com.sun.xml.bind:jaxb-impl:2.3.0'
     implementation 'javax.activation:activation:1.1.1'
 
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.register('copyRuntimeLibs', Copy) {
@@ -89,4 +91,8 @@ tasks.named('startScripts') {
 
 tasks.named('assemble') {
     dependsOn tasks.named('copyRuntimeLibs')
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }

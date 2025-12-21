@@ -1,18 +1,21 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.util.List;
-
 import io.dashbase.clue.LuceneContext;
 import io.dashbase.clue.client.CmdlineHelper;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Readonly
+@Command(name = "search", mixinStandardHelpOptions = true)
 public class SearchCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -21,6 +24,12 @@ public class SearchCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-q", "--query"}, arity = "0..*", description = "query")
+  private String[] query;
+
+  @Option(names = {"-n", "--num"}, defaultValue = "10")
+  private int num;
 
   @Override
   public String getName() {
@@ -33,16 +42,14 @@ public class SearchCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-q", "--query").nargs("*").setDefault(new String[]{"*"});
-    parser.addArgument("-n", "--num").type(Integer.class).setDefault(10);
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
+  protected void run(PrintStream out) throws Exception {
     IndexSearcher searcher = ctx.getIndexSearcher();
-    List<String> qlist = args.getList("query");
+    List<String> qlist;
+    if (query == null || query.length == 0) {
+      qlist = Collections.singletonList("*");
+    } else {
+      qlist = Arrays.asList(query);
+    }
 
     Query q;
 
@@ -56,7 +63,7 @@ public class SearchCommand extends ClueCommand {
     
     out.println("parsed query: " + q);
 
-    int count = args.getInt("num");
+    int count = num;
 
     long start = System.currentTimeMillis();
     TopDocs td = searcher.search(q, count);

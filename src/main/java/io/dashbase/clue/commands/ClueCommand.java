@@ -1,17 +1,17 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-
 import io.dashbase.clue.ClueContext;
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine;
 
-public abstract class ClueCommand {
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.util.concurrent.Callable;
 
-  protected ClueContext ctx;
-  private ArgumentParser parser;
+public abstract class ClueCommand implements Callable<Integer> {
+
+  protected final ClueContext ctx;
+  private PrintStream out = System.out;
 
   public ClueCommand(ClueContext ctx){
     this(ctx, false);
@@ -19,31 +19,65 @@ public abstract class ClueCommand {
 
   public ClueCommand(ClueContext ctx, boolean skipRegistration){
     this.ctx = ctx;
-    if (!skipRegistration) {
-      this.ctx.registerCommand(this);
-    }
   }
 
-  public final Namespace parseArgs(String[] args) throws ArgumentParserException {
-     if (parser == null) {
-       this.parser = buildParser(ArgumentParsers.newFor(getName())
-               .build().defaultHelp(true).description(help()));
-       if (parser == null) {
-         return null;
-       }
-     }
-     return parser.parseArgs(args);
+  public final int execute(String[] args, PrintStream out) {
+    ClueCommand command = newInstance();
+    command.out = out;
+    CommandLine cmd = new CommandLine(command);
+    cmd.setCommandName(command.getName());
+    if (command.help() != null && !command.help().isEmpty()) {
+      cmd.getCommandSpec().usageMessage().description(command.help());
+    }
+    PrintWriter writer = new PrintWriter(out, true);
+    cmd.setOut(writer);
+    cmd.setErr(writer);
+    cmd.setParameterExceptionHandler((ex, argsList) -> {
+      PrintWriter err = ex.getCommandLine().getErr();
+      err.println(ex.getMessage());
+      ex.getCommandLine().usage(err);
+      return ex.getCommandLine().getCommandSpec().exitCodeOnInvalidInput();
+    });
+    cmd.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
+      ex.printStackTrace(out);
+      return commandLine.getCommandSpec().exitCodeOnExecutionException();
+    });
+    return cmd.execute(args);
   }
-  
+
   public ClueContext getContext(){
     return ctx;
   }
 
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    return null;
+  protected PrintStream getOut() {
+    return out;
   }
-  
+
+  protected ClueCommand newInstance() {
+    try {
+      Constructor<? extends ClueCommand> ctor;
+      try {
+        ctor = getClass().getConstructor(ctx.getClass());
+      } catch (NoSuchMethodException e) {
+        ctor = getClass().getConstructor(ClueContext.class);
+      }
+      return ctor.newInstance(ctx);
+    } catch (Exception e) {
+      throw new IllegalStateException("Unable to create command instance for: " + getName(), e);
+    }
+  }
+
+  @Override
+  public Integer call() throws Exception {
+    if (ctx.isReadOnlyMode() && !getClass().isAnnotationPresent(Readonly.class)) {
+      out.println("read-only mode, command: " + getName() + " is not allowed");
+      return 0;
+    }
+    run(out);
+    return 0;
+  }
+
   public abstract String getName();
   public abstract String help();
-  public abstract void execute(Namespace args, PrintStream out) throws Exception;
+  protected abstract void run(PrintStream out) throws Exception;
 }

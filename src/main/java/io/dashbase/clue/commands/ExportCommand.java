@@ -1,19 +1,18 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-import java.nio.file.FileSystems;
-
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.codecs.simpletext.SimpleTextCodec;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
 
-import io.dashbase.clue.ClueContext;
+import java.io.PrintStream;
+import java.nio.file.FileSystems;
 
 @Readonly
+@Command(name = "export", mixinStandardHelpOptions = true)
 public class ExportCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -22,6 +21,13 @@ public class ExportCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-t", "--text"}, arity = "0..1", defaultValue = "true", fallbackValue = "true",
+      description = "export to text")
+  private boolean exportToText;
+
+  @Option(names = {"-o", "--output"}, required = true, description = "output directory")
+  private String output;
 
   @Override
   public String getName() {
@@ -34,24 +40,16 @@ public class ExportCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-t", "--text").type(Boolean.class)
-            .setDefault(true).help("export to text");
-    parser.addArgument("-o", "--output").required(true).help("output directory");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    boolean isExportToText = args.getBoolean("text");
+  protected void run(PrintStream out) throws Exception {
+    boolean isExportToText = exportToText;
     if (isExportToText) {
-      System.out.println("exporting index to text");
+      out.println("exporting index to text");
     }
     else {
-      System.out.println("exporting index to binary");
+      out.println("exporting index to binary");
     }
 
-    FSDirectory fsdir = FSDirectory.open(FileSystems.getDefault().getPath(args.getString("output")));
+    FSDirectory fsdir = FSDirectory.open(FileSystems.getDefault().getPath(output));
     
     IndexWriter writer = null;
     

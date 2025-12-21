@@ -1,14 +1,13 @@
 package io.dashbase.clue.commands;
 
-import java.io.PrintStream;
-
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.IndexWriter;
 
-import io.dashbase.clue.ClueContext;
+import java.io.PrintStream;
 
+@Command(name = "merge", mixinStandardHelpOptions = true)
 public class MergeCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -17,6 +16,9 @@ public class MergeCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-n", "--num"}, defaultValue = "1")
+  private int num;
 
   @Override
   public String getName() {
@@ -29,14 +31,8 @@ public class MergeCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-n", "--num").type(Integer.class).setDefault(1);
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    int count = args.getInt("num");
+  protected void run(PrintStream out) throws Exception {
+    int count = num;
     IndexWriter writer = ctx.getIndexWriter();
     if (writer != null) {
       writer.forceMerge(count, true);

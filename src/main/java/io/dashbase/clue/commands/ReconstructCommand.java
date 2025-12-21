@@ -1,16 +1,8 @@
 package io.dashbase.clue.commands;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
-import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
@@ -21,7 +13,15 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 @Readonly
+@Command(name = "reconstruct", mixinStandardHelpOptions = true)
 public class ReconstructCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -30,6 +30,12 @@ public class ReconstructCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-f", "--field"}, required = true, description = "field name")
+  private String field;
+
+  @Option(names = {"-d", "--doc"}, required = true, description = "doc id")
+  private int doc;
 
   @Override
   public String getName() {
@@ -91,17 +97,7 @@ public class ReconstructCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-f", "--field").required(true).help("field name");
-    parser.addArgument("-d", "--doc").type(Integer.class).required(true).help("doc id");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    String field = args.getString("field");
-    
-    int doc = args.getInt("doc");
+  protected void run(PrintStream out) throws Exception {
     
     IndexReader reader = ctx.getIndexReader();
     List<LeafReaderContext> leaves = reader.leaves();

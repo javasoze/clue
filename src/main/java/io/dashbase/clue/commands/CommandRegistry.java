@@ -1,9 +1,10 @@
 package io.dashbase.clue.commands;
 
-import net.sourceforge.argparse4j.inf.Namespace;
-
-import java.io.PrintStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class CommandRegistry {
@@ -43,18 +44,8 @@ public class CommandRegistry {
     }
 
     public Optional<ClueCommand> getCommand(String cmd){
-
         ClueCommand command = cmdMap.get(cmd);
         if (command != null) {
-            if (readonly) {
-                if (!command.getClass().isAnnotationPresent(Readonly.class)) {
-                    command = new FilterCommand(command) {
-                        public void execute(Namespace args, PrintStream out) throws Exception {
-                            out.println("read-only mode, command: " + getName() + " is not allowed");
-                        }
-                    };
-                }
-            }
             return Optional.of(command);
         } else {
             return Optional.empty();

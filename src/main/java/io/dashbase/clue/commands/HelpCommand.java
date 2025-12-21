@@ -1,12 +1,13 @@
 package io.dashbase.clue.commands;
 
+import io.dashbase.clue.ClueContext;
+import picocli.CommandLine.Command;
+
 import java.io.PrintStream;
 import java.util.Collection;
 
-import io.dashbase.clue.ClueContext;
-import net.sourceforge.argparse4j.inf.Namespace;
-
 @Readonly
+@Command(name = HelpCommand.CMD_NAME, mixinStandardHelpOptions = true)
 public class HelpCommand extends ClueCommand {
 
   public static final String CMD_NAME = "help";
@@ -25,7 +26,7 @@ public class HelpCommand extends ClueCommand {
   }
 
   @Override
-  public void execute(Namespace args, PrintStream out) {
+  protected void run(PrintStream out) {
     Collection<ClueCommand> commands = ctx.getCommandRegistry().getAvailableCommands();
     
     for (ClueCommand cmd : commands){

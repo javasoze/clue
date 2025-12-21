@@ -1,14 +1,15 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.Namespace;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import org.apache.lucene.index.*;
 
 import java.io.PrintStream;
 import java.util.List;
 
 @Readonly
+@Command(name = "norm", mixinStandardHelpOptions = true)
 public class NormsCommand extends ClueCommand {
 
   private final LuceneContext ctx;
@@ -17,6 +18,15 @@ public class NormsCommand extends ClueCommand {
     super(ctx);
     this.ctx = ctx;
   }
+
+  @Option(names = {"-f", "--field"}, required = true, description = "field name")
+  private String field;
+
+  @Option(names = {"-d", "--docs"}, arity = "0..*", description = "doc ids, e.g. d1 d2 d3")
+  private int[] docs;
+
+  @Option(names = {"-n", "--num"}, defaultValue = "20", description = "num per page")
+  private int numPerPage;
 
   @Override
   public String getName() {
@@ -50,29 +60,19 @@ public class NormsCommand extends ClueCommand {
   }
 
   @Override
-  protected ArgumentParser buildParser(ArgumentParser parser) {
-    parser.addArgument("-f", "--field").required(true).help("field name");
-    parser.addArgument("-d", "--docs").type(Integer.class).nargs("*").help("doc ids, e.g. d1 d2 d3");
-    parser.addArgument("-n", "--num").type(Integer.class).setDefault(20).help("num per page");
-    return parser;
-  }
-
-  @Override
-  public void execute(Namespace args, PrintStream out) throws Exception {
-    String field = args.getString("field");
+  protected void run(PrintStream out) throws Exception {
+    String field = this.field;
     
     IndexReader reader = ctx.getIndexReader();
     
     
-    List<Integer> docidList = args.getList("docs");
-
-    int numPerPage = args.getInt("num");
+    int[] docidList = docs;
 
     List<LeafReaderContext> leaves = reader.leaves();
-    if (docidList != null && !docidList.isEmpty()) {
+    if (docidList != null && docidList.length > 0) {
       for (int i = leaves.size() - 1; i >= 0; --i) {
         LeafReaderContext ctx = leaves.get(i);
-        for (Integer docid : docidList) {
+        for (int docid : docidList) {
           if (ctx.docBase <= docid) {
             LeafReader atomicReader = ctx.reader();
             FieldInfo finfo = atomicReader.getFieldInfos().fieldInfo(field);
