@@ -64,7 +64,7 @@ public class InfoCommand extends ClueCommand {
             if (termsEnum != null) {
               BytesRef term;
               while ((term = termsEnum.next()) != null) {
-                  String termStr = term.utf8ToString();
+                  String termStr = safeTermToString(term);
                   AtomicLong count = docFreqStats.get(termStr);
                   if (count == null) {
                     count = new AtomicLong(0);
@@ -95,6 +95,14 @@ public class InfoCommand extends ClueCommand {
       out.println("doc_count:\t" + docCount);
       out.println("sum_doc_freq:\t" + sumDocFreq);
       out.println("sum_total_term_freq:\t" + sumTotalTermFreq);
+    }
+  }
+
+  private static String safeTermToString(BytesRef term) {
+    try {
+      return term.utf8ToString();
+    } catch (IndexOutOfBoundsException e) {
+      return term.toString();
     }
   }
 

@@ -108,12 +108,15 @@ public class LuceneContext extends ClueContext {
     @Override
     public void shutdown() throws Exception{
         try {
-            readerFactory.shutdown();
-        }
-        finally{
-            directory.close();
             if (writer != null) {
                 writer.close();
+                writer = null;
+            }
+        } finally {
+            try {
+                readerFactory.shutdown();
+            } finally {
+                directory.close();
             }
         }
     }
