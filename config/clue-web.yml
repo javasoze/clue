@@ -1,1 +1,3 @@
-dir: "myidx"
+clue:
+  web:
+    dir: "/Users/john/github/search-lake/luts/data/index"

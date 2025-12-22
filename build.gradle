@@ -12,8 +12,8 @@ description = 'command line client for Apache Lucene'
 
 ext {
     luceneVersion = '10.2.2'
-    dropwizardVersion = '1.3.5'
     retrofit2Version = '2.5.0'
+    micronautVersion = '5.0.0-M5'
 }
 
 repositories {
@@ -55,8 +55,6 @@ publishing {
 }
 
 dependencies {
-    implementation platform("io.dropwizard:dropwizard-bom:${dropwizardVersion}")
-
     implementation "org.apache.lucene:lucene-core:${luceneVersion}"
     implementation "org.apache.lucene:lucene-codecs:${luceneVersion}"
     implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"
@@ -65,7 +63,19 @@ dependencies {
     implementation "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     implementation "org.apache.lucene:lucene-facet:${luceneVersion}"
 
-    implementation 'io.dropwizard:dropwizard-core'
+    // https://mvnrepository.com/artifact/tools.jackson.core/jackson-databind
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.1'
+// https://mvnrepository.com/artifact/tools.jackson.dataformat/jackson-dataformat-yaml
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1'
+    annotationProcessor "io.micronaut:micronaut-inject-java:${micronautVersion}"
+    implementation "io.micronaut:micronaut-runtime:${micronautVersion}"
+    implementation "io.micronaut:micronaut-http:${micronautVersion}"
+    implementation "io.micronaut:micronaut-http-server:${micronautVersion}"
+    implementation "io.micronaut:micronaut-http-server-netty:${micronautVersion}"
+    implementation "io.micronaut:micronaut-jackson-databind:${micronautVersion}"
+    implementation "jakarta.annotation:jakarta.annotation-api:2.1.1"
+    runtimeOnly "ch.qos.logback:logback-classic:1.4.14"
+    runtimeOnly "ch.qos.logback:logback-core:1.4.14"
 
     implementation "com.squareup.retrofit2:retrofit:${retrofit2Version}"
     implementation "com.squareup.retrofit2:converter-scalars:${retrofit2Version}"

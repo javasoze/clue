@@ -75,6 +75,10 @@ public class TermsCommand extends ClueCommand {
 
     int numCount = 0;
     int numPerPage = 20;
+    int webLimit = -1;
+    if (Boolean.getBoolean("clue.web.mode")) {
+      webLimit = 100;
+    }
     
     for (LeafReaderContext leaf : leaves){
       LeafReader atomicReader = leaf.reader();
@@ -119,6 +123,7 @@ public class TermsCommand extends ClueCommand {
       }
     }
     
+    boolean truncated = false;
     while(termMap != null && !termMap.isEmpty()){
       numCount++;
       Entry<BytesRef,TermsEnum> entry = termMap.pollFirstEntry();
@@ -126,6 +131,10 @@ public class TermsCommand extends ClueCommand {
       BytesRef key = entry.getKey();
       AtomicInteger count = termCountMap.remove(key);
       out.println(bytesRefPrinter.print(key)+" (" + count + ") ");
+      if (webLimit > 0 && numCount >= webLimit) {
+        truncated = true;
+        break;
+      }
       if (ctx.isInteractiveMode() && numCount % numPerPage == 0){
           out.println("Prtess q to break");
           int ch = System.in.read();
@@ -150,6 +159,9 @@ public class TermsCommand extends ClueCommand {
         count.getAndAdd(te.docFreq());
         nextKey = te.next();
       }
+    }
+    if (truncated) {
+      out.println("truncated after " + webLimit + " terms (web mode)");
     }
     out.flush();
   }

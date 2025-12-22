@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>Clue Web Console</title>
+    <meta
+      name="description"
+      content="Clue Web Console - modern Lucene command runner"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div class="backdrop">
+      <div class="glow glow-1"></div>
+      <div class="glow glow-2"></div>
+      <div class="grid-mask"></div>
+    </div>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-dot"></span>
+          <div>
+            <div class="brand-title">Clue Web</div>
+            <div class="brand-subtitle">Lucene command studio</div>
+          </div>
+        </div>
+        <div class="status-pill" id="connection-status">Connecting...</div>
+      </header>
+
+      <main class="workspace">
+        <section class="panel library">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Command Library</div>
+              <div class="panel-subtitle">
+                Browse what the index can answer
+              </div>
+            </div>
+            <span class="badge" id="command-count">0</span>
+          </div>
+          <label class="field">
+            <span class="field-label">Filter</span>
+            <input
+              id="command-filter"
+              class="field-input"
+              type="text"
+              placeholder="search commands"
+              autocomplete="off"
+            />
+          </label>
+          <div id="command-list" class="command-list"></div>
+        </section>
+
+        <section class="panel runner">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Command Runner</div>
+              <div class="panel-subtitle">
+                Run Lucene commands against the active index
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-label">Last run</div>
+              <div class="meta-value" id="last-run">never</div>
+            </div>
+          </div>
+
+          <form id="run-form" class="runner-form">
+            <label class="field">
+              <span class="field-label">Command</span>
+              <input
+                id="command-input"
+                class="field-input"
+                type="text"
+                placeholder="search"
+                autocomplete="off"
+              />
+            </label>
+            <label class="field">
+              <span class="field-label">Arguments</span>
+              <input
+                id="args-input"
+                class="field-input"
+                type="text"
+                placeholder="-field title -count 10"
+                autocomplete="off"
+              />
+            </label>
+            <button id="run-button" class="primary-button" type="submit">
+              Run command
+            </button>
+          </form>
+
+          <div class="output-header">
+            <div>
+              <div class="panel-title">Output</div>
+              <div class="panel-subtitle">Streaming from the server</div>
+            </div>
+            <button id="copy-output" class="ghost-button" type="button">
+              Copy output
+            </button>
+          </div>
+          <pre id="output" class="output">Waiting for a command...</pre>
+
+          <div class="history">
+            <div class="panel-title">Recent commands</div>
+            <div id="history-list" class="history-list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -3,50 +3,57 @@ package io.dashbase.clue.server;
 import io.dashbase.clue.ClueApplication;
 import io.dashbase.clue.ClueContext;
 import io.dashbase.clue.util.CommandLineParser;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.QueryValue;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Set;
 
-@Path("/clue")
+@Controller("/clue")
 public class ClueCommandResource {
     private final ClueContext ctx;
-    public ClueCommandResource(ClueContext ctx) {
-        this.ctx = ctx;
+
+    public ClueCommandResource(ClueWebContext ctxProvider) {
+        this.ctx = ctxProvider.context();
     }
 
     static String[] buildArgs(String param) {
         return CommandLineParser.splitArgs(param);
     }
 
-    @GET
-    @Path("commands")
-    @Produces({MediaType.APPLICATION_JSON})
+    @Get("/commands")
+    @Produces(MediaType.APPLICATION_JSON)
     public Collection<String> commands() {
         Set<String> registeredCommands = ctx.getCommandRegistry().commandNames();
         return registeredCommands;
     }
 
-    @GET
-    @Path("command/{cmd}")
-    public Response command(@PathParam("cmd") String cmd, @DefaultValue("") @QueryParam("args") String args) throws Exception {
+    @Get("/command/{cmd}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public HttpResponse<String> command(@PathVariable String cmd,
+                                        @QueryValue(defaultValue = "") String args) throws Exception {
         boolean cmdFound = ctx.getCommand(cmd).isPresent();
         final String[] commandArgs = buildArgs(args);
-        int status = cmdFound ? 200 : 404;
+        HttpStatus status = cmdFound ? HttpStatus.OK : HttpStatus.NOT_FOUND;
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try (PrintStream ps = new PrintStream(buffer)) {
             int code = ClueApplication.handleCommand(ctx, cmd, commandArgs, ps);
             if (cmdFound && code != 0) {
-                status = 500;
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
             }
         }
-        return Response.status(status)
-                .type(MediaType.TEXT_PLAIN)
-                .entity(buffer.toString())
-                .build();
+        String output = new String(buffer.toByteArray(), StandardCharsets.UTF_8);
+        return HttpResponse.status(status)
+                .contentType(MediaType.TEXT_PLAIN_TYPE)
+                .body(output);
     }
 }
