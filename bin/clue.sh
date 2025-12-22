@@ -9,6 +9,7 @@ HEAP_OPTS="-Xmx1g -Xms1g -XX:NewSize=256m"
 #JAVA_DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y"
 
 MAIN_CLASS="io.dashbase.clue.ClueApplication"
+
 DIR_PROVIDER=""
 ARGS=()
 while [[ $# -gt 0 ]]; do
