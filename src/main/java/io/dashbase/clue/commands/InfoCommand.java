@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
+import io.dashbase.clue.api.BytesRefPrinter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import org.apache.lucene.index.*;
@@ -99,11 +100,7 @@ public class InfoCommand extends ClueCommand {
   }
 
   private static String safeTermToString(BytesRef term) {
-    try {
-      return term.utf8ToString();
-    } catch (IndexOutOfBoundsException e) {
-      return term.toString();
-    }
+    return BytesRefPrinter.toUtf8String(term);
   }
 
   @Override

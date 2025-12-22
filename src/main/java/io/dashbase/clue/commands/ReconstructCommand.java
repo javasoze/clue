@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
+import io.dashbase.clue.api.BytesRefPrinter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import org.apache.lucene.index.FieldInfo;
@@ -63,7 +64,7 @@ public class ReconstructCommand extends ClueCommand {
             textList = new ArrayList<String>();
             docTextMap.put(pos, textList);
           }
-          textList.add(text.utf8ToString());
+          textList.add(BytesRefPrinter.toUtf8String(text));
         }
       }
     }
@@ -86,7 +87,7 @@ public class ReconstructCommand extends ClueCommand {
       postings = te.postings(postings, PostingsEnum.FREQS);
       int iterDoc = postings.advance(docid);
       if (iterDoc == docid) {
-        textList.add(text.utf8ToString());
+        textList.add(BytesRefPrinter.toUtf8String(text));
       }
     }
     StringBuilder buf = new StringBuilder();
