@@ -2,11 +2,6 @@ package io.dashbase.clue.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jline.console.ConsoleReader;
-import jline.console.completer.ArgumentCompleter;
-import jline.console.completer.Completer;
-import jline.console.completer.FileNameCompleter;
-import jline.console.completer.StringsCompleter;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -21,10 +16,8 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -39,13 +32,15 @@ public class ClueCommandClient {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         if ("https".equals(url.getProtocol())) {
-            try {
-                setSslSocketFactory(okHttpClientBuilder);
-            } catch(Exception e) {
-                throw new IllegalStateException("cannot create ssl connection: " + e);
+            String insecureFlag = System.getProperty("clue.insecure.ssl");
+            if ("true".equalsIgnoreCase(insecureFlag)) {
+                try {
+                    setSslSocketFactory(okHttpClientBuilder);
+                } catch (Exception e) {
+                    throw new IllegalStateException("cannot create ssl connection: " + e);
+                }
             }
         }
-
         final OkHttpClient okHttpClient = okHttpClientBuilder.readTimeout(10, TimeUnit.SECONDS)
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .build();
@@ -116,13 +111,27 @@ public class ClueCommandClient {
 
     public void handleCommand(String cmdName, String[] args, PrintStream out) {
         try {
-            String argString = CmdlineHelper.toString(Arrays.asList(args));
+            String argString = io.dashbase.clue.util.CommandLineParser.joinArgs(args);
             Call<ResponseBody> call = svc.command(cmdName, argString);
 
             Response<ResponseBody> response = call.execute();
-            try (ResponseBody responseBody = response.body()) {
-                InputStream is = responseBody.byteStream();
-                is.transferTo(System.out);
+            if (!response.isSuccessful()) {
+                try (ResponseBody errorBody = response.errorBody()) {
+                    out.println("request failed: " + response.code() + " " + response.message());
+                    if (errorBody != null) {
+                        out.println(errorBody.string());
+                    }
+                }
+                return;
+            }
+            ResponseBody responseBody = response.body();
+            if (responseBody == null) {
+                out.println("request failed: empty response body");
+                return;
+            }
+            try (ResponseBody body = responseBody) {
+                InputStream is = body.byteStream();
+                is.transferTo(out);
             }
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -139,20 +148,6 @@ public class ClueCommandClient {
     }
 
     public void run() throws Exception {
-        ConsoleReader consoleReader = new ConsoleReader();
-        consoleReader.setBellEnabled(false);
-
-        Collection<String> commands = getCommands();
-
-        LinkedList<Completer> completors = new LinkedList<Completer>();
-        completors.add(new StringsCompleter(commands));
-
-        completors.add(new FileNameCompleter());
-
-        consoleReader.addCompleter(new ArgumentCompleter(completors));
-
-
-
         while(true){
             String line = readCommand();
             if (line == null || line.isEmpty()) continue;
@@ -160,7 +155,7 @@ public class ClueCommandClient {
             if ("exit".equals(line)) {
                 System.exit(0);
             }
-            String[] parts = line.split("\\s");
+            String[] parts = io.dashbase.clue.util.CommandLineParser.splitArgs(line);
             if (parts.length > 0){
                 String cmd = parts[0];
                 String[] cmdArgs = new String[parts.length - 1];
