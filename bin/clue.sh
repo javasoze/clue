@@ -4,6 +4,7 @@ bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
 
 lib=$bin/../build/libs
+plugins_dir=$bin/../plugins
 
 HEAP_OPTS="-Xmx1g -Xms1g -XX:NewSize=256m"
 #JAVA_DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y"
@@ -43,4 +44,9 @@ if [[ -n "$DIR_PROVIDER" ]]; then
   EXTRA_JAVA_OPTS="-Dclue.dir.provider=$DIR_PROVIDER"
 fi
 
-(cd $bin/..; java $JAVA_OPTS $JAVA_DEBUG $HEAP_OPTS $EXTRA_JAVA_OPTS -classpath "$lib/*" $MAIN_CLASS "${ARGS[@]}")
+CLASSPATH="$lib/*"
+if [[ -d "$plugins_dir" ]]; then
+  CLASSPATH="$CLASSPATH:$plugins_dir/*"
+fi
+
+(cd $bin/..; java $JAVA_OPTS $JAVA_DEBUG $HEAP_OPTS $EXTRA_JAVA_OPTS -classpath "$CLASSPATH" $MAIN_CLASS "${ARGS[@]}")
