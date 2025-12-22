@@ -1,9 +1,11 @@
-# This workflow will build a package using Gradle and then publish it to GitHub Packages when a release is created.
+# This workflow will build a package using Gradle and publish snapshots on master updates or releases on release creation.
 # For more information see: https://github.com/actions/setup-java#gradle-builds
 
 name: Gradle Package
 
 on:
+  push:
+    branches: [master]
   release:
     types: [created]
 
@@ -11,6 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      CLUE_SNAPSHOT: ${{ github.event_name == 'push' }}
 
     steps:
     - uses: actions/checkout@v4
@@ -24,7 +28,15 @@ jobs:
     - name: Build with Gradle
       run: gradle build
 
-    - name: Publish to GitHub Packages
+    - name: Publish snapshot to GitHub Packages
+      if: github.event_name == 'push'
+      run: gradle publish
+      env:
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Publish release to GitHub Packages
+      if: github.event_name == 'release'
       run: gradle publish
       env:
         GITHUB_ACTOR: ${{ github.actor }}
