@@ -1,3 +1,16 @@
 # default config
 queryBuilder:
   type: default
+
+dirBuilder:
+  type: default
+  provider: block
+  options:
+    threads: "4"
+    region: "us-east1"
+    endpoint: "http://localhost:6666/"
+    accessKey: "admin"
+    secretKey: "password"
+    cacheDir: "/tmp"
+    bucket: "poc-data"
+    indexPath: "/"

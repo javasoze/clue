@@ -1,1 +1,2 @@
 io.dashbase.clue.api.FsDirectoryProvider
+io.dashbase.clue.api.BlockDirectoryProvider
