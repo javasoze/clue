@@ -9,9 +9,12 @@ public interface BytesRefPrinter {
 
     @Override
     public String print(BytesRef bytesRef) {
-      return bytesRef.utf8ToString();
+        try {
+            return bytesRef.utf8ToString();
+        } catch (Exception e) {
+            return bytesRef.toString();
+        }
     }
-    
   };
   
   public static BytesRefPrinter RawBytesPrinter = new BytesRefPrinter() {
