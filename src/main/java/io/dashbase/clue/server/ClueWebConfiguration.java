@@ -1,12 +1,16 @@
 package io.dashbase.clue.server;
 
-import io.dashbase.clue.ClueAppConfiguration;
-import io.dropwizard.Configuration;
+import io.micronaut.context.annotation.ConfigurationProperties;
 
-import javax.validation.constraints.NotNull;
+@ConfigurationProperties("clue.web")
+public class ClueWebConfiguration {
+    private String dir;
 
-public class ClueWebConfiguration extends Configuration {
-    @NotNull
-    public String dir = null;
-    public ClueAppConfiguration clue = new ClueAppConfiguration();
+    public String getDir() {
+        return dir;
+    }
+
+    public void setDir(String dir) {
+        this.dir = dir;
+    }
 }

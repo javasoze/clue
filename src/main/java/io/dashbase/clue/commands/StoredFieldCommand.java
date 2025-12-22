@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
+import io.dashbase.clue.api.BytesRefPrinter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import org.apache.lucene.document.Document;
@@ -82,7 +83,7 @@ public class StoredFieldCommand extends ClueCommand {
 
         BytesRef bytesRef = storedData.getBinaryValue(field);
         if (bytesRef != null) {
-          out.println(bytesRef);
+          out.println(formatBytesRef(bytesRef));
           found = true;
           break;
         }
@@ -94,7 +95,7 @@ public class StoredFieldCommand extends ClueCommand {
         }
 
         for (BytesRef data : dataArray) {
-          out.println(data);
+          out.println(formatBytesRef(data));
         }
         found = true;
         break;
@@ -110,6 +111,10 @@ public class StoredFieldCommand extends ClueCommand {
       out.println(doc+" not found");
       return;
     }
+  }
+
+  private static String formatBytesRef(BytesRef bytesRef) {
+    return BytesRefPrinter.toUtf8String(bytesRef);
   }
 
 }

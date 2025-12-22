@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
+import io.dashbase.clue.api.BytesRefPrinter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import org.apache.lucene.index.*;
@@ -63,7 +64,7 @@ public class DocValCommand extends ClueCommand {
         BinaryDocValues bv = (BinaryDocValues)docVals;
         if (bv.advanceExact(subid)) {
           bytesRef = bv.binaryValue();
-          val = bytesRef.utf8ToString();
+          val = BytesRefPrinter.toUtf8String(bytesRef);
         }
         break;
       case SORTED: {
@@ -75,7 +76,7 @@ public class DocValCommand extends ClueCommand {
           sb.append("value: [");
           if (val_count > 0) {
             bytesRef = sv.lookupOrd(0);
-            sb.append(bytesRef.utf8ToString());
+            sb.append(BytesRefPrinter.toUtf8String(bytesRef));
           }
           sb.append("]");
           val = sb.toString();
@@ -97,7 +98,7 @@ public class DocValCommand extends ClueCommand {
             if (!firstPass) {
               sb.append(", ");
             }
-            sb.append(bytesRef.utf8ToString());
+            sb.append(BytesRefPrinter.toUtf8String(bytesRef));
             firstPass = false;
           }
           sb.append("]");

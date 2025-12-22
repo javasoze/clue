@@ -1,0 +1,8 @@
+micronaut:
+  application:
+    name: clue-web
+  router:
+    static-resources:
+      default:
+        paths: classpath:public
+        mapping: "/**"

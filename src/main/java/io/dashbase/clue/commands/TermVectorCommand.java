@@ -1,6 +1,7 @@
 package io.dashbase.clue.commands;
 
 import io.dashbase.clue.LuceneContext;
+import io.dashbase.clue.api.BytesRefPrinter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import org.apache.lucene.index.*;
@@ -63,7 +64,7 @@ public class TermVectorCommand extends ClueCommand {
         
         while ((text = te.next()) != null) {
           long tf = te.totalTermFreq();
-          out.println(text.utf8ToString()+" ("+tf+")");
+          out.println(BytesRefPrinter.toUtf8String(text) + " (" + tf + ")");
         }
         found = true;
         break;

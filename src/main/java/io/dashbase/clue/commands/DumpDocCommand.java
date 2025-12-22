@@ -2,6 +2,7 @@ package io.dashbase.clue.commands;
 
 
 import io.dashbase.clue.LuceneContext;
+import io.dashbase.clue.api.BytesRefPrinter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import org.apache.lucene.document.Document;
@@ -75,7 +76,8 @@ public class DumpDocCommand extends ClueCommand {
 
                     final BytesRef bytesRef = indexableField.binaryValue();
                     if (bytesRef != null) {
-                        out.println(bytesRef);
+                        out.println(BytesRefPrinter.toUtf8String(bytesRef));
+                        continue;
                     }
 
                     out.println("<unsupported value type>");
