@@ -5,7 +5,9 @@ plugins {
 }
 
 group = 'io.dashbase.clue'
-version = '1.0.0-10.2.2'
+def baseVersion = '1.0.0-10.2.2'
+def isSnapshot = (project.findProperty('snapshot') ?: System.getenv('CLUE_SNAPSHOT'))?.toString()?.toBoolean()
+version = isSnapshot ? "${baseVersion}-SNAPSHOT" : baseVersion
 description = 'command line client for Apache Lucene'
 
 ext {
