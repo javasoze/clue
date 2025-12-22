@@ -270,7 +270,32 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   margin: 18px 0 12px;
+}
+
+.output-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.toggle input {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
 }
 
 .ghost-button {
@@ -299,6 +324,35 @@ body {
   line-height: 1.55;
   overflow-x: auto;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
+}
+
+.output.wrapped {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.output.json {
+  white-space: pre-wrap;
+}
+
+.json-key {
+  color: #f7b267;
+}
+
+.json-string {
+  color: #8fd3b7;
+}
+
+.json-number {
+  color: #f08c6b;
+}
+
+.json-boolean {
+  color: #9db6ff;
+}
+
+.json-null {
+  color: #cdb4db;
 }
 
 .meta {

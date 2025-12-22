@@ -10,10 +10,13 @@ const commandCount = document.getElementById("command-count");
 const lastRun = document.getElementById("last-run");
 const historyList = document.getElementById("history-list");
 const copyButton = document.getElementById("copy-output");
+const wrapToggle = document.getElementById("wrap-toggle");
+const jsonToggle = document.getElementById("json-toggle");
 
 const state = {
   commands: [],
   history: [],
+  lastOutputText: "Waiting for a command...",
 };
 
 function setStatus(stateName, text) {
@@ -66,6 +69,53 @@ function renderHistory() {
   });
 }
 
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function highlightJson(jsonText) {
+  const escaped = escapeHtml(jsonText);
+  return escaped.replace(
+    /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+    (match) => {
+      let cls = "json-number";
+      if (match.startsWith('"')) {
+        cls = match.endsWith(":") ? "json-key" : "json-string";
+      } else if (match === "true" || match === "false") {
+        cls = "json-boolean";
+      } else if (match === "null") {
+        cls = "json-null";
+      }
+      return `<span class="${cls}">${match}</span>`;
+    }
+  );
+}
+
+function renderOutput() {
+  const text = state.lastOutputText || "";
+  output.classList.remove("json");
+
+  if (jsonToggle.checked) {
+    try {
+      const parsed = JSON.parse(text);
+      const pretty = JSON.stringify(parsed, null, 2);
+      output.classList.add("json");
+      output.classList.add("wrapped");
+      output.innerHTML = highlightJson(pretty);
+      return;
+    } catch (err) {
+      jsonToggle.checked = false;
+      wrapToggle.checked = true;
+    }
+  }
+
+  output.classList.toggle("wrapped", wrapToggle.checked);
+  output.textContent = text;
+}
+
 function updateLastRun() {
   const now = new Date();
   lastRun.textContent = now.toLocaleTimeString([], {
@@ -96,7 +146,8 @@ async function loadCommands() {
     setStatus("ok", "Ready to run");
   } catch (err) {
     setStatus("error", "API unavailable");
-    output.textContent = `Unable to reach /clue/commands.\n${err.message}`;
+    state.lastOutputText = `Unable to reach /clue/commands.\n${err.message}`;
+    renderOutput();
   }
 }
 
@@ -112,16 +163,19 @@ async function runCommand() {
   const command = commandInput.value.trim();
   const args = argsInput.value.trim();
   if (!command) {
-    output.textContent = "Pick a command from the list or type one.";
+    state.lastOutputText = "Pick a command from the list or type one.";
+    renderOutput();
     return;
   }
   runButton.disabled = true;
-  output.textContent = "Running...";
+  state.lastOutputText = "Running...";
+  renderOutput();
   try {
     const url = `/clue/command/${encodeURIComponent(command)}?args=${encodeURIComponent(args)}`;
     const res = await fetch(url);
     const text = await res.text();
-    output.textContent = text || "(no output)";
+    state.lastOutputText = text || "(no output)";
+    renderOutput();
     updateLastRun();
     addHistory(command, args);
     if (res.ok) {
@@ -132,7 +186,8 @@ async function runCommand() {
       setStatus("error", "Command failed");
     }
   } catch (err) {
-    output.textContent = `Failed to run command.\n${err.message}`;
+    state.lastOutputText = `Failed to run command.\n${err.message}`;
+    renderOutput();
     setStatus("error", "Network error");
   } finally {
     runButton.disabled = false;
@@ -141,20 +196,24 @@ async function runCommand() {
 
 copyButton.addEventListener("click", async () => {
   try {
-    await navigator.clipboard.writeText(output.textContent);
+    await navigator.clipboard.writeText(state.lastOutputText || "");
     copyButton.textContent = "Copied!";
     setTimeout(() => {
       copyButton.textContent = "Copy output";
     }, 1200);
   } catch (err) {
-    output.textContent += "\nCopy failed.";
+    state.lastOutputText = `${state.lastOutputText}\nCopy failed.`;
+    renderOutput();
   }
 });
 
+wrapToggle.addEventListener("change", renderOutput);
+jsonToggle.addEventListener("change", renderOutput);
 commandFilter.addEventListener("input", filterCommands);
 runForm.addEventListener("submit", (event) => {
   event.preventDefault();
   runCommand();
 });
 
+renderOutput();
 loadCommands();
