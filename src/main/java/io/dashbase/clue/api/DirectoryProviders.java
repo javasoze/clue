@@ -40,7 +40,13 @@ public final class DirectoryProviders {
         System.err.println("Failed to load directory provider: " + e.getMessage());
         continue;
       }
-      String name = provider.getName();
+      String name;
+      try {
+        name = provider.getName();
+      } catch (RuntimeException e) {
+        System.err.println("Skipping DirectoryProvider with failing name: " + provider.getClass().getName());
+        continue;
+      }
       if (name == null || name.isBlank()) {
         System.err.println("Skipping DirectoryProvider with empty name: " + provider.getClass().getName());
         continue;

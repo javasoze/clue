@@ -22,6 +22,7 @@ public final class CommandPlugins {
 
   public static void registerAll(ClueContext ctx) {
     for (CommandPlugin plugin : PLUGINS.values()) {
+      String pluginName = pluginName(plugin);
       try {
         Collection<ClueCommand> commands = plugin.createCommands(ctx);
         if (commands == null || commands.isEmpty()) {
@@ -31,10 +32,14 @@ public final class CommandPlugins {
           if (command == null) {
             continue;
           }
-          ctx.registerCommand(command);
+          try {
+            ctx.registerCommand(command);
+          } catch (RuntimeException e) {
+            System.err.println("Skipping command from plugin '" + pluginName + "': " + e.getMessage());
+          }
         }
       } catch (RuntimeException e) {
-        System.err.println("Failed to register commands from plugin '" + plugin.getName() + "': " + e.getMessage());
+        System.err.println("Failed to register commands from plugin '" + pluginName + "': " + e.getMessage());
       }
     }
   }
@@ -51,7 +56,13 @@ public final class CommandPlugins {
         System.err.println("Failed to load command plugin: " + e.getMessage());
         continue;
       }
-      String name = plugin.getName();
+      String name;
+      try {
+        name = plugin.getName();
+      } catch (RuntimeException e) {
+        System.err.println("Skipping CommandPlugin with failing name: " + plugin.getClass().getName());
+        continue;
+      }
       if (name == null || name.isBlank()) {
         System.err.println("Skipping CommandPlugin with empty name: " + plugin.getClass().getName());
         continue;
@@ -63,5 +74,17 @@ public final class CommandPlugins {
       plugins.put(name, plugin);
     }
     return Collections.unmodifiableMap(plugins);
+  }
+
+  private static String pluginName(CommandPlugin plugin) {
+    try {
+      String name = plugin.getName();
+      if (name == null || name.isBlank()) {
+        return plugin.getClass().getName();
+      }
+      return name;
+    } catch (RuntimeException e) {
+      return plugin.getClass().getName();
+    }
   }
 }

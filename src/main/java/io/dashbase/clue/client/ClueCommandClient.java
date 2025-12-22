@@ -120,9 +120,23 @@ public class ClueCommandClient {
             Call<ResponseBody> call = svc.command(cmdName, argString);
 
             Response<ResponseBody> response = call.execute();
-            try (ResponseBody responseBody = response.body()) {
-                InputStream is = responseBody.byteStream();
-                is.transferTo(System.out);
+            if (!response.isSuccessful()) {
+                try (ResponseBody errorBody = response.errorBody()) {
+                    out.println("request failed: " + response.code() + " " + response.message());
+                    if (errorBody != null) {
+                        out.println(errorBody.string());
+                    }
+                }
+                return;
+            }
+            ResponseBody responseBody = response.body();
+            if (responseBody == null) {
+                out.println("request failed: empty response body");
+                return;
+            }
+            try (ResponseBody body = responseBody) {
+                InputStream is = body.byteStream();
+                is.transferTo(out);
             }
         } catch (Exception e) {
             e.printStackTrace(out);

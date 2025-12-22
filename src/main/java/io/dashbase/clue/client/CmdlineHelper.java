@@ -5,7 +5,6 @@ import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
-import jline.console.completer.StringsCompleter;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
@@ -24,15 +23,14 @@ public class CmdlineHelper {
         consoleReader = new ConsoleReader();
         consoleReader.setBellEnabled(false);
 
-        Collection<String> commands = commandNameSupplier != null
-                ? commandNameSupplier.get() : Collections.emptyList();
-
-        Collection<String> fields = fieldNameSupplier != null
-                ? fieldNameSupplier.get() : Collections.emptyList();
+        Supplier<Collection<String>> commandSupplier = commandNameSupplier != null
+                ? commandNameSupplier : Collections::emptyList;
+        Supplier<Collection<String>> fieldSupplier = fieldNameSupplier != null
+                ? fieldNameSupplier : Collections::emptyList;
 
         LinkedList<Completer> completors = new LinkedList<Completer>();
-        completors.add(new StringsCompleter(commands));
-        completors.add(new StringsCompleter(fields));
+        completors.add(new DynamicStringsCompleter(commandSupplier));
+        completors.add(new DynamicStringsCompleter(fieldSupplier));
         completors.add(new FileNameCompleter());
         consoleReader.addCompleter(new ArgumentCompleter(completors));
     }
@@ -64,5 +62,28 @@ public class CmdlineHelper {
             q = queryBuilder.build(qstring);
         }
         return q;
+    }
+
+    private static final class DynamicStringsCompleter implements Completer {
+        private final Supplier<Collection<String>> valuesSupplier;
+
+        private DynamicStringsCompleter(Supplier<Collection<String>> valuesSupplier) {
+            this.valuesSupplier = valuesSupplier;
+        }
+
+        @Override
+        public int complete(String buffer, int cursor, List<CharSequence> candidates) {
+            String prefix = buffer == null ? "" : buffer;
+            Collection<String> values = valuesSupplier.get();
+            if (values == null || values.isEmpty()) {
+                return -1;
+            }
+            for (String value : values) {
+                if (value != null && value.startsWith(prefix)) {
+                    candidates.add(value);
+                }
+            }
+            return candidates.isEmpty() ? -1 : 0;
+        }
     }
 }
