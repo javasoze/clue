@@ -45,7 +45,8 @@ public class IndexTrimCommand extends ClueCommand {
     int trimPercent = percent;
     
     if (trimPercent < 0 || trimPercent > 100) {
-      throw new IllegalArgumentException("invalid percent: " + trimPercent);
+      out.println("invalid percent: " + trimPercent);
+      return;
     }
     
     IndexWriter writer = ctx.getIndexWriter();    

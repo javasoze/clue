@@ -49,20 +49,28 @@ public class ClueApplication {
     }
   }
   
-  public static void handleCommand(ClueContext ctx, String cmdName, String[] args, PrintStream out){
+  public static int handleCommand(ClueContext ctx, String cmdName, String[] args, PrintStream out){
     Optional<ClueCommand> helpCommand = ctx.getCommand(HelpCommand.CMD_NAME);
     Optional<ClueCommand> cmd = ctx.getCommand(cmdName);
+    boolean unknown = false;
     if (!cmd.isPresent()){
       out.println(cmdName+" is not supported:");
       cmd = helpCommand;
+      unknown = true;
     }
 
+    if (!cmd.isPresent()) {
+      out.println("help command not available");
+      return 1;
+    }
     ClueCommand clueCommand = cmd.get();
     try{
-      clueCommand.execute(args, out);
+      int code = clueCommand.execute(args, out);
+      return unknown && code == 0 ? 1 : code;
     }
     catch(Exception e){
       e.printStackTrace(out);
+      return 1;
     }
   }
 
@@ -70,7 +78,10 @@ public class ClueApplication {
     CmdlineHelper helper = new CmdlineHelper(new Supplier<Collection<String>>() {
       @Override
       public Collection<String> get() {
-        return ctx.getCommandRegistry().commandNames();
+        return ctx.getCommandRegistry().getAvailableCommands()
+            .stream()
+            .map(ClueCommand::getName)
+            .toList();
       }
     }, new Supplier<Collection<String>>() {
       @Override
@@ -121,8 +132,12 @@ public class ClueApplication {
           cmdArgs = new String[args.length - 3];
           System.arraycopy(args, 3, cmdArgs, 0, cmdArgs.length);
           app.ctx.setReadOnlyMode(true);
-          app.handleCommand(app.ctx, cmd, cmdArgs, System.out);
+          int code = app.handleCommand(app.ctx, cmd, cmdArgs, System.out);
           app.shutdown();
+          System.exit(code);
+        } else {
+          System.err.println("usage: <index location> readonly <command> <command args>");
+          System.exit(1);
         }
       }
       else {
@@ -130,8 +145,9 @@ public class ClueApplication {
         String[] cmdArgs;
         cmdArgs = new String[args.length - 2];
         System.arraycopy(args, 2, cmdArgs, 0, cmdArgs.length);
-        app.handleCommand(app.ctx, cmd, cmdArgs, System.out);
+        int code = app.handleCommand(app.ctx, cmd, cmdArgs, System.out);
         app.shutdown();
+        System.exit(code);
       }
       return;
     }

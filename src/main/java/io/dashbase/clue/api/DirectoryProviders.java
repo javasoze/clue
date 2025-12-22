@@ -1,8 +1,10 @@
 package io.dashbase.clue.api;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
 public final class DirectoryProviders {
@@ -29,13 +31,23 @@ public final class DirectoryProviders {
   private static Map<String, DirectoryProvider> loadProviders() {
     Map<String, DirectoryProvider> providers = new LinkedHashMap<>();
     ServiceLoader<DirectoryProvider> loader = ServiceLoader.load(DirectoryProvider.class);
-    for (DirectoryProvider provider : loader) {
+    Iterator<DirectoryProvider> iterator = loader.iterator();
+    while (iterator.hasNext()) {
+      DirectoryProvider provider;
+      try {
+        provider = iterator.next();
+      } catch (ServiceConfigurationError e) {
+        System.err.println("Failed to load directory provider: " + e.getMessage());
+        continue;
+      }
       String name = provider.getName();
       if (name == null || name.isBlank()) {
-        throw new IllegalStateException("DirectoryProvider has empty name: " + provider.getClass().getName());
+        System.err.println("Skipping DirectoryProvider with empty name: " + provider.getClass().getName());
+        continue;
       }
       if (providers.containsKey(name)) {
-        throw new IllegalStateException("Duplicate DirectoryProvider name: " + name);
+        System.err.println("Skipping duplicate DirectoryProvider name: " + name);
+        continue;
       }
       providers.put(name, provider);
     }

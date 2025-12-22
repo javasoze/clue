@@ -71,7 +71,7 @@ public abstract class ClueCommand implements Callable<Integer> {
   public Integer call() throws Exception {
     if (ctx.isReadOnlyMode() && !getClass().isAnnotationPresent(Readonly.class)) {
       out.println("read-only mode, command: " + getName() + " is not allowed");
-      return 0;
+      return 1;
     }
     run(out);
     return 0;
