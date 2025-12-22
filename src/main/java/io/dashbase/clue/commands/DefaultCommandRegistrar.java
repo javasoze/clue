@@ -32,6 +32,7 @@ public class DefaultCommandRegistrar implements CommandRegistrar {
         register(clueCtx, new DeleteUserCommitData(ctx));
         register(clueCtx, new DumpDocCommand(ctx));
         register(clueCtx, new PointsCommand(ctx));
+        CommandPlugins.registerAll(clueCtx);
     }
 
     private void register(ClueContext ctx, ClueCommand command) {

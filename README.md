@@ -77,6 +77,117 @@ Command list:
 	trim - trims the index, <TRIM PERCENTAGE> <OPTIONS>, options are: head, tail, random
 	tv - shows term vector of a field for a doc
 ```
+
+### Directory Provider Plugins (ServiceLoader)
+
+Clue loads directory providers via the Java ServiceLoader framework. This lets you add custom Lucene Directory implementations without changing Clue itself.
+
+Usage:
+
+    ./bin/clue.sh --dir-provider fs my-idx info
+
+If not set, the provider defaults to `fs`.
+
+Configure in `config/clue.yml`:
+
+```yaml
+dirBuilder:
+  type: default
+  provider: fs
+  options:
+    key: value
+```
+
+Implement a provider:
+
+```java
+public class MyDirectoryProvider implements DirectoryProvider {
+  @Override
+  public String getName() {
+    return "my-provider";
+  }
+
+  @Override
+  public Directory build(String location, Map<String, String> options) throws IOException {
+    // Create and return your Directory implementation here.
+  }
+}
+```
+
+Register it in your plugin jar:
+
+```
+META-INF/services/io.dashbase.clue.api.DirectoryProvider
+```
+
+with contents:
+
+```
+com.example.MyDirectoryProvider
+```
+
+Place your plugin jar on the classpath (for example, copy it into `build/libs`).
+
+### Command Plugins (ServiceLoader)
+
+Command plugins are discovered via ServiceLoader and are registered at startup. Any command you return is available via `help` and can be invoked like built-in commands.
+
+Implement a plugin:
+
+```java
+public class MyCommandPlugin implements CommandPlugin {
+  @Override
+  public String getName() {
+    return "my-plugin";
+  }
+
+  @Override
+  public Collection<ClueCommand> createCommands(ClueContext ctx) {
+    return Collections.singletonList(new HelloCommand(ctx));
+  }
+}
+```
+
+Implement a command:
+
+```java
+@Readonly
+@Command(name = "hello", mixinStandardHelpOptions = true)
+public class HelloCommand extends ClueCommand {
+  public HelloCommand(ClueContext ctx) {
+    super(ctx);
+  }
+
+  @Override
+  public String getName() {
+    return "hello";
+  }
+
+  @Override
+  public String help() {
+    return "prints a greeting";
+  }
+
+  @Override
+  protected void run(PrintStream out) {
+    out.println("hello from plugin");
+  }
+}
+```
+
+Register it in your plugin jar:
+
+```
+META-INF/services/io.dashbase.clue.commands.CommandPlugin
+```
+
+with contents:
+
+```
+com.example.MyCommandPlugin
+```
+
+Place your plugin jar on the classpath (for example, copy it into `build/libs`). Use `@Readonly` if you want the command to appear while in read-only mode.
 	
 ### Build a sample index to play with:
 
