@@ -83,6 +83,10 @@ public class CmdlineHelper {
                     candidates.add(value);
                 }
             }
+            if (candidates.size() == 1) {
+                String value = candidates.get(0).toString();
+                candidates.set(0, value + " ");
+            }
             return candidates.isEmpty() ? -1 : 0;
         }
     }

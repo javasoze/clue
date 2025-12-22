@@ -78,6 +78,100 @@ Command list:
 	tv - shows term vector of a field for a doc
 ```
 
+### Command Reference
+
+All commands support `-h`/`--help` for detailed usage.
+
+```
+count
+  -q, --query <query...>          Optional. Defaults to "*" (match all).
+
+delete
+  -q, --query <query>             Required.
+
+directory
+  (no options)
+
+docsetinfo
+  -f, --field <field:term>        Required.
+  -s, --size <bucketSize>         Optional. Default: 1000.
+
+docval
+  -f, --field <field>             Required.
+  -d, --docs <docIds...>          Optional. If omitted, all docs are shown.
+  -n, --num <numPerPage>          Optional. Default: 20.
+
+dumpdoc
+  -d, --doc <docId>               Required.
+
+explain
+  -q, --query <query...>          Required.
+  -d, --docs <docIds...>          Required.
+
+export
+  -o, --output <dir>              Required.
+  -t, --text [true|false]         Optional. Default: true.
+
+help
+  (no options)
+
+info
+  -s, --seg <segmentId>           Optional. Default: -1 (summary view).
+
+merge
+  -n, --num <segments>            Optional. Default: 1.
+
+norm
+  -f, --field <field>             Required.
+  -d, --docs <docIds...>          Optional. If omitted, all docs are shown.
+  -n, --num <numPerPage>          Optional. Default: 20.
+
+points
+  -f, --field <field:value>       Required.
+
+postings
+  -f, --field <field:term>        Required.
+  -n, --num <numPerPage>          Optional. Default: 20.
+
+readonly
+  readonly <true|false>           Required positional argument.
+
+reconstruct
+  -f, --field <field>             Required.
+  -d, --doc <docId>               Required.
+
+search
+  -q, --query <query...>          Optional. Defaults to "*" (match all).
+  -n, --num <numHits>             Optional. Default: 10.
+
+showcommitdata
+  (no options)
+
+savecommitdata
+  -k, --key <key>                 Required.
+  -v, --value <value>             Required.
+
+deletecommitdata
+  -k, --key <key>                 Required.
+
+stored
+  -f, --field <field>             Required.
+  -d, --doc <docId>               Required.
+
+terms
+  -f, --field <field[:term|prefix*]> Required.
+
+trim
+  -p, --percent <0-100>           Required.
+
+tv
+  -f, --field <field>             Required.
+  -d, --doc <docId>               Required.
+
+exit (interactive mode only)
+  (no options)
+```
+
 ### Directory Provider Plugins (ServiceLoader)
 
 Clue loads directory providers via the Java ServiceLoader framework. This lets you add custom Lucene Directory implementations without changing Clue itself.

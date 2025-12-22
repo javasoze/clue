@@ -11,6 +11,7 @@ import org.apache.lucene.index.DirectoryReader;
 
 import io.dashbase.clue.commands.ClueCommand;
 import io.dashbase.clue.commands.HelpCommand;
+import io.dashbase.clue.util.CommandLineParser;
 
 public class ClueApplication {
   
@@ -97,7 +98,7 @@ public class ClueApplication {
       if ("exit".equals(line)) {
         return;
       }
-      String[] parts = line.split("\\s");
+      String[] parts = CommandLineParser.splitArgs(line);
       if (parts.length > 0){
         String cmd = parts[0];
         String[] cmdArgs = new String[parts.length - 1];

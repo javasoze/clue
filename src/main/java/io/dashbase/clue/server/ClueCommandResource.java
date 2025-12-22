@@ -2,20 +2,15 @@ package io.dashbase.clue.server;
 
 import io.dashbase.clue.ClueApplication;
 import io.dashbase.clue.ClueContext;
-import io.dashbase.clue.commands.ClueCommand;
-import io.dashbase.clue.commands.HelpCommand;
+import io.dashbase.clue.util.CommandLineParser;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Path("/clue")
 public class ClueCommandResource {
@@ -25,14 +20,7 @@ public class ClueCommandResource {
     }
 
     static String[] buildArgs(String param) {
-        String[] args = new String[]{};
-        if (param != null) {
-            param = param.trim();
-            if (!param.isEmpty()) {
-                args = param.split("\\s+");
-            }
-        }
-        return  args;
+        return CommandLineParser.splitArgs(param);
     }
 
     @GET
@@ -46,30 +34,19 @@ public class ClueCommandResource {
     @GET
     @Path("command/{cmd}")
     public Response command(@PathParam("cmd") String cmd, @DefaultValue("") @QueryParam("args") String args) throws Exception {
-        Optional<ClueCommand> clueCommand = ctx.getCommand(cmd);
-        final AtomicBoolean cmdFound = new AtomicBoolean(false);
-        if (clueCommand.isPresent()) {
-            cmdFound.set(true);
-        } else {
-            clueCommand = ctx.getCommand(HelpCommand.CMD_NAME);
-        }
-
-        final ClueCommand command = clueCommand.isPresent() ? clueCommand.get() : null;
+        boolean cmdFound = ctx.getCommand(cmd).isPresent();
         final String[] commandArgs = buildArgs(args);
-
-        StreamingOutput stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                PrintStream ps = new PrintStream(os);
-                try {
-                    ClueApplication.handleCommand(ctx, cmd, commandArgs, ps);
-                    ps.flush();
-                } catch (Exception e) {
-                    e.printStackTrace(ps);
-                }
+        int status = cmdFound ? 200 : 404;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try (PrintStream ps = new PrintStream(buffer)) {
+            int code = ClueApplication.handleCommand(ctx, cmd, commandArgs, ps);
+            if (cmdFound && code != 0) {
+                status = 500;
             }
-        };
-
-        return Response.ok(stream).build();
+        }
+        return Response.status(status)
+                .type(MediaType.TEXT_PLAIN)
+                .entity(buffer.toString())
+                .build();
     }
 }
