@@ -17,6 +17,7 @@ public class ClueAppConfiguration  {
     public IndexReaderFactory indexReaderFactory = new DefaultIndexReaderFactory();
     public AnalyzerFactory analyzerFactory = new DefaultAnalyzerFactory();
     public CommandRegistrar commandRegistrar = new DefaultCommandRegistrar();
+    public boolean enableConcurrency = false;
 
     private static final String CLUE_CONF_FILE = "clue.yml";
     private static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());

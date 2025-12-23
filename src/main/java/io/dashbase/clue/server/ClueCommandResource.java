@@ -2,6 +2,7 @@ package io.dashbase.clue.server;
 
 import io.dashbase.clue.ClueApplication;
 import io.dashbase.clue.ClueContext;
+import io.dashbase.clue.commands.ClueCommand;
 import io.dashbase.clue.util.CommandLineParser;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
@@ -16,7 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller("/clue")
 public class ClueCommandResource {
@@ -33,8 +34,12 @@ public class ClueCommandResource {
     @Get("/commands")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<String> commands() {
-        Set<String> registeredCommands = ctx.getCommandRegistry().commandNames();
-        return registeredCommands;
+        return ctx.getCommandRegistry()
+                .getAvailableCommands()
+                .stream()
+                .map(ClueCommand::getName)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     @Get("/command/{cmd}")

@@ -38,13 +38,24 @@ This will create the following artifact in the build/libs directory:
 
 ### Run:
 
-Interactive Mode:
+Start Clue (CLI):
+
+Interactive mode:
 
     ./bin/clue.sh my-idx
 
-Non-interactive Mode:
+Non-interactive mode:
 
     ./bin/clue.sh my-idx command args
+
+Start Clue Web:
+
+1) Update `clue.web.dir` in `config/clue-web.yml` to point at your index.
+2) Run the web app:
+
+    ./bin/clue-web.sh
+
+The service starts on port 8080 by default and exposes endpoints under `/clue`.
 
 Command list:
 ```bash
@@ -143,6 +154,7 @@ reconstruct
 search
   -q, --query <query...>          Optional. Defaults to "*" (match all).
   -n, --num <numHits>             Optional. Default: 10.
+  -s, --sort <sort...>            Optional. field[:type[:asc|desc]] or score/doc; type: string|int|long|float|double.
 
 showcommitdata
   (no options)
