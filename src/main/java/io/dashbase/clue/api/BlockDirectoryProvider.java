@@ -9,11 +9,6 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
-
-import static io.dashbase.clue.util.OptionsParsingUtil.parseIntOption;
-import static io.dashbase.clue.util.OptionsParsingUtil.parsePathOption;
-import static io.dashbase.clue.util.OptionsParsingUtil.parseStringOption;
 
 public class BlockDirectoryProvider implements DirectoryProvider {
   private static final String PROVIDER_NAME = "block";
@@ -42,15 +37,15 @@ public class BlockDirectoryProvider implements DirectoryProvider {
   }
 
   @Override
-  public Directory build(String location, Map<String, String> options) throws IOException {
-    int threads = parseIntOption(options, OPTION_THREADS, DEFAULT_THREADS);
-    String region = parseStringOption(options, OPTION_REGION, DEFAULT_REGION);
-    String endpoint = parseStringOption(options, OPTION_ENDPOINT, DEFAULT_ENDPOINT);
-    String accessKey = parseStringOption(options, OPTION_ACCESS_KEY, DEFAULT_ACCESS_KEY);
-    String secretKey = parseStringOption(options, OPTION_SECRET_KEY, DEFAULT_SECRET_KEY);
-    Path cacheDir = parsePathOption(options, OPTION_CACHE_DIR, DEFAULT_CACHE_DIR);
-    String bucket = parseStringOption(options, OPTION_BUCKET, DEFAULT_BUCKET);
-    String indexPath = parseStringOption(options, OPTION_INDEX_PATH, DEFAULT_INDEX_PATH);
+  public Directory build(String location, ParsedOptions options) throws IOException {
+    int threads = options.getInt(OPTION_THREADS, DEFAULT_THREADS);
+    String region = options.getString(OPTION_REGION, DEFAULT_REGION);
+    String endpoint = options.getString(OPTION_ENDPOINT, DEFAULT_ENDPOINT);
+    String accessKey = options.getString(OPTION_ACCESS_KEY, DEFAULT_ACCESS_KEY);
+    String secretKey = options.getString(OPTION_SECRET_KEY, DEFAULT_SECRET_KEY);
+    Path cacheDir = options.getPath(OPTION_CACHE_DIR, DEFAULT_CACHE_DIR);
+    String bucket = options.getString(OPTION_BUCKET, DEFAULT_BUCKET);
+    String indexPath = options.getString(OPTION_INDEX_PATH, DEFAULT_INDEX_PATH);
 
     if (!Files.exists(cacheDir)) {
         Files.createDirectories(cacheDir);

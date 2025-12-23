@@ -1,6 +1,7 @@
 package io.dashbase.clue.api;
 
 import java.lang.reflect.Array;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -179,5 +180,15 @@ public class ParsedOptions {
             return null;
         }
         return options.get(option);
+    }
+
+
+    public Path getPath(String option, Path defaultValue) {
+        var obj = getOption(option);
+        if (obj == null) {
+            return defaultValue;
+        } else {
+            return Path.of(String.valueOf(obj));
+        }
     }
 }
