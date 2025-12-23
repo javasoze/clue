@@ -26,6 +26,9 @@ public class InfoCommand extends ClueCommand {
   @Option(names = {"-s", "--seg"}, defaultValue = "-1", description = "segment id")
   private int seg;
 
+  @Option(names = {"-x", "--expand"}, defaultValue = "false", description = "expand fields")
+  private boolean expandFields;
+
   @Override
   public String getName() {
     return "info";
@@ -113,9 +116,9 @@ public class InfoCommand extends ClueCommand {
     if (r instanceof DirectoryReader) {
       DirectoryReader dr = (DirectoryReader)r;
       SegmentInfos sis = SegmentInfos.readLatestCommit(dr.directory()); // read infos from dir
-
       // assuming codecs are the same for all segments
       for (SegmentCommitInfo commitInfo : sis) {
+
         if (commitInfo != null) {          
           out.println("Codec found: " + commitInfo.info.getCodec().getName());
           break;
@@ -124,8 +127,7 @@ public class InfoCommand extends ClueCommand {
     }
     
     List<LeafReaderContext> leaves = r.leaves();
-    int segid = seg;
-    if (segid < 0) {
+    if (seg < 0) {
       out.println("numdocs: " + r.numDocs());
       out.println("maxdoc: " + r.maxDoc());
       out.println("num deleted docs: " + r.numDeletedDocs());
@@ -133,6 +135,22 @@ public class InfoCommand extends ClueCommand {
       SortedMap<String, Object[]> fields = new TreeMap<String, Object[]>();
       for (LeafReaderContext leaf : leaves) {        
         LeafReader ar = leaf.reader();
+
+        ar = FilterLeafReader.unwrap(ar);
+
+        SegmentReader sr = (SegmentReader)ar;
+        String segmentName = sr.getSegmentName();
+
+        out.println("Segment name: " + segmentName);
+
+        var sort = ar.getMetaData().sort();
+
+        if (sort != null) {
+            out.println("Sort: " + sort);
+        } else {
+            out.println("Sort: None");
+        }
+
         FieldInfos fldInfos = ar.getFieldInfos();
 
         for (var finfo : fldInfos) {
@@ -152,18 +170,20 @@ public class InfoCommand extends ClueCommand {
         }
       }
       out.println("number of fields: " + fields.size());
-      
-      for (Object[] finfo : fields.values()) {
-        FieldInfo f = (FieldInfo) finfo[0];
-        out.println("=================================== Field "+f.name+" ===================================");
-        toString(finfo, out);
+
+      if (expandFields) {
+          for (Object[] finfo : fields.values()) {
+              FieldInfo f = (FieldInfo) finfo[0];
+              out.println("=================================== Field " + f.name + " ===================================");
+              toString(finfo, out);
+          }
       }
     } else {
-      LeafReaderContext leaf = leaves.get(segid);
+      LeafReaderContext leaf = leaves.get(seg);
       LeafReader atomicReader = leaf.reader();
 
 
-        out.println("segment " + segid + ": ");
+        out.println("segment " + seg + ": ");
         out.println("doc base:\t" + leaf.docBase);
         out.println("numdocs:\t" + atomicReader.numDocs());
         out.println("maxdoc:\t" + atomicReader.maxDoc());
@@ -173,11 +193,13 @@ public class InfoCommand extends ClueCommand {
 
         out.println("number of fields: " + fields.size());
 
-        for (int i = 0; i < fields.size(); ++i) {
-          FieldInfo finfo = fields.fieldInfo(i);
-          Terms te = atomicReader.terms(finfo.name);
-          out.println("=================================== Field " + finfo.name + " ===================================");
-          toString(new Object[]{finfo, Collections.singletonList(te)}, out);
+        if (expandFields) {
+            for (int i = 0; i < fields.size(); ++i) {
+                FieldInfo finfo = fields.fieldInfo(i);
+                Terms te = atomicReader.terms(finfo.name);
+                out.println("=================================== Field " + finfo.name + " ===================================");
+                toString(new Object[]{finfo, Collections.singletonList(te)}, out);
+            }
         }
     }
     out.flush();
