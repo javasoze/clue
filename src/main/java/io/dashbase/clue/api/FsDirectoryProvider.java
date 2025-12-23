@@ -1,12 +1,11 @@
 package io.dashbase.clue.api;
 
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.util.Map;
+
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 
 public class FsDirectoryProvider implements DirectoryProvider {
   @Override
@@ -15,7 +14,7 @@ public class FsDirectoryProvider implements DirectoryProvider {
   }
 
   @Override
-  public Directory build(String location, Map<String, String> options) throws IOException {
+  public Directory build(String location, ParsedOptions options) throws IOException {
     File directory = new File(location);
     return FSDirectory.open(FileSystems.getDefault().getPath(directory.getPath()));
   }

@@ -202,7 +202,7 @@ public class MyDirectoryProvider implements DirectoryProvider {
   }
 
   @Override
-  public Directory build(String location, Map<String, String> options) throws IOException {
+  public Directory build(String location, ParsedOptions options) throws IOException {
     // Create and return your Directory implementation here.
   }
 }

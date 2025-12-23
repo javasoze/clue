@@ -1,8 +1,6 @@
 package io.dashbase.clue.api;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.store.Directory;
@@ -11,7 +9,7 @@ public class DefaultDirectoryBuilder implements DirectoryBuilder {
 
   public String dir = null;
   public String provider = DirectoryProviders.DEFAULT_PROVIDER_NAME;
-  public Map<String, String> options = new HashMap<>();
+  public Map<String, Object> options;
 
   @Override
   public Directory build(String location) throws IOException {
@@ -28,7 +26,7 @@ public class DefaultDirectoryBuilder implements DirectoryBuilder {
       providerName = overrideProvider;
     }
     DirectoryProvider directoryProvider = DirectoryProviders.getProvider(providerName);
-    Map<String, String> providerOptions = options == null ? Collections.emptyMap() : options;
+    ParsedOptions providerOptions = ParsedOptions.parse(options);
     return directoryProvider.build(idxDir, providerOptions);
   }
 }
