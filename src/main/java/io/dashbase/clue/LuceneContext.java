@@ -10,6 +10,9 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class LuceneContext extends ClueContext {
     private final IndexReaderFactory readerFactory;
@@ -21,6 +24,7 @@ public class LuceneContext extends ClueContext {
     private final AnalyzerFactory analyzerFactory;
     private final BytesRefDisplay termBytesRefDisplay;
     private final BytesRefDisplay payloadBytesRefDisplay;
+    private final Executor executor;
 
     public LuceneContext(String dir, ClueAppConfiguration config, boolean interactiveMode)
             throws Exception {
@@ -35,6 +39,7 @@ public class LuceneContext extends ClueContext {
         this.termBytesRefDisplay = new StringBytesRefDisplay();
         this.payloadBytesRefDisplay = new StringBytesRefDisplay();
         this.writer = null;
+        this.executor = config.enableConcurrency ?  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1) : null;
     }
 
 
@@ -42,8 +47,17 @@ public class LuceneContext extends ClueContext {
         return readerFactory.getIndexReader();
     }
 
+    private static final int MAX_DOCS_PER_SLICE = 250_000;
+
+    private static final int MAX_SEGMENTS_PER_SLICE = 5;
+
     public IndexSearcher getIndexSearcher() {
-        return new IndexSearcher(getIndexReader());
+        return new IndexSearcher(getIndexReader(), executor) {
+            @Override
+            protected LeafSlice[] slices(List<LeafReaderContext> leaves) {
+                return slices(leaves, MAX_DOCS_PER_SLICE, MAX_SEGMENTS_PER_SLICE, false);
+            }
+        };
     }
 
     public IndexWriter getIndexWriter(){
@@ -103,6 +117,10 @@ public class LuceneContext extends ClueContext {
 
     public void refreshReader() throws Exception {
         readerFactory.refreshReader();
+    }
+
+    public boolean isCurrentSearch() {
+      return this.executor != null;
     }
 
     @Override
