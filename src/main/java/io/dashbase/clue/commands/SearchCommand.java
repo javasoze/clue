@@ -70,7 +70,6 @@ public class SearchCommand extends ClueCommand {
     }
     
     out.println("parsed query: " + q);
-    out.println("concurrent search: " + ctx.isCurrentSearch());
 
     int count = num;
     Sort sortSpec = buildSort(sort, out);
@@ -83,6 +82,7 @@ public class SearchCommand extends ClueCommand {
     long end = System.currentTimeMillis();
     
     out.println("numhits: " + td.totalHits);
+    out.println("concurrent search: " + ctx.isCurrentSearch());
     out.println("time: " + (end-start) + "ms");
     ScoreDoc[] docs = td.scoreDocs;
     for (ScoreDoc doc : docs){
