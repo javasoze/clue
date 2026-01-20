@@ -1,0 +1,24 @@
+{
+  "description": "Clue JShell Skills Configuration",
+  "version": "1.0",
+
+  "indexes": {
+    "cars": "cars",
+    "_comment": "Add your index aliases here, e.g.: \"myindex\": \"/path/to/lucene/index\""
+  },
+
+  "classpath": {
+    "base": "build/libs/*",
+    "plugins": [
+      "plugins/t-digest-3.3.jar"
+    ],
+    "_comment": "Add custom JARs to plugins array as needed"
+  },
+
+  "defaults": {
+    "termsSize": 10,
+    "histogramInterval": 1000,
+    "percentilePrecision": 100,
+    "cardinalityPrecision": 14
+  }
+}
